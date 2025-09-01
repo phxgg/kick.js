@@ -1,0 +1,45 @@
+{
+  "name": "kick.js",
+  "version": "1.0.0",
+  "description": "A JavaScript library for interacting with the Kick API.",
+  "license": "SEE LICENSE IN LICENSE",
+  "author": "phxgg",
+  "main": "dist/app.js",
+  "engines": {
+    "node": ">=22.15.0"
+  },
+  "scripts": {
+    "ncu:check": "npx npm-check-updates -x @types/node",
+    "ncu:update": "npx npm-check-updates -u -x @types/node",
+    "bump-deps": "npm run ncu:update && npm i && git add . && git commit -m \"chore: bump deps\"",
+    "clean": "rimraf ./dist",
+    "dev": "tsx watch src/app.ts",
+    "start": "node ./dist/app.js",
+    "build": "npm run clean && tsc",
+    "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "jest"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "typescript": "^5.9.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.34.0",
+    "@types/express": "^5.0.3",
+    "@types/node": "^22",
+    "@typescript-eslint/eslint-plugin": "^8.41.0",
+    "@typescript-eslint/parser": "^8.41.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.3.0",
+    "jiti": "^2.5.1",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "tsx": "^4.20.5",
+    "typescript-eslint": "^8.41.0"
+  }
+}
