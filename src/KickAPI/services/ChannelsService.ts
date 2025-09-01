@@ -1,10 +1,9 @@
+import { BaseResponse } from '../BaseResponse';
 import { Channel, ChannelDto } from '../Channel';
 import { KICK_BASE_URL, KickClient } from '../Client';
+import { handleError } from '../errors';
 
-export type FetchChannelsResponse = {
-  data: ChannelDto[];
-  message: string;
-};
+export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 
 export type UpdateChannelDto = {
   categoryId: number | string;
@@ -13,8 +12,8 @@ export type UpdateChannelDto = {
 };
 
 export class ChannelsService {
-  private CHANNELS_URL: string = KICK_BASE_URL + '/channels';
-  private client: KickClient;
+  private readonly CHANNELS_URL: string = KICK_BASE_URL + '/channels';
+  protected readonly client: KickClient;
 
   constructor(client: KickClient) {
     this.client = client;
@@ -31,29 +30,34 @@ export class ChannelsService {
     broadcasterUserId,
     slug,
   }: {
-    broadcasterUserId?: number | string;
+    broadcasterUserId?: (number | string)[];
     slug?: string[];
   }): Promise<Channel[]> {
     const url = new URL(this.CHANNELS_URL);
-    if (broadcasterUserId) {
-      url.searchParams.append('broadcaster_user_id', String(broadcasterUserId));
+    if (broadcasterUserId && broadcasterUserId.length > 0 && slug && slug.length > 0) {
+      throw new Error('Cannot mix broadcasterUserId and slug parameters');
     }
-    slug?.forEach((s) => url.searchParams.append('slug', s));
+    if (broadcasterUserId && broadcasterUserId.length > 0) {
+      url.searchParams.append('broadcaster_user_id', broadcasterUserId.join(' '));
+    }
+    if (slug && slug.length > 0) {
+      slug.forEach((s) => url.searchParams.append('slug', s));
+    }
     const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch channels');
+      handleError(response);
     }
     const json = (await response.json()) as FetchChannelsResponse;
-    const data = json.data.map((channel) => new Channel(this.client, channel));
-    return data;
+    const channels = json.data.map((channel) => new Channel(this.client, channel));
+    return channels;
   }
 
   async fetchById(id: number | string): Promise<Channel> {
-    return (await this.fetch({ broadcasterUserId: id }))[0];
+    return (await this.fetch({ broadcasterUserId: [id] }))[0];
   }
 
   async fetchBySlug(slug: string): Promise<Channel> {
@@ -74,7 +78,7 @@ export class ChannelsService {
       }),
     });
     if (!response.ok) {
-      throw new Error('Failed to update channel');
+      handleError(response);
     }
   }
 }

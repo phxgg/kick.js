@@ -1,14 +1,25 @@
+import { KickClient } from './Client';
+
 export type MessageDto = {
   is_sent: boolean;
   message_id: string;
 };
 
 export class Message {
-  is_sent: boolean;
-  message_id: string;
+  protected readonly client: KickClient;
 
-  constructor({ is_sent, message_id }: MessageDto) {
-    this.is_sent = is_sent;
-    this.message_id = message_id;
+  constructor(
+    client: KickClient,
+    private dto: MessageDto,
+  ) {
+    this.client = client;
+  }
+
+  get isSent() {
+    return this.dto.is_sent;
+  }
+
+  get messageId() {
+    return this.dto.message_id;
   }
 }

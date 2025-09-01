@@ -7,16 +7,24 @@ export type CategoryDto = {
 };
 
 export class Category {
-  client: KickClient;
+  protected readonly client: KickClient;
 
-  id: number;
-  name: string;
-  thumbnail: string;
-
-  constructor(client: KickClient, { id, name, thumbnail }: CategoryDto) {
+  constructor(
+    client: KickClient,
+    private dto: CategoryDto,
+  ) {
     this.client = client;
-    this.id = id;
-    this.name = name;
-    this.thumbnail = thumbnail;
+  }
+
+  get id() {
+    return this.dto.id;
+  }
+
+  get name() {
+    return this.dto.name;
+  }
+
+  get thumbnail() {
+    return this.dto.thumbnail;
   }
 }

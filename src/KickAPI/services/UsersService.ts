@@ -1,29 +1,22 @@
+import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../Client';
+import { handleError } from '../errors';
+import { User, type UserDto } from '../User';
 
-export type TokenIntrospectResponse = {
-  data: {
-    active: boolean;
-    client_id: string;
-    exp: number;
-    scope: string;
-    token_type: string;
-  };
-  message: string;
+type TokenIntrospect = {
+  active: boolean;
+  client_id: string;
+  exp: number;
+  scope: string;
+  token_type: string;
 };
 
-export type FetchUserResponse = {
-  data: {
-    email: string;
-    name: string;
-    profile_picture: string;
-    user_id: number;
-  }[];
-  message: string;
-};
+export type TokenIntrospectResponse = BaseResponse<TokenIntrospect>;
+export type FetchUserResponse = BaseResponse<UserDto[]>;
 
 export class UsersService {
-  private USERS_URL: string = KICK_BASE_URL + '/users';
-  private client: KickClient;
+  private readonly USERS_URL: string = KICK_BASE_URL + '/users';
+  protected readonly client: KickClient;
 
   constructor(client: KickClient) {
     this.client = client;
@@ -35,7 +28,7 @@ export class UsersService {
    * Find the full spec here: https://datatracker.ietf.org/doc/html/rfc7662
    * When active=false there is no additional information added in the response.
    */
-  async introspect(): Promise<TokenIntrospectResponse> {
+  async introspect(): Promise<TokenIntrospect> {
     const response = await fetch(`${KICK_BASE_URL}/token/introspect`, {
       method: 'POST',
       headers: {
@@ -43,9 +36,11 @@ export class UsersService {
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to introspect token');
+      handleError(response);
     }
-    return response.json();
+    const json = (await response.json()) as TokenIntrospectResponse;
+    const token = json.data;
+    return token;
   }
 
   /**
@@ -54,16 +49,22 @@ export class UsersService {
    * for the currently authorised user will be returned by default.
    * @param id The ID of the user to fetch
    */
-  async fetch(id?: number | string): Promise<FetchUserResponse> {
-    const url = id ? `${this.USERS_URL}/${String(id)}` : this.USERS_URL;
+  async fetch(ids?: (number | string)[]): Promise<User[]> {
+    const url = ids && ids.length > 0 ? `${this.USERS_URL}/${ids.join(' ')}` : this.USERS_URL;
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
     if (!response.ok) {
-      throw new Error('Failed to fetch user');
+      handleError(response);
     }
-    return response.json();
+    const json = (await response.json()) as FetchUserResponse;
+    const data = json.data.map((user) => new User(this.client, user));
+    return data;
+  }
+
+  async me(): Promise<User> {
+    return (await this.fetch())[0];
   }
 }
