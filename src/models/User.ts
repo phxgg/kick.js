@@ -1,0 +1,22 @@
+import { Schema, model, Document } from 'mongoose';
+
+export interface IUser extends Document {
+  kickUserId: string;
+  name?: string;
+  email: string;
+  image?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const UserSchema = new Schema<IUser>(
+  {
+    kickUserId: { type: String, required: true, unique: true, index: true },
+    name: { type: String },
+    email: { type: String, required: true, unique: true, index: true },
+    image: { type: String },
+  },
+  { timestamps: true },
+);
+
+export const User = model<IUser>('User', UserSchema);

@@ -1,5 +1,7 @@
+import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../Client';
-import { Message } from '../Message';
+import { handleError } from '../errors';
+import { Message, MessageDto } from '../Message';
 
 export enum ChatMessageType {
   USER = 'user',
@@ -13,17 +15,11 @@ export type SendMessageDto = {
   type: ChatMessageType;
 };
 
-export type SendMessageResponse = {
-  data: {
-    is_sent: boolean;
-    message_id: string;
-  };
-  message: string;
-};
+export type SendMessageResponse = BaseResponse<MessageDto>;
 
 export class ChatService {
-  private CHAT_URL: string = KICK_BASE_URL + '/chat';
-  private client: KickClient;
+  private readonly CHAT_URL: string = KICK_BASE_URL + '/chat';
+  protected readonly client: KickClient;
 
   constructor(client: KickClient) {
     this.client = client;
@@ -47,12 +43,10 @@ export class ChatService {
       body: JSON.stringify({ broadcasterUserId, content, replyToMessageId, type }),
     });
     if (!response.ok) {
-      // FIXME: keeps failing
-      console.log(response.status, response.statusText);
-      throw new Error('Failed to send chat message');
+      handleError(response);
     }
     const json = (await response.json()) as SendMessageResponse;
-    const data = new Message(json.data);
-    return data;
+    const message = new Message(this.client, json.data);
+    return message;
   }
 }

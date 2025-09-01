@@ -1,12 +1,13 @@
-import crypto from 'crypto';
+import { handleError } from './errors';
+import { generateCodeChallenge, generateCodeVerifier } from '@/utils/pkce';
 
-export type AppTokenResponse = {
+export type AppToken = {
   access_token: string;
   token_type: string;
   expires_in: number;
 };
 
-export type TokenResponse = {
+export type Token = {
   access_token: string;
   token_type: string;
   refresh_token: string;
@@ -26,31 +27,10 @@ export class OAuth {
   private clientSecret: string;
   private codeVerifier: string;
 
-  constructor(clientId: string, clientSecret: string) {
+  constructor(clientId: string, clientSecret: string, codeVerifier?: string) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.codeVerifier = OAuth.generateCodeVerifier();
-  }
-
-  /**
-   * Generates a random code verifier for PKCE
-   */
-  static generateCodeVerifier(length: number = 128): string {
-    const charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
-    let verifier = '';
-    const randomBytes = crypto.randomBytes(length);
-    for (let i = 0; i < length; i++) {
-      verifier += charset[randomBytes[i] % charset.length];
-    }
-    return verifier;
-  }
-
-  /**
-   * Generates a code challenge from a code verifier using SHA-256 and base64-url encoding
-   */
-  static async generateCodeChallenge(codeVerifier: string): Promise<string> {
-    const hash = crypto.createHash('sha256').update(codeVerifier).digest();
-    return hash.toString('base64url');
+    this.codeVerifier = codeVerifier || generateCodeVerifier();
   }
 
   async generateAuthorizeURL(): Promise<string> {
@@ -58,11 +38,11 @@ export class OAuth {
     const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
 
     // Generate a code challenge from the verifier (async)
-    const codeChallenge = await OAuth.generateCodeChallenge(this.codeVerifier);
+    const codeChallenge = generateCodeChallenge(this.codeVerifier);
 
     authorizeUrl.searchParams.append('client_id', this.clientId);
     authorizeUrl.searchParams.append('response_type', 'code');
-    authorizeUrl.searchParams.append('redirect_uri', process.env.KICK_REDIRECT_URL);
+    authorizeUrl.searchParams.append('redirect_uri', process.env.KICK_CALLBACK_URL);
     authorizeUrl.searchParams.append('state', 'your_state');
     authorizeUrl.searchParams.append('scope', scopes.join(' '));
     authorizeUrl.searchParams.append('code_challenge', codeChallenge);
@@ -70,7 +50,7 @@ export class OAuth {
     return authorizeUrl.toString();
   }
 
-  async exchangeToken(code: string): Promise<TokenResponse> {
+  async exchangeToken(code: string): Promise<Token> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/token`;
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -82,20 +62,20 @@ export class OAuth {
         client_secret: this.clientSecret,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: process.env.KICK_REDIRECT_URL,
+        redirect_uri: process.env.KICK_CALLBACK_URL,
         code_verifier: this.codeVerifier,
       }),
     });
 
     if (!response.ok) {
-      throw new Error('Failed to exchange token');
+      handleError(response);
     }
 
-    const data = (await response.json()) as TokenResponse;
+    const data = (await response.json()) as Token;
     return data;
   }
 
-  async generateAppToken(): Promise<AppTokenResponse> {
+  async generateAppToken(): Promise<AppToken> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/token`;
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -110,14 +90,14 @@ export class OAuth {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to authorize');
+      handleError(response);
     }
 
     const data = await response.json();
     return data;
   }
 
-  async refreshToken(refreshToken: string): Promise<TokenResponse> {
+  async refreshToken(refreshToken: string): Promise<Token> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/token`;
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -133,7 +113,7 @@ export class OAuth {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to refresh token');
+      handleError(response);
     }
 
     const data = await response.json();
@@ -150,7 +130,7 @@ export class OAuth {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to revoke token');
+      handleError(response);
     }
   }
 }
