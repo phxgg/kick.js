@@ -40,7 +40,12 @@ export class ChatService {
         Authorization: `Bearer ${this.client.token?.access_token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ broadcasterUserId, content, replyToMessageId, type }),
+      body: JSON.stringify({
+        broadcaster_user_id: broadcasterUserId,
+        content,
+        reply_to_message_id: replyToMessageId,
+        type,
+      }),
     });
     if (!response.ok) {
       handleError(response);

@@ -8,8 +8,8 @@ import cookieParser from 'cookie-parser';
 import session from 'express-session';
 import mongoose from 'mongoose';
 import passport from 'passport';
-import { initKickAuth } from './passport/kick';
-import oauthRoutes from './routes/oauth';
+import { initKickOAuth } from './passport/kick';
+import { createOAuthRouter } from './routes/oauth';
 import { KickClient } from './KickAPI/Client';
 
 const client = new KickClient(process.env.KICK_CLIENT_ID, process.env.KICK_CLIENT_SECRET);
@@ -32,7 +32,7 @@ app.use(
 app.use(cookieParser());
 
 // Initialize Passport OAuth2 strategy for Kick
-initKickAuth(client);
+initKickOAuth(client);
 
 // Connect to MongoDB
 // const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/kickjs';
@@ -46,8 +46,9 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Routes
-app.use('/oauth', oauthRoutes);
+app.use('/oauth', createOAuthRouter(client));
 
+// Start the API server
 app.listen(3000, () => {
   console.log('Server is running on http://localhost:3000');
 });

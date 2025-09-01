@@ -4,7 +4,7 @@ import { KickClient } from '@/KickAPI/Client';
 
 const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
 
-export function initKickAuth(client: KickClient) {
+export function initKickOAuth(client: KickClient) {
   passport.use(
     'kick',
     new OAuth2Strategy(
@@ -46,3 +46,5 @@ export function initKickAuth(client: KickClient) {
     done(null, obj);
   });
 }
+
+export default initKickOAuth;
