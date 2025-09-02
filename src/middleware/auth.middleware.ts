@@ -8,6 +8,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   const token = header.slice('Bearer '.length).trim();
   try {
     const { userId } = verifyAccessToken(token);
+    // fetch user from database and attach `user` property to req object
     (req as any).userId = userId;
     next();
   } catch {
