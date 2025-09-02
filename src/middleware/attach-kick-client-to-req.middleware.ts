@@ -40,7 +40,7 @@ export async function attachKickClientToReq(req: Request, res: Response, next: N
       });
     }
 
-    req.client = client;
+    req.kick = client;
     next();
   } catch (err) {
     next(err);

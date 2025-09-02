@@ -6,7 +6,7 @@ import { handleError } from '../errors';
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 
 export type UpdateChannelDto = {
-  categoryId: number | string;
+  categoryId: number;
   customTags?: string[];
   streamTitle?: string;
 };
@@ -26,13 +26,7 @@ export class ChannelsService {
    * Provide only `slug` parameters (up to 50, each max 25 characters) Note: You cannot mix `broadcasterUserId` and `slug` parameters in the same request.
    * @param options The options for fetching the channel
    */
-  async fetch({
-    broadcasterUserId,
-    slug,
-  }: {
-    broadcasterUserId?: (number | string)[];
-    slug?: string[];
-  }): Promise<Channel[]> {
+  async fetch({ broadcasterUserId, slug }: { broadcasterUserId?: number[]; slug?: string[] }): Promise<Channel[]> {
     const url = new URL(this.CHANNELS_URL);
     if (broadcasterUserId && broadcasterUserId.length > 0 && slug && slug.length > 0) {
       throw new Error('Cannot mix broadcasterUserId and slug parameters');
@@ -56,7 +50,7 @@ export class ChannelsService {
     return channels;
   }
 
-  async fetchById(id: number | string): Promise<Channel> {
+  async fetchById(id: number): Promise<Channel> {
     return (await this.fetch({ broadcasterUserId: [id] }))[0];
   }
 

@@ -2,6 +2,7 @@ import { AppToken, OAuth, Token } from './OAuth';
 import { CategoriesService } from './services/CategoriesService';
 import { ChannelsService } from './services/ChannelsService';
 import { ChatService } from './services/ChatService';
+import { EventsService } from './services/EventsService';
 import { LivestreamsService } from './services/LivestreamsService';
 import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
@@ -19,6 +20,7 @@ export class KickClient {
   public chat: ChatService;
   public moderation: ModerationService;
   public livestreams: LivestreamsService;
+  public events: EventsService;
 
   constructor(clientId: string, clientSecret: string) {
     this.oauth = new OAuth(clientId, clientSecret);
@@ -28,6 +30,7 @@ export class KickClient {
     this.chat = new ChatService(this);
     this.moderation = new ModerationService(this);
     this.livestreams = new LivestreamsService(this);
+    this.events = new EventsService(this);
   }
 
   async initializeAppToken() {

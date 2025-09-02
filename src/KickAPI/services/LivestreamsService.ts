@@ -9,8 +9,8 @@ export enum Sort {
 }
 
 export type FetchLivestreamsParams = {
-  broadcaster_user_id?: (number | string)[];
-  category_id?: number | string;
+  broadcaster_user_id?: number[];
+  category_id?: number;
   language?: string;
   limit?: number;
   sort?: Sort;

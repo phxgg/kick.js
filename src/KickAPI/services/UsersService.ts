@@ -49,8 +49,11 @@ export class UsersService {
    * for the currently authorised user will be returned by default.
    * @param id The ID of the user to fetch
    */
-  async fetch(ids?: (number | string)[]): Promise<User[]> {
-    const url = ids && ids.length > 0 ? `${this.USERS_URL}/${ids.join(' ')}` : this.USERS_URL;
+  async fetch(ids?: number[]): Promise<User[]> {
+    const url = new URL(this.USERS_URL);
+    if (ids && ids.length > 0) {
+      url.searchParams.append('id', ids.join(' '));
+    }
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,

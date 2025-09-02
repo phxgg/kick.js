@@ -7,7 +7,7 @@ declare global {
   namespace Express {
     interface User extends IUser {}
     interface Request {
-      client?: KickClient;
+      kick?: KickClient;
       user?: User;
     }
   }

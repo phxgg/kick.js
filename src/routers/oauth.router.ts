@@ -12,7 +12,7 @@ export function createOAuthRouter() {
 
   router.get('/kick/callback', passport.authenticate('kick'), attachKickClientToReq, async (req, res) => {
     const user = req.user;
-    const channel = await req.client.channels.fetchBySlug('phxgg');
+    const channel = await req.kick.channels.fetchBySlug('phxgg');
     return res.json({ user: user.toJSON(), channel: channel.toJSON() });
     // const accessToken = signAccessToken(userId);
     // const refreshToken = signRefreshToken(userId);
