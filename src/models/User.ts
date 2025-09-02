@@ -1,4 +1,4 @@
-import { Document, model, Schema } from 'mongoose';
+import { Document, Model, model, models, Schema } from 'mongoose';
 
 export interface IUser extends Document {
   kickUserId: string;
@@ -19,4 +19,5 @@ const UserSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-export const UserModel = model<IUser>('User', UserSchema);
+// Reuse existing compiled model if present
+export const UserModel: Model<IUser> = (models.User as Model<IUser>) || model<IUser>('User', UserSchema);

@@ -7,7 +7,6 @@ import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
-import mongoose from 'mongoose';
 import morgan from 'morgan';
 import passport from 'passport';
 
@@ -15,8 +14,8 @@ import logger from '@/winston.logger';
 import { connectMongo } from '@/db';
 
 import { ensureKickClient } from './middleware/ensure-kick-client.middleware';
-import { initKickPassportOAuth } from './passport/kick.passport';
 import { createOAuthRouter } from './routers/oauth.router';
+import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
 
 morgan.token('remote-user', (req: any) => {
   return req.user ? req.user.email : 'guest';
@@ -59,16 +58,16 @@ app.use(cookieParser());
 app.use(compression());
 
 // Initialize Passport OAuth2 strategy for Kick
-initKickPassportOAuth();
+initKickPassportOAuthStrategy();
 
-// Initialize Passport (JWT strategy)
+// Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
 // Ensure Kick client is attached to request
 app.use(ensureKickClient);
 
-// Routes
+// Routers
 app.use('/oauth', createOAuthRouter());
 
 // Connect to MongoDB

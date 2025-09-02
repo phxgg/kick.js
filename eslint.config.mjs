@@ -13,7 +13,7 @@ const compat = new FlatCompat({
 
 const configs = [
   {
-    ignores: ['eslint.config.mjs', 'prettier.config.mjs'],
+    ignores: ['dist', 'eslint.config.mjs', 'prettier.config.mjs'],
   },
   ...compat.extends('plugin:@typescript-eslint/recommended', 'plugin:prettier/recommended'),
   {
