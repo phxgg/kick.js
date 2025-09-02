@@ -7,6 +7,7 @@ export interface IAccount extends Document {
   accessToken?: string | null; // (optional) store if you need to call provider APIs
   refreshToken?: string | null;
   tokenType?: string | null;
+  scope?: string[] | null;
   expiresAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ const AccountSchema = new Schema<IAccount>(
     accessToken: { type: String, default: null },
     refreshToken: { type: String, default: null },
     tokenType: { type: String, default: null },
+    scope: { type: [String], default: null },
     expiresAt: { type: Date, default: null },
   },
   { timestamps: true },
@@ -27,4 +29,4 @@ const AccountSchema = new Schema<IAccount>(
 
 AccountSchema.index({ provider: 1, providerAccountId: 1 }, { unique: true });
 
-export const Account = model<IAccount>('Account', AccountSchema);
+export const AccountModel = model<IAccount>('Account', AccountSchema);

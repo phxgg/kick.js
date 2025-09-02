@@ -17,12 +17,11 @@ import { initKickPassportOAuth } from './passport/kick.passport';
 import { createOAuthRouter } from './routers/oauth.router';
 import { KickClient } from './KickAPI/Client';
 import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
+import { ensureKickClient } from './middleware/ensure-kick-client.middleware';
 
 morgan.token('remote-user', (req: any) => {
   return req.user ? req.user.email : 'guest';
 });
-
-const client = new KickClient(process.env.KICK_CLIENT_ID, process.env.KICK_CLIENT_SECRET);
 
 const app = express();
 app.use(
@@ -61,20 +60,21 @@ app.use(cookieParser());
 app.use(compression());
 
 // Initialize Passport OAuth2 strategy for Kick
-initKickPassportOAuth(client);
+initKickPassportOAuth();
 
 // Connect to MongoDB
-// const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/kickjs';
-// mongoose
-//   .connect(mongoUri)
-//   .then(() => console.log('[MongoDB] connected'))
-//   .catch((err) => console.error('[MongoDB] connection error', err));
+const mongoUri = process.env.MONGODB_URI!;
+mongoose
+  .connect(mongoUri)
+  .then(() => logger.info('[MongoDB] connected'))
+  .catch((err) => logger.error('[MongoDB] connection error', err));
 
 // Initialize Passport (JWT strategy)
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(attachKickClientToReq(client));
+// app.use(attachKickClientToReq(client));
+app.use(ensureKickClient);
 
 // Routes
 app.use('/oauth', createOAuthRouter());
