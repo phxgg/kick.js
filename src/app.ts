@@ -7,7 +7,6 @@ import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
-import mongoose from 'mongoose';
 import morgan from 'morgan';
 import passport from 'passport';
 
