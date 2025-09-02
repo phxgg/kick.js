@@ -8,7 +8,7 @@ import { UserModel } from '@/models/User';
 
 const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
 
-export function initKickPassportOAuth() {
+export function initKickPassportOAuthStrategy() {
   passport.use(
     'kick',
     new OAuth2Strategy(
@@ -84,4 +84,4 @@ export function initKickPassportOAuth() {
   });
 }
 
-export default initKickPassportOAuth;
+export default initKickPassportOAuthStrategy;

@@ -15,7 +15,7 @@ import { connectMongo } from '@/db';
 
 import { ensureKickClient } from './middleware/ensure-kick-client.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
-import { initKickPassportOAuth } from './strategies/kick.strategy';
+import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
 
 morgan.token('remote-user', (req: any) => {
   return req.user ? req.user.email : 'guest';
@@ -58,7 +58,7 @@ app.use(cookieParser());
 app.use(compression());
 
 // Initialize Passport OAuth2 strategy for Kick
-initKickPassportOAuth();
+initKickPassportOAuthStrategy();
 
 // Initialize Passport
 app.use(passport.initialize());
