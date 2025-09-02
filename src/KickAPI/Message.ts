@@ -1,17 +1,19 @@
 import { KickClient } from './Client';
+import { Serializable } from './Serializable';
 
 export type MessageDto = {
   is_sent: boolean;
   message_id: string;
 };
 
-export class Message {
+export class Message extends Serializable {
   protected readonly client: KickClient;
 
   constructor(
     client: KickClient,
-    private dto: MessageDto,
+    private dto: MessageDto
   ) {
+    super();
     this.client = client;
   }
 

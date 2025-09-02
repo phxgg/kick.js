@@ -1,10 +1,14 @@
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
-import { KickClient } from '@/KickAPI/Client';
+
+import { KICK_BASE_URL } from '@/KickAPI/Client';
+import { FetchUserResponse } from '@/KickAPI/services/UsersService';
+import { AccountModel } from '@/models/Account';
+import { UserModel } from '@/models/User';
 
 const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
 
-export function initKickPassportOAuth(client: KickClient) {
+export function initKickPassportOAuth() {
   passport.use(
     'kick',
     new OAuth2Strategy(
@@ -21,29 +25,62 @@ export function initKickPassportOAuth(client: KickClient) {
       },
       async function (req, accessToken, refreshToken, params, profile, done) {
         try {
-          client.setToken({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-            token_type: params.token_type,
-            expires_in: params.expires_in,
-            scope: params.scope,
+          // Fetch user information from Kick API
+          const res = await fetch(`${KICK_BASE_URL}/users`, {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           });
-          const user = await client.users.me();
-          const plain = user.toJSON();
-          done(null, plain);
+          const json = (await res.json()) as FetchUserResponse;
+          const kickUser = json.data[0];
+
+          // Upsert local User
+          const userDoc = await UserModel.findOneAndUpdate(
+            { kickUserId: String(kickUser.user_id) },
+            {
+              kickUserId: String(kickUser.user_id),
+              name: kickUser.name,
+              email: kickUser.email,
+              image: kickUser.profile_picture,
+            },
+            { new: true, upsert: true }
+          );
+
+          // Upsert Account
+          await AccountModel.findOneAndUpdate(
+            { provider: 'kick', providerAccountId: String(kickUser.user_id) },
+            {
+              userId: userDoc._id,
+              provider: 'kick',
+              providerAccountId: String(kickUser.user_id),
+              accessToken,
+              refreshToken,
+              tokenType: params.token_type,
+              scope: params.scope ? params.scope.split(' ') : null,
+              expiresAt: new Date(Date.now() + params.expires_in * 1000),
+            },
+            { upsert: true, new: true }
+          );
+
+          done(null, userDoc);
         } catch (error) {
           done(error);
         }
-      },
-    ),
+      }
+    )
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user);
+    done(null, user._id.toString());
   });
 
-  passport.deserializeUser((obj, done) => {
-    done(null, obj);
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      const user = await UserModel.findById(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
   });
 }
 

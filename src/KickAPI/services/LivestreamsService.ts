@@ -37,7 +37,7 @@ export class LivestreamsService {
     if (broadcaster_user_id) {
       url.searchParams.append(
         'broadcaster_user_id',
-        Array.isArray(broadcaster_user_id) ? broadcaster_user_id.join(' ') : String(broadcaster_user_id),
+        Array.isArray(broadcaster_user_id) ? broadcaster_user_id.join(' ') : String(broadcaster_user_id)
       );
     }
     if (category_id) {

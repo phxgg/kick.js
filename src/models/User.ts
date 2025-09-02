@@ -1,4 +1,4 @@
-import { Schema, model, Document } from 'mongoose';
+import { Document, model, Schema } from 'mongoose';
 
 export interface IUser extends Document {
   kickUserId: string;
@@ -16,7 +16,7 @@ const UserSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true, index: true },
     image: { type: String },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-export const User = model<IUser>('User', UserSchema);
+export const UserModel = model<IUser>('User', UserSchema);

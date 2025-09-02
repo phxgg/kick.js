@@ -1,4 +1,5 @@
 import { KickClient } from './Client';
+import { Serializable } from './Serializable';
 
 export type CategoryDto = {
   id: number;
@@ -6,13 +7,14 @@ export type CategoryDto = {
   thumbnail: string;
 };
 
-export class Category {
+export class Category extends Serializable {
   protected readonly client: KickClient;
 
   constructor(
     client: KickClient,
-    private dto: CategoryDto,
+    private dto: CategoryDto
   ) {
+    super();
     this.client = client;
   }
 

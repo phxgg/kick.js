@@ -1,10 +1,10 @@
+import { AppToken, OAuth, Token } from './OAuth';
 import { CategoriesService } from './services/CategoriesService';
-import { OAuth, AppToken, Token } from './OAuth';
-import { UsersService } from './services/UsersService';
-import { ChatService } from './services/ChatService';
 import { ChannelsService } from './services/ChannelsService';
-import { ModerationService } from './services/ModerationService';
+import { ChatService } from './services/ChatService';
 import { LivestreamsService } from './services/LivestreamsService';
+import { ModerationService } from './services/ModerationService';
+import { UsersService } from './services/UsersService';
 
 export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
 
