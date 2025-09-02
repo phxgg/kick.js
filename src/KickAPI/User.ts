@@ -1,4 +1,5 @@
 import { KickClient } from './Client';
+import { Serializable } from './Serializable';
 
 export type UserDto = {
   email: string;
@@ -7,13 +8,14 @@ export type UserDto = {
   user_id: number;
 };
 
-export class User {
+export class User extends Serializable {
   protected readonly client: KickClient;
 
   constructor(
     client: KickClient,
-    private dto: UserDto,
+    private dto: UserDto
   ) {
+    super();
     this.client = client;
   }
 
@@ -31,14 +33,5 @@ export class User {
 
   get userId() {
     return this.dto.user_id;
-  }
-
-  toJSON() {
-    return {
-      email: this.email,
-      name: this.name,
-      profile_picture: this.profilePicture,
-      user_id: this.userId,
-    };
   }
 }

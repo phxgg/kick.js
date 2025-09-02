@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+import { NextFunction, Request, Response } from 'express';
+
 import { KickClient } from '@/KickAPI/Client';
 import { AccountModel } from '@/models/Account';
 
@@ -8,7 +9,10 @@ export async function ensureKickClient(req: Request, res: Response, next: NextFu
   try {
     if (!req.user) return next(); // not authenticated
     const kickUserId = req.user.kickUserId;
-    const account = await AccountModel.findOne({ provider: 'kick', providerAccountId: kickUserId });
+    const account = await AccountModel.findOne({
+      provider: 'kick',
+      providerAccountId: kickUserId,
+    });
     if (!account || !account.accessToken) return next();
 
     // Build a fresh client per request

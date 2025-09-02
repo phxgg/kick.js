@@ -1,9 +1,10 @@
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
-import { KICK_BASE_URL, KickClient } from '@/KickAPI/Client';
+
+import { KICK_BASE_URL } from '@/KickAPI/Client';
 import { FetchUserResponse } from '@/KickAPI/services/UsersService';
-import { UserModel } from '@/models/User';
 import { AccountModel } from '@/models/Account';
+import { UserModel } from '@/models/User';
 
 const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
 
@@ -42,7 +43,7 @@ export function initKickPassportOAuth() {
               email: kickUser.email,
               image: kickUser.profile_picture,
             },
-            { new: true, upsert: true },
+            { new: true, upsert: true }
           );
 
           // Upsert Account
@@ -58,23 +59,28 @@ export function initKickPassportOAuth() {
               scope: params.scope ? params.scope.split(' ') : null,
               expiresAt: new Date(Date.now() + params.expires_in * 1000),
             },
-            { upsert: true, new: true },
+            { upsert: true, new: true }
           );
 
           done(null, userDoc);
         } catch (error) {
           done(error);
         }
-      },
-    ),
+      }
+    )
   );
 
   passport.serializeUser((user, done) => {
-    done(null, user);
+    done(null, user._id.toString());
   });
 
-  passport.deserializeUser((obj, done) => {
-    done(null, obj as any);
+  passport.deserializeUser(async (id: string, done) => {
+    try {
+      const user = await UserModel.findById(id);
+      done(null, user);
+    } catch (err) {
+      done(err);
+    }
   });
 }
 

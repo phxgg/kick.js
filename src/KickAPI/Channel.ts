@@ -1,6 +1,7 @@
 import { Category, type CategoryDto } from './Category';
 import { KickClient } from './Client';
 import { Message } from './Message';
+import { Serializable } from './Serializable';
 import { ChatMessageType } from './services/ChatService';
 
 export type ChannelDto = {
@@ -22,13 +23,14 @@ export type ChannelDto = {
   stream_title: string;
 };
 
-export class Channel {
+export class Channel extends Serializable {
   protected readonly client: KickClient;
 
   constructor(
     client: KickClient,
-    private dto: ChannelDto,
+    private dto: ChannelDto
   ) {
+    super();
     this.client = client;
   }
 

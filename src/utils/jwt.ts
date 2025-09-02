@@ -3,11 +3,15 @@ import jwt from 'jsonwebtoken';
 export type JwtPayload = { userId: string };
 
 export function signAccessToken(userId: string) {
-  return jwt.sign({ userId } as JwtPayload, process.env.JWT_SECRET, { expiresIn: '15m' });
+  return jwt.sign({ userId } as JwtPayload, process.env.JWT_SECRET, {
+    expiresIn: '15m',
+  });
 }
 
 export function signRefreshToken(userId: string) {
-  return jwt.sign({ userId } as JwtPayload, process.env.JWT_REFRESH_SECRET, { expiresIn: '30d' });
+  return jwt.sign({ userId } as JwtPayload, process.env.JWT_REFRESH_SECRET, {
+    expiresIn: '30d',
+  });
 }
 
 export function verifyAccessToken(token: string) {

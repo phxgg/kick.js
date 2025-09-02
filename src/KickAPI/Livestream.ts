@@ -1,5 +1,6 @@
 import { Category, type CategoryDto } from './Category';
 import { KickClient } from './Client';
+import { Serializable } from './Serializable';
 
 export type LivestreamDto = {
   broadcaster_user_id: number;
@@ -14,13 +15,14 @@ export type LivestreamDto = {
   viewer_count: number;
 };
 
-export class Livestream {
+export class Livestream extends Serializable {
   protected readonly client: KickClient;
 
   constructor(
     client: KickClient,
-    private dto: LivestreamDto,
+    private dto: LivestreamDto
   ) {
+    super();
     this.client = client;
   }
 

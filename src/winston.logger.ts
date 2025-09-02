@@ -1,5 +1,6 @@
-import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
+
+import winston from 'winston';
 
 const transports: winston.transport[] = [];
 
@@ -13,10 +14,10 @@ if (!isProduction) {
         winston.format.colorize(),
         winston.format.timestamp(),
         winston.format.printf(
-          (info) => `${info.timestamp} [${info.level}]${info.label ? ' [' + info.label + ']' : ''} ${info.message}`,
-        ),
+          (info) => `${info.timestamp} [${info.level}]${info.label ? ' [' + info.label + ']' : ''} ${info.message}`
+        )
       ),
-    }),
+    })
   );
 }
 
@@ -29,7 +30,7 @@ const accessLogTransport: DailyRotateFile = new DailyRotateFile({
   maxSize: '20m', // Maximum size of each log file
   maxFiles: '14d', // Keep files for the last 14 days
   format: winston.format.combine(
-    winston.format((info) => (info.label === 'HTTP' ? info : false))(), // Only log HTTP requests
+    winston.format((info) => (info.label === 'HTTP' ? info : false))() // Only log HTTP requests
   ),
 });
 
@@ -47,10 +48,10 @@ transports.push(
   new winston.transports.File({
     filename: 'logs/combined.log',
     format: winston.format.combine(
-      winston.format((info) => (info.label !== 'HTTP' ? info : false))(), // Exclude HTTP logs
+      winston.format((info) => (info.label !== 'HTTP' ? info : false))() // Exclude HTTP logs
     ),
   }),
-  accessLogTransport,
+  accessLogTransport
 );
 
 export const winstonInstance = winston.createLogger({

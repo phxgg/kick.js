@@ -1,4 +1,4 @@
-import { Schema, model, Document, Types } from 'mongoose';
+import { Document, model, Schema, Types } from 'mongoose';
 
 export interface IAccount extends Document {
   userId: Types.ObjectId;
@@ -15,7 +15,12 @@ export interface IAccount extends Document {
 
 const AccountSchema = new Schema<IAccount>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: 'User',
+      required: true,
+      index: true,
+    },
     provider: { type: String, required: true },
     providerAccountId: { type: String, required: true },
     accessToken: { type: String, default: null },
@@ -24,7 +29,7 @@ const AccountSchema = new Schema<IAccount>(
     scope: { type: [String], default: null },
     expiresAt: { type: Date, default: null },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 AccountSchema.index({ provider: 1, providerAccountId: 1 }, { unique: true });
