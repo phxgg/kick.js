@@ -1,4 +1,4 @@
-import { Document, model, Schema, Types } from 'mongoose';
+import { Document, Model, model, models, Schema, Types } from 'mongoose';
 
 export interface IAccount extends Document {
   userId: Types.ObjectId;
@@ -34,4 +34,6 @@ const AccountSchema = new Schema<IAccount>(
 
 AccountSchema.index({ provider: 1, providerAccountId: 1 }, { unique: true });
 
-export const AccountModel = model<IAccount>('Account', AccountSchema);
+// Reuse existing compiled model if present
+export const AccountModel: Model<IAccount> =
+  (models.Account as Model<IAccount>) || model<IAccount>('Account', AccountSchema);
