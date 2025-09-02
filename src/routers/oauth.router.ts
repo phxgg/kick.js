@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import passport from 'passport';
 
-import { ensureKickClient } from '@/middleware/ensure-kick-client.middleware';
+import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 
 // import { signAccessToken, signRefreshToken } from '@/utils/jwt';
 
@@ -10,7 +10,7 @@ export function createOAuthRouter() {
 
   router.get('/kick', passport.authenticate('kick'));
 
-  router.get('/kick/callback', passport.authenticate('kick'), ensureKickClient, async (req, res) => {
+  router.get('/kick/callback', passport.authenticate('kick'), attachKickClientToReq, async (req, res) => {
     const user = req.user;
     const channel = await req.client.channels.fetchBySlug('phxgg');
     return res.json({ user: user.toJSON(), channel: channel.toJSON() });

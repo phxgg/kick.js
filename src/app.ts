@@ -13,7 +13,7 @@ import passport from 'passport';
 import logger from '@/winston.logger';
 import { connectMongo } from '@/db';
 
-import { ensureKickClient } from './middleware/ensure-kick-client.middleware';
+import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
 
@@ -42,6 +42,7 @@ app.use(
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET!,
@@ -65,7 +66,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Ensure Kick client is attached to request
-app.use(ensureKickClient);
+app.use(attachKickClientToReq);
 
 // Routers
 app.use('/oauth', createOAuthRouter());
