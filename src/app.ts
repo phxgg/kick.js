@@ -68,7 +68,7 @@ app.use(passport.session());
 // Ensure Kick client is attached to request
 app.use(ensureKickClient);
 
-// Routes
+// Routers
 app.use('/oauth', createOAuthRouter());
 
 // Connect to MongoDB
