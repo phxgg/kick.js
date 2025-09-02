@@ -61,7 +61,7 @@ app.use(compression());
 // Initialize Passport OAuth2 strategy for Kick
 initKickPassportOAuth();
 
-// Initialize Passport (JWT strategy)
+// Initialize Passport
 app.use(passport.initialize());
 app.use(passport.session());
 
