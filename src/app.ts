@@ -15,8 +15,8 @@ import logger from '@/winston.logger';
 import { connectMongo } from '@/db';
 
 import { ensureKickClient } from './middleware/ensure-kick-client.middleware';
-import { initKickPassportOAuth } from './passport/kick.passport';
 import { createOAuthRouter } from './routers/oauth.router';
+import { initKickPassportOAuth } from './strategies/kick.strategy';
 
 morgan.token('remote-user', (req: any) => {
   return req.user ? req.user.email : 'guest';
