@@ -34,11 +34,8 @@ export class LivestreamsService {
     sort,
   }: FetchLivestreamsParams): Promise<Livestream[]> {
     const url = new URL(this.LIVESTREAMS_URL);
-    if (broadcaster_user_id) {
-      url.searchParams.append(
-        'broadcaster_user_id',
-        Array.isArray(broadcaster_user_id) ? broadcaster_user_id.join(' ') : String(broadcaster_user_id)
-      );
+    if (broadcaster_user_id && broadcaster_user_id.length > 0) {
+      broadcaster_user_id.forEach((id) => url.searchParams.append('broadcaster_user_id', String(id)));
     }
     if (category_id) {
       url.searchParams.append('category_id', String(category_id));

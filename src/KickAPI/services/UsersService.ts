@@ -51,8 +51,8 @@ export class UsersService {
    */
   async fetch(ids?: number[]): Promise<User[]> {
     const url = new URL(this.USERS_URL);
-    if (ids && ids.length > 0) {
-      url.searchParams.append('id', ids.join(' '));
+    if (ids) {
+      ids.forEach((id) => url.searchParams.append('id', String(id)));
     }
     const response = await fetch(url, {
       headers: {
