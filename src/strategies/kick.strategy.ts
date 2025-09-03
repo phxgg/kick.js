@@ -1,7 +1,7 @@
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
 
-import { KICK_BASE_URL } from '@/KickAPI/Client';
+import { KICK_BASE_URL } from '@/KickAPI/KickClient';
 import { FetchUserResponse } from '@/KickAPI/services/UsersService';
 import { AccountModel } from '@/models/Account';
 import { UserModel } from '@/models/User';

@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { User, type UserDto } from '../User';
 
 type TokenIntrospect = {
@@ -49,8 +49,11 @@ export class UsersService {
    * for the currently authorised user will be returned by default.
    * @param id The ID of the user to fetch
    */
-  async fetch(ids?: (number | string)[]): Promise<User[]> {
-    const url = ids && ids.length > 0 ? `${this.USERS_URL}/${ids.join(' ')}` : this.USERS_URL;
+  async fetch(ids?: number[]): Promise<User[]> {
+    const url = new URL(this.USERS_URL);
+    if (ids) {
+      ids.forEach((id) => url.searchParams.append('id', String(id)));
+    }
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,

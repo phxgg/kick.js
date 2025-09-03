@@ -1,11 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { KickClient } from '@/KickAPI/Client';
+import { KickClient } from '@/KickAPI/KickClient';
 import { AccountModel } from '@/models/Account';
 
 const REFRESH_THRESHOLD_MS = 60 * 1000; // refresh if <60s left
 
-export async function ensureKickClient(req: Request, res: Response, next: NextFunction) {
+export async function attachKickClientToReq(req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.user) return next(); // not authenticated
     const kickUserId = req.user.kickUserId;
@@ -40,7 +40,7 @@ export async function ensureKickClient(req: Request, res: Response, next: NextFu
       });
     }
 
-    req.client = client;
+    req.kick = client;
     next();
   } catch (err) {
     next(err);

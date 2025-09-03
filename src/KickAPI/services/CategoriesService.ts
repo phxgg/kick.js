@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { Category, CategoryDto } from '../Category';
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 
 export type SearchCategoryParams = {
   q: string;
@@ -49,7 +49,7 @@ export class CategoriesService {
    * Get information about a specific category.
    * @param id The ID of the category to fetch
    */
-  async fetch(id: number | string): Promise<Category> {
+  async fetch(id: number): Promise<Category> {
     const response = await fetch(`${this.CATEGORIES_URL}/${String(id)}`, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,

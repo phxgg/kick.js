@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Message, MessageDto } from '../Message';
 
 export enum ChatMessageType {
@@ -9,7 +9,7 @@ export enum ChatMessageType {
 }
 
 export type SendMessageDto = {
-  broadcasterUserId?: number | string;
+  broadcasterUserId?: number;
   content: string;
   replyToMessageId?: string;
   type: ChatMessageType;
@@ -41,7 +41,7 @@ export class ChatService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        broadcaster_user_id: broadcasterUserId,
+        broadcaster_user_id: Number(broadcasterUserId),
         content,
         reply_to_message_id: replyToMessageId,
         type,

@@ -1,4 +1,4 @@
-import { KickClient } from './Client';
+import { KickClient } from './KickClient';
 import { Serializable } from './Serializable';
 
 export type CategoryDto = {

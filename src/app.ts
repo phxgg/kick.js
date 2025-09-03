@@ -1,6 +1,7 @@
 // initialize dotenv
 import './env';
 
+import crypto from 'crypto';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -13,7 +14,9 @@ import passport from 'passport';
 import logger from '@/winston.logger';
 import { connectMongo } from '@/db';
 
-import { ensureKickClient } from './middleware/ensure-kick-client.middleware';
+import { EventSubscriptionMethod } from './KickAPI/services/EventsService';
+import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
+import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
 
@@ -41,7 +44,17 @@ app.use(
 );
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(
+  express.json({
+    // Attach rawBody to request if we're handling webhooks
+    verify: (req, res, buf) => {
+      if (req.url.startsWith('/webhooks')) {
+        (req as any).rawBody = buf;
+      }
+    },
+  })
+);
+app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
     secret: process.env.SESSION_SECRET!,
@@ -65,10 +78,52 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Ensure Kick client is attached to request
-app.use(ensureKickClient);
+app.use(attachKickClientToReq);
 
 // Routers
+app.use('/webhooks', createWebhookRouter()); // kick webhooks
 app.use('/oauth', createOAuthRouter());
+
+/**
+ * DEBUG
+ * These endpoints are meant for debugging purposes only.
+ */
+app.get('/events', async (req, res) => {
+  if (!req.kick) {
+    return res.sendStatus(403);
+  }
+  const events = await req.kick.events.fetch();
+  res.json(events);
+});
+
+app.get('/subscribe', async (req, res) => {
+  if (!req.kick) {
+    return res.sendStatus(403);
+  }
+  const me = await req.kick.users.me();
+  const subscription = (
+    await req.kick.events.subscribe({
+      broadcasterUserId: me.userId,
+      events: [{ name: 'chat.message.sent', version: 1 }],
+      method: EventSubscriptionMethod.WEBHOOK,
+    })
+  )[0];
+  if (subscription.error) {
+    logger.error(`Failed to subscribe to event ${subscription.name} - ERROR_MSG: ${subscription.error}`);
+    return res.sendStatus(500);
+  }
+  logger.info(subscription);
+  return res.json(subscription);
+});
+
+app.get('/delete', async (req, res) => {
+  if (!req.kick) {
+    return res.sendStatus(403);
+  }
+  const subscriptions = await req.kick.events.fetch();
+  await req.kick.events.unsubscribe(subscriptions.map((sub) => sub.id));
+  res.sendStatus(204);
+});
 
 // Connect to MongoDB
 // Start only after DB connect (optional: remove await to start immediately)
@@ -79,7 +134,7 @@ app.use('/oauth', createOAuthRouter());
       logger.info('Server started on http://localhost:3000');
     });
   } catch (err) {
-    logger.error('Failed to start server (DB connect failed)', err);
+    logger.error('Failed to start server (DB connect failed)', { error: err });
     process.exit(1);
   }
 })();

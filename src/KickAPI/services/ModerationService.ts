@@ -1,10 +1,10 @@
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Message } from '../Message';
 
 export type BanUserDto = {
-  broadcasterUserId: number | string;
-  userId: number | string;
+  broadcasterUserId: number;
+  userId: number;
   reason?: string;
 };
 
@@ -13,8 +13,8 @@ export type TimeoutUserDto = BanUserDto & {
 };
 
 export type RemoveBanDto = {
-  broadcasterUserId: number | string;
-  userId: number | string;
+  broadcasterUserId: number;
+  userId: number;
 };
 
 export class ModerationService {

@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Livestream, type LivestreamDto } from '../Livestream';
 
 export enum Sort {
@@ -9,8 +9,8 @@ export enum Sort {
 }
 
 export type FetchLivestreamsParams = {
-  broadcaster_user_id?: (number | string)[];
-  category_id?: number | string;
+  broadcaster_user_id?: number[];
+  category_id?: number;
   language?: string;
   limit?: number;
   sort?: Sort;
@@ -34,11 +34,8 @@ export class LivestreamsService {
     sort,
   }: FetchLivestreamsParams): Promise<Livestream[]> {
     const url = new URL(this.LIVESTREAMS_URL);
-    if (broadcaster_user_id) {
-      url.searchParams.append(
-        'broadcaster_user_id',
-        Array.isArray(broadcaster_user_id) ? broadcaster_user_id.join(' ') : String(broadcaster_user_id)
-      );
+    if (broadcaster_user_id && broadcaster_user_id.length > 0) {
+      broadcaster_user_id.forEach((id) => url.searchParams.append('broadcaster_user_id', String(id)));
     }
     if (category_id) {
       url.searchParams.append('category_id', String(category_id));

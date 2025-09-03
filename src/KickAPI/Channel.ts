@@ -1,5 +1,5 @@
 import { Category, type CategoryDto } from './Category';
-import { KickClient } from './Client';
+import { KickClient } from './KickClient';
 import { Message } from './Message';
 import { Serializable } from './Serializable';
 import { ChatMessageType } from './services/ChatService';
