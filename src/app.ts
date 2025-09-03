@@ -1,7 +1,6 @@
 // initialize dotenv
 import './env';
 
-import crypto from 'crypto';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -17,6 +16,7 @@ import { connectMongo } from '@/db';
 import { EventSubscriptionMethod } from './KickAPI/services/EventsService';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
+import { authMiddleware } from './middleware/auth.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
 
@@ -67,7 +67,7 @@ app.use(
     },
   })
 );
-app.use(cookieParser());
+app.use(cookieParser(process.env.SESSION_SECRET!));
 app.use(compression());
 
 // Initialize Passport OAuth2 strategy for Kick
@@ -77,9 +77,6 @@ initKickPassportOAuthStrategy();
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Ensure Kick client is attached to request
-app.use(attachKickClientToReq);
-
 // Routers
 app.use('/webhooks', createWebhookRouter()); // kick webhooks
 app.use('/oauth', createOAuthRouter());
@@ -88,7 +85,7 @@ app.use('/oauth', createOAuthRouter());
  * DEBUG
  * These endpoints are meant for debugging purposes only.
  */
-app.get('/events', async (req, res) => {
+app.get('/events', authMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
     return res.sendStatus(403);
   }
@@ -96,7 +93,7 @@ app.get('/events', async (req, res) => {
   res.json(events);
 });
 
-app.get('/subscribe', async (req, res) => {
+app.get('/subscribe', authMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
     return res.sendStatus(403);
   }
@@ -116,7 +113,7 @@ app.get('/subscribe', async (req, res) => {
   return res.json(subscription);
 });
 
-app.get('/delete', async (req, res) => {
+app.get('/delete', authMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
     return res.sendStatus(403);
   }
