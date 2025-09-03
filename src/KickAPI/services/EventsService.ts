@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
 import { EventSubscription, EventSubscriptionDto } from '../EventSubscription';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 
 export enum EventSubscriptionMethod {
   WEBHOOK = 'webhook',

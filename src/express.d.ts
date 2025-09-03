@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-object-type */
-import type { KickClient } from '@/KickAPI/Client';
+import type { KickClient } from '@/KickAPI/KickClient';
 
 import type { IUser } from './models/User';
 

@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { Channel, ChannelDto } from '../Channel';
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 

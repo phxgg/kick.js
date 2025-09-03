@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL } from '../KickClient';
 
 export type PublicKeyDto = { public_key: string };
 export type PublicKeyResponse = BaseResponse<PublicKeyDto>;

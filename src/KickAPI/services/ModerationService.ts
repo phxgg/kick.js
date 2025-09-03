@@ -1,5 +1,5 @@
-import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
+import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Message } from '../Message';
 
 export type BanUserDto = {
