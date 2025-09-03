@@ -77,7 +77,7 @@ export class EventsService {
 
   async unsubscribe(ids: string[]): Promise<void> {
     const url = new URL(this.EVENTS_URL);
-    url.searchParams.append('id', ids.join(' '));
+    ids.forEach((id) => url.searchParams.append('id', id));
     const response = await fetch(url.toString(), {
       method: 'DELETE',
       headers: {
