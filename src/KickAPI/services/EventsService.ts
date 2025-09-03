@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../Client';
 import { handleError } from '../errors';
-import { Event, EventDto } from '../Event';
+import { EventSubscription, EventSubscriptionDto } from '../EventSubscription';
 
 export enum EventSubscriptionMethod {
   WEBHOOK = 'webhook',
@@ -18,16 +18,14 @@ export type SubscribeToEventDto = {
   method?: EventSubscriptionMethod;
 };
 
-export type EventSubscriptionDto = {
+export type PostEventSubscriptionData = {
   error?: string;
   name: string;
   subscription_id?: string;
   version: number;
 };
-
-export type EventSubscriptionResponse = BaseResponse<EventSubscriptionDto[]>;
-
-export type FetchEventsResponse = BaseResponse<EventDto[]>;
+export type EventSubscriptionResponse = BaseResponse<PostEventSubscriptionData[]>;
+export type FetchEventsResponse = BaseResponse<EventSubscriptionDto[]>;
 
 export class EventsService {
   private EVENTS_URL: string = KICK_BASE_URL + '/events/subscriptions';
@@ -37,7 +35,7 @@ export class EventsService {
     this.client = client;
   }
 
-  async fetch(): Promise<Event[]> {
+  async fetch(): Promise<EventSubscription[]> {
     const response = await fetch(this.EVENTS_URL, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -49,11 +47,11 @@ export class EventsService {
     }
 
     const json = (await response.json()) as FetchEventsResponse;
-    const data = json.data.map((item) => new Event(this.client, item));
+    const data = json.data.map((item) => new EventSubscription(this.client, item));
     return data;
   }
 
-  async subscribe({ broadcasterUserId, events, method }: SubscribeToEventDto): Promise<EventSubscriptionDto[]> {
+  async subscribe({ broadcasterUserId, events, method }: SubscribeToEventDto): Promise<PostEventSubscriptionData[]> {
     const response = await fetch(this.EVENTS_URL, {
       method: 'POST',
       headers: {

@@ -15,7 +15,7 @@ import logger from '@/winston.logger';
 import { connectMongo } from '@/db';
 
 import { EventSubscriptionMethod } from './KickAPI/services/EventsService';
-import { getKickPublicKey } from './KickAPI/services/PublicKeyService';
+import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
@@ -44,7 +44,16 @@ app.use(
 );
 app.use(helmet());
 app.use(cors());
-app.use(express.json());
+app.use(
+  express.json({
+    // Attach rawBody to request if we're handling webhooks
+    verify: (req, res, buf) => {
+      if (req.url.startsWith('/webhooks')) {
+        (req as any).rawBody = buf;
+      }
+    },
+  })
+);
 app.use(express.urlencoded({ extended: true }));
 app.use(
   session({
@@ -71,38 +80,8 @@ app.use(passport.session());
 // Ensure Kick client is attached to request
 app.use(attachKickClientToReq);
 
-// Kick webhooks
-app.post('/webhooks/kick', express.raw({ type: 'application/json' }), async (req, res) => {
-  const messageId = req.headers['Kick-Event-Message-Id'];
-  const subscriptionId = req.headers['Kick-Event-Subscription-Id'];
-  const eventSignature = req.headers['Kick-Event-Signature'];
-  const messageTimestamp = req.headers['Kick-Event-Message-Timestamp'];
-  const eventType = req.headers['Kick-Event-Type'];
-  const eventVersion = req.headers['Kick-Event-Version'];
-
-  const publicKey = await getKickPublicKey();
-
-  const rawBody = req.body.toString('utf8');
-  if (!messageId || !messageTimestamp || !rawBody || !eventSignature) {
-    logger.error('Missing required parameters for signature verification');
-    return res.sendStatus(400);
-  }
-
-  const constructSignature = `${messageId}.${messageTimestamp}.${rawBody}`;
-  // create an RSA-SHA256 verifier
-  const verifier = crypto.createVerify('RSA-SHA256');
-  verifier.update(constructSignature);
-  const signature = Buffer.from(eventSignature as string, 'base64');
-  const isValid = verifier.verify(publicKey, signature);
-  if (!isValid) {
-    logger.warn('Webhook signature verification failed');
-    return res.sendStatus(403);
-  }
-  logger.info('Received Kick webhook event', { event: rawBody });
-  res.sendStatus(200);
-});
-
 // Routers
+app.use('/webhooks', createWebhookRouter()); // kick webhooks
 app.use('/oauth', createOAuthRouter());
 
 /**
@@ -114,7 +93,6 @@ app.get('/events', async (req, res) => {
     return res.sendStatus(403);
   }
   const events = await req.kick.events.fetch();
-  console.log(events);
   res.json(events);
 });
 
@@ -131,10 +109,10 @@ app.get('/subscribe', async (req, res) => {
     })
   )[0];
   if (subscription.error) {
-    logger.error(`Failed to subscribe to event ${subscription.name} - ERROR: ${subscription.error}`);
+    logger.error(`Failed to subscribe to event ${subscription.name} - ERROR_MSG: ${subscription.error}`);
     return res.sendStatus(500);
   }
-  console.log(subscription);
+  logger.info(subscription);
   return res.json(subscription);
 });
 
@@ -156,7 +134,7 @@ app.get('/delete', async (req, res) => {
       logger.info('Server started on http://localhost:3000');
     });
   } catch (err) {
-    logger.error('Failed to start server (DB connect failed)', err);
+    logger.error('Failed to start server (DB connect failed)', { error: err });
     process.exit(1);
   }
 })();

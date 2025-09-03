@@ -9,6 +9,7 @@ declare global {
     interface Request {
       kick?: KickClient;
       user?: User;
+      rawBody?: Buffer;
     }
   }
 }

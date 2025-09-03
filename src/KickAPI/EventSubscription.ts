@@ -1,7 +1,7 @@
 import { KickClient } from './Client';
 import { Serializable } from './Serializable';
 
-export type EventDto = {
+export type EventSubscriptionDto = {
   app_id: string;
   broadcaster_user_id: number;
   created_at: string;
@@ -12,12 +12,12 @@ export type EventDto = {
   version: number;
 };
 
-export class Event extends Serializable {
+export class EventSubscription extends Serializable {
   protected readonly client: KickClient;
 
   constructor(
     client: KickClient,
-    private dto: EventDto
+    private dto: EventSubscriptionDto
   ) {
     super();
     this.client = client;

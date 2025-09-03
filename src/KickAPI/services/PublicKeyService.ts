@@ -2,8 +2,8 @@ import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL } from '../Client';
 import { handleError } from '../errors';
 
-export type PublicKey = { publicKey: string };
-export type PublicKeyResponse = BaseResponse<PublicKey>;
+export type PublicKeyDto = { public_key: string };
+export type PublicKeyResponse = BaseResponse<PublicKeyDto>;
 
 interface CacheEntry {
   key: string;
@@ -46,7 +46,7 @@ export class PublicKeyService {
         handleError(response);
       }
       const json = (await response.json()) as PublicKeyResponse;
-      const key = json.data.publicKey;
+      const key = json.data.public_key;
       this.cache = { key, fetchedAt: Date.now() };
       this.inFlight = undefined;
       return key;
