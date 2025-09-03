@@ -10,7 +10,7 @@ export type UserIdentityEventProperty = {
 };
 
 export type UserEventProperty = {
-  is_anonymous: boolean;
+  is_anonymous: boolean; // if true, all other properties are null
   user_id: number;
   username: string;
   is_verified: boolean;
@@ -19,7 +19,7 @@ export type UserEventProperty = {
   identity: UserIdentityEventProperty | null;
 };
 
-// Helper “override” utilities
+// Helper "override" utilities
 export type WithIdentityNull<T extends { identity?: any }> = Omit<T, 'identity'> & { identity: null };
 export type WithIdentity<T extends { identity?: any }> = Omit<T, 'identity'> & { identity: UserIdentityEventProperty };
 
