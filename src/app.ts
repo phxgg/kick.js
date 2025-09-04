@@ -98,13 +98,11 @@ app.get('/subscribe', authMiddleware, attachKickClientToReq, async (req, res) =>
     return res.sendStatus(403);
   }
   const me = await req.kick.users.me();
-  const subscription = (
-    await req.kick.events.subscribe({
-      broadcasterUserId: me.userId,
-      events: [{ name: 'chat.message.sent', version: 1 }],
-      method: EventSubscriptionMethod.WEBHOOK,
-    })
-  )[0];
+  const subscription = await req.kick.events.subscribe({
+    broadcasterUserId: me.userId,
+    event: { name: 'chat.message.sent', version: 1 },
+    method: EventSubscriptionMethod.WEBHOOK,
+  });
   if (subscription.error) {
     logger.error(`Failed to subscribe to event ${subscription.name} - ERROR_MSG: ${subscription.error}`);
     return res.sendStatus(500);
@@ -118,7 +116,7 @@ app.get('/delete', authMiddleware, attachKickClientToReq, async (req, res) => {
     return res.sendStatus(403);
   }
   const subscriptions = await req.kick.events.fetch();
-  await req.kick.events.unsubscribe(subscriptions.map((sub) => sub.id));
+  await req.kick.events.unsubscribeMultiple(subscriptions.map((sub) => sub.id));
   res.sendStatus(204);
 });
 

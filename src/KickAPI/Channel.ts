@@ -71,11 +71,11 @@ export class Channel extends Serializable {
     return this.dto.stream_title;
   }
 
-  async send(content: string): Promise<Message> {
+  async send(content: string, type = ChatMessageType.BOT): Promise<Message> {
     return await this.client.chat.send({
-      broadcasterUserId: this.dto.broadcaster_user_id,
+      broadcasterUserId: this.broadcasterUserId,
       content,
-      type: ChatMessageType.BOT,
+      type,
     });
   }
 }

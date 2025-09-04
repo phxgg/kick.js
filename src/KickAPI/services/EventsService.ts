@@ -12,9 +12,15 @@ export type EventDetailsDto = {
   version: number;
 };
 
-export type SubscribeToEventDto = {
+export type SubscribeToMultipleEventsDto = {
   broadcasterUserId?: number;
   events: EventDetailsDto[];
+  method?: EventSubscriptionMethod;
+};
+
+export type SubscribeToSingleEventDto = {
+  broadcasterUserId?: number;
+  event: EventDetailsDto;
   method?: EventSubscriptionMethod;
 };
 
@@ -51,7 +57,11 @@ export class EventsService {
     return data;
   }
 
-  async subscribe({ broadcasterUserId, events, method }: SubscribeToEventDto): Promise<PostEventSubscriptionData[]> {
+  async subscribeMultiple({
+    broadcasterUserId,
+    events,
+    method,
+  }: SubscribeToMultipleEventsDto): Promise<PostEventSubscriptionData[]> {
     const response = await fetch(this.EVENTS_URL, {
       method: 'POST',
       headers: {
@@ -73,7 +83,16 @@ export class EventsService {
     return json.data;
   }
 
-  async unsubscribe(ids: string[]): Promise<void> {
+  async subscribe({ broadcasterUserId, event, method }: SubscribeToSingleEventDto): Promise<PostEventSubscriptionData> {
+    const results = await this.subscribeMultiple({
+      broadcasterUserId,
+      events: [event],
+      method,
+    });
+    return results[0];
+  }
+
+  async unsubscribeMultiple(ids: string[]): Promise<void> {
     const url = new URL(this.EVENTS_URL);
     ids.forEach((id) => url.searchParams.append('id', id));
     const response = await fetch(url.toString(), {
@@ -86,5 +105,9 @@ export class EventsService {
     if (!response.ok) {
       handleError(response);
     }
+  }
+
+  async unsubscribe(id: string): Promise<void> {
+    return this.unsubscribeMultiple([id]);
   }
 }
