@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import ms, { type StringValue } from 'ms';
 import passport from 'passport';
 
 import { signAccessToken, signRefreshToken } from '@/utils/jwt';
@@ -19,7 +20,11 @@ export function createOAuthRouter() {
       const userId = req.user._id.toString();
       const accessToken = signAccessToken({ sub: userId });
       const refreshToken = signRefreshToken({ sub: userId });
-      return res.json({ accessToken, refreshToken, expiresIn: 60 * 15 }); // 15 minutes
+      return res.json({
+        accessToken,
+        refreshToken,
+        expiresIn: Math.floor(ms(process.env.JWT_ACCESS_EXPIRATION! as StringValue) / 1000),
+      });
     }
   );
 
