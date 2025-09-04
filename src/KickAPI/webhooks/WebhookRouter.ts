@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import express from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import logger from '@/winston.logger';
 
@@ -24,7 +25,7 @@ export function createWebhookRouter() {
       const rawBody = req.rawBody!.toString('utf8');
       if (!messageId || !messageTimestamp || !rawBody || !eventSignature) {
         logger.error('Missing required parameters for signature verification');
-        return res.sendStatus(400);
+        return res.sendStatus(StatusCodes.BAD_REQUEST);
       }
 
       const constructSignature = `${messageId}.${messageTimestamp}.${rawBody}`;
@@ -34,7 +35,7 @@ export function createWebhookRouter() {
       const isValid = verifier.verify(publicKey, signature);
       if (!isValid) {
         logger.warn('Webhook signature verification failed');
-        return res.sendStatus(403);
+        return res.sendStatus(StatusCodes.FORBIDDEN);
       }
       const parsedBody = JSON.parse(rawBody);
       logger.info('Received Kick webhook event', { event: parsedBody });
@@ -46,10 +47,10 @@ export function createWebhookRouter() {
           break;
       }
 
-      res.sendStatus(200);
+      res.sendStatus(StatusCodes.OK);
     } catch (err) {
       logger.error(`Error processing Kick webhook event`, err);
-      res.sendStatus(500);
+      res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
   });
 

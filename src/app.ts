@@ -7,6 +7,7 @@ import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
+import { StatusCodes } from 'http-status-codes';
 import morgan from 'morgan';
 import passport from 'passport';
 
@@ -17,8 +18,10 @@ import { EventSubscriptionMethod } from './KickAPI/services/EventsService';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
 import { authMiddleware } from './middleware/auth.middleware';
+import { validateData } from './middleware/validate-data.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
+import { testValidator } from './validators/test.validator';
 
 morgan.token('remote-user', (req: any) => {
   return req.user ? req.user.email : 'guest';
@@ -77,7 +80,7 @@ initKickPassportOAuthStrategy();
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Routers
+// Initialize certain routes before middleware
 app.use('/webhooks', createWebhookRouter()); // kick webhooks
 app.use('/oauth', createOAuthRouter());
 
@@ -85,9 +88,13 @@ app.use('/oauth', createOAuthRouter());
  * DEBUG
  * These endpoints are meant for debugging purposes only.
  */
+app.post('/test', authMiddleware, validateData(testValidator), attachKickClientToReq, async (req, res) => {
+  res.json({ message: 'Data is valid', data: req.body });
+});
+
 app.get('/events', authMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
-    return res.sendStatus(403);
+    return res.sendStatus(StatusCodes.FORBIDDEN);
   }
   const events = await req.kick.events.fetch();
   res.json(events);
@@ -95,7 +102,7 @@ app.get('/events', authMiddleware, attachKickClientToReq, async (req, res) => {
 
 app.get('/subscribe', authMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
-    return res.sendStatus(403);
+    return res.sendStatus(StatusCodes.FORBIDDEN);
   }
   const me = await req.kick.users.me();
   const subscription = await req.kick.events.subscribe({
@@ -105,7 +112,7 @@ app.get('/subscribe', authMiddleware, attachKickClientToReq, async (req, res) =>
   });
   if (subscription.error) {
     logger.error(`Failed to subscribe to event ${subscription.name} - ERROR_MSG: ${subscription.error}`);
-    return res.sendStatus(500);
+    return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
   }
   logger.info(subscription);
   return res.json(subscription);
@@ -113,12 +120,15 @@ app.get('/subscribe', authMiddleware, attachKickClientToReq, async (req, res) =>
 
 app.get('/delete', authMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
-    return res.sendStatus(403);
+    return res.sendStatus(StatusCodes.FORBIDDEN);
   }
   const subscriptions = await req.kick.events.fetch();
   await req.kick.events.unsubscribeMultiple(subscriptions.map((sub) => sub.id));
-  res.sendStatus(204);
+  res.sendStatus(StatusCodes.NO_CONTENT);
 });
+/**
+ * END DEBUG
+ */
 
 // Connect to MongoDB
 // Start only after DB connect (optional: remove await to start immediately)
