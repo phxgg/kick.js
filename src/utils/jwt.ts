@@ -1,23 +1,24 @@
 import jwt from 'jsonwebtoken';
+import type { StringValue } from 'ms';
 
-export type JwtPayload = { userId: string };
+export type JwtPayload = { sub: string };
 
-export function signAccessToken(userId: string) {
-  return jwt.sign({ userId } as JwtPayload, process.env.JWT_SECRET, {
-    expiresIn: '15m',
+export function signAccessToken(payload: JwtPayload) {
+  return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, {
+    expiresIn: process.env.JWT_ACCESS_EXPIRATION! as StringValue,
   });
 }
 
-export function signRefreshToken(userId: string) {
-  return jwt.sign({ userId } as JwtPayload, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: '30d',
+export function signRefreshToken(payload: JwtPayload) {
+  return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
+    expiresIn: process.env.JWT_REFRESH_EXPIRATION! as StringValue,
   });
 }
 
 export function verifyAccessToken(token: string) {
-  return jwt.verify(token, process.env.JWT_SECRET) as JwtPayload;
+  return jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as JwtPayload;
 }
 
 export function verifyRefreshToken(token: string) {
-  return jwt.verify(token, process.env.JWT_REFRESH_SECRET) as JwtPayload;
+  return jwt.verify(token, process.env.JWT_REFRESH_SECRET!) as JwtPayload;
 }

@@ -1,18 +1,20 @@
 import { NextFunction, Request, Response } from 'express';
 
+import { UserModel } from '@/models/User';
+
 import { verifyAccessToken } from '../utils/jwt';
 
-export function requireAuth(req: Request, res: Response, next: NextFunction) {
-  const header = req.header('Authorization');
-  if (!header?.startsWith('Bearer ')) return res.status(401).json({ error: 'Unauthorized' });
-
-  const token = header.slice('Bearer '.length).trim();
+export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+  const auth = req.header('authorization');
+  if (!auth?.startsWith('Bearer ')) return res.status(401).json({ error: 'missing_token' });
+  const token = auth.split(' ')[1];
   try {
-    const { userId } = verifyAccessToken(token);
-    // fetch user from database and attach `user` property to req object
-    (req as any).userId = userId;
+    const payload = verifyAccessToken(token);
+    // load user from database and attach to req object
+    const user = await UserModel.findById(payload.sub);
+    req.user = user;
     next();
   } catch {
-    return res.status(401).json({ error: 'Invalid or expired token' });
+    return res.status(401).json({ error: 'invalid_token' });
   }
 }
