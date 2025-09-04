@@ -4,13 +4,13 @@ export type JwtPayload = { sub: string };
 
 export function signAccessToken(payload: JwtPayload) {
   return jwt.sign(payload, process.env.JWT_ACCESS_SECRET!, {
-    expiresIn: '15m',
+    expiresIn: (process.env.JWT_ACCESS_EXPIRATION as any) || '15m',
   });
 }
 
 export function signRefreshToken(payload: JwtPayload) {
   return jwt.sign(payload, process.env.JWT_REFRESH_SECRET!, {
-    expiresIn: '30d',
+    expiresIn: (process.env.JWT_REFRESH_EXPIRATION as any) || '30d',
   });
 }
 
