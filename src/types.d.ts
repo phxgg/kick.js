@@ -4,6 +4,9 @@ import type { IUser } from '@/models/User';
 import type { EnvSchema } from '@/validators/env.validator';
 
 declare global {
+  namespace NodeJS {
+    interface ProcessEnv extends EnvSchema {}
+  }
   namespace Express {
     interface User extends IUser {}
     interface Request {
@@ -11,9 +14,6 @@ declare global {
       user?: User;
       rawBody?: Buffer;
     }
-  }
-  namespace NodeJS {
-    interface ProcessEnv extends EnvSchema {}
   }
 }
 
