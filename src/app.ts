@@ -58,6 +58,7 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.SESSION_SECRET!));
 app.use(
   session({
     secret: process.env.SESSION_SECRET!,
@@ -70,7 +71,6 @@ app.use(
     },
   })
 );
-app.use(cookieParser(process.env.SESSION_SECRET!));
 app.use(compression());
 
 // Initialize Passport OAuth2 strategy for Kick
