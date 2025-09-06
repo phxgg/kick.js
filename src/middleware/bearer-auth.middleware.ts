@@ -9,7 +9,7 @@ import { verifyAccessToken } from '../utils/jwt';
  * HTTP Bearer token authentication middleware.
  * Supports token in `Authorization` header, request body, or query string as `access_token`.
  */
-export async function authMiddleware(req: Request, res: Response, next: NextFunction) {
+export async function bearerAuthMiddleware(req: Request, res: Response, next: NextFunction) {
   let token: string;
   const authorization = req.header('authorization');
 
