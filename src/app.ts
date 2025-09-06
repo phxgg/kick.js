@@ -17,7 +17,7 @@ import { connectMongo } from '@/db';
 import { EventSubscriptionMethod } from './KickAPI/services/EventsService';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
-import { bearerAuthMiddleware } from './middleware/auth.middleware';
+import { bearerAuthMiddleware } from './middleware/bearer-auth.middleware';
 import { validateData } from './middleware/validate-data.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
