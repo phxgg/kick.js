@@ -17,7 +17,7 @@ import { connectMongo } from '@/db';
 import { EventSubscriptionMethod } from './KickAPI/services/EventsService';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { attachKickClientToReq } from './middleware/attach-kick-client-to-req.middleware';
-import { authMiddleware } from './middleware/auth.middleware';
+import { bearerAuthMiddleware } from './middleware/bearer-auth.middleware';
 import { validateData } from './middleware/validate-data.middleware';
 import { createOAuthRouter } from './routers/oauth.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
@@ -28,6 +28,8 @@ morgan.token('remote-user', (req: any) => {
 });
 
 const app = express();
+// If you have your node.js behind a proxy and are using secure: true, you need to set "trust proxy" in express:
+// app.set('trust proxy', 1);
 app.use(
   morgan(
     // apache like format string
@@ -58,6 +60,7 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser(process.env.SESSION_SECRET!));
 app.use(
   session({
     secret: process.env.SESSION_SECRET!,
@@ -70,7 +73,6 @@ app.use(
     },
   })
 );
-app.use(cookieParser(process.env.SESSION_SECRET!));
 app.use(compression());
 
 // Initialize Passport OAuth2 strategy for Kick
@@ -88,11 +90,11 @@ app.use('/oauth', createOAuthRouter());
  * DEBUG
  * These endpoints are meant for debugging purposes only.
  */
-app.post('/test', authMiddleware, validateData(testValidator), attachKickClientToReq, async (req, res) => {
+app.post('/test', bearerAuthMiddleware, validateData(testValidator), attachKickClientToReq, async (req, res) => {
   res.json({ message: 'Data is valid', data: req.body });
 });
 
-app.get('/events', authMiddleware, attachKickClientToReq, async (req, res) => {
+app.get('/events', bearerAuthMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
     return res.sendStatus(StatusCodes.FORBIDDEN);
   }
@@ -100,7 +102,7 @@ app.get('/events', authMiddleware, attachKickClientToReq, async (req, res) => {
   res.json(events);
 });
 
-app.get('/subscribe', authMiddleware, attachKickClientToReq, async (req, res) => {
+app.get('/subscribe', bearerAuthMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
     return res.sendStatus(StatusCodes.FORBIDDEN);
   }
@@ -118,7 +120,7 @@ app.get('/subscribe', authMiddleware, attachKickClientToReq, async (req, res) =>
   return res.json(subscription);
 });
 
-app.get('/delete', authMiddleware, attachKickClientToReq, async (req, res) => {
+app.get('/delete', bearerAuthMiddleware, attachKickClientToReq, async (req, res) => {
   if (!req.kick) {
     return res.sendStatus(StatusCodes.FORBIDDEN);
   }
