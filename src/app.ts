@@ -28,6 +28,8 @@ morgan.token('remote-user', (req: any) => {
 });
 
 const app = express();
+// If you have your node.js behind a proxy and are using secure: true, you need to set "trust proxy" in express:
+// app.set('trust proxy', 1);
 app.use(
   morgan(
     // apache like format string
