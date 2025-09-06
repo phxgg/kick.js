@@ -15,12 +15,14 @@ export async function authMiddleware(req: Request, res: Response, next: NextFunc
 
   if (authorization) {
     const parts = authorization.split(' ');
-    if (parts.length !== 2)
+    if (parts.length !== 2) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'malformed_authorization_header' });
+    }
     const scheme = parts[0];
     const credentials = parts[1];
-    if (!/^Bearer$/i.test(scheme))
+    if (!/^Bearer$/i.test(scheme)) {
       return res.status(StatusCodes.UNAUTHORIZED).json({ error: 'malformed_authorization_header' });
+    }
     token = credentials;
   }
 
