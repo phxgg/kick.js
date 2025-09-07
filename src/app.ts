@@ -103,7 +103,7 @@ app.get('/hello', (req, res) => {
       logger.info('Server started on http://localhost:3000');
     });
   } catch (err) {
-    logger.error('Failed to start server (DB connect failed)', { error: err });
+    logger.error('Failed to start server (DB connect failed)', err);
     process.exit(1);
   }
 })();

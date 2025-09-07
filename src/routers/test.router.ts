@@ -39,7 +39,7 @@ export function createTestRouter() {
       method: EventSubscriptionMethod.WEBHOOK,
     });
     if (subscription.error) {
-      logger.error(`Failed to subscribe to event ${subscription.name} - ERROR_MSG: ${subscription.error}`);
+      logger.error(`Failed to subscribe to event`, { subscription });
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
     logger.info(subscription);
