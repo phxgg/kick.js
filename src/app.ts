@@ -1,6 +1,7 @@
 // initialize dotenv
 import './env';
 
+import path from 'path';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -25,6 +26,11 @@ morgan.token('remote-user', (req: any) => {
 const app = express();
 // If you have your node.js behind a proxy and are using secure: true, you need to set "trust proxy" in express:
 // app.set('trust proxy', 1);
+
+// view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
 app.use(
   morgan(
     // apache like format string
@@ -55,6 +61,7 @@ app.use(
   })
 );
 app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser(process.env.SESSION_SECRET!));
 app.use(
   session({
@@ -82,6 +89,10 @@ app.use('/webhooks', createWebhookRouter()); // kick webhooks
 app.use('/oauth', createOAuthRouter());
 // Test route to verify auth and validation
 app.use('', createTestRouter());
+// Simple hello world route to test view engine
+app.use('/hello', (req, res) => {
+  res.render('hello', { message: 'Hello World!' });
+});
 
 // Connect to MongoDB
 // Start only after DB connect (optional: remove await to start immediately)
