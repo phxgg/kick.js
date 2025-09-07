@@ -13,11 +13,14 @@ import { testValidator } from '@/validators/test.validator';
 export function createTestRouter() {
   const router = Router();
 
-  router.post('/test', bearerAuthMiddleware, validateData(testValidator), attachKickClientToReq, async (req, res) => {
+  router.use(bearerAuthMiddleware);
+  router.use(attachKickClientToReq);
+
+  router.post('/test', validateData(testValidator), async (req, res) => {
     res.json({ message: 'Data is valid', data: req.body });
   });
 
-  router.get('/events', bearerAuthMiddleware, attachKickClientToReq, async (req, res) => {
+  router.get('/events', async (req, res) => {
     if (!req.kick) {
       return res.sendStatus(StatusCodes.FORBIDDEN);
     }
@@ -25,7 +28,7 @@ export function createTestRouter() {
     res.json(events);
   });
 
-  router.get('/subscribe', bearerAuthMiddleware, attachKickClientToReq, async (req, res) => {
+  router.get('/subscribe', async (req, res) => {
     if (!req.kick) {
       return res.sendStatus(StatusCodes.FORBIDDEN);
     }
@@ -43,7 +46,7 @@ export function createTestRouter() {
     return res.json(subscription);
   });
 
-  router.get('/delete', bearerAuthMiddleware, attachKickClientToReq, async (req, res) => {
+  router.get('/delete', async (req, res) => {
     if (!req.kick) {
       return res.sendStatus(StatusCodes.FORBIDDEN);
     }
