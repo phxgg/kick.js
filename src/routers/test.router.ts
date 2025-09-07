@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 import logger from '@/winston.logger';
 
 import { EventSubscriptionMethod } from '@/KickAPI/services/EventsService';
+import { WebhookEvents } from '@/KickAPI/webhooks/WebhookEvents';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
 import { validateData } from '@/middleware/validate-data.middleware';
@@ -31,7 +32,7 @@ export function createTestRouter() {
     const me = await req.kick.users.me();
     const subscription = await req.kick.events.subscribe({
       broadcasterUserId: me.userId,
-      event: { name: 'chat.message.sent', version: 1 },
+      event: { name: WebhookEvents.CHAT_MESSAGE_SENT, version: 1 },
       method: EventSubscriptionMethod.WEBHOOK,
     });
     if (subscription.error) {
