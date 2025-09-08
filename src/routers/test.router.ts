@@ -1,10 +1,6 @@
 import { Router } from 'express';
-import { StatusCodes } from 'http-status-codes';
 
-import logger from '@/winston.logger';
-
-import { EventSubscriptionMethod } from '@/KickAPI/services/EventsService';
-import { WebhookEvents } from '@/KickAPI/webhooks/WebhookEvents';
+import { testController } from '@/controllers/test.controller';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
 import { validateData } from '@/middleware/validate-data.middleware';
@@ -16,44 +12,10 @@ export function createTestRouter() {
   router.use(bearerAuthMiddleware);
   router.use(attachKickClientToReq);
 
-  router.post('/test', validateData(testValidator), async (req, res) => {
-    res.json({ message: 'Data is valid', data: req.body });
-  });
-
-  router.get('/events', async (req, res) => {
-    if (!req.kick) {
-      return res.sendStatus(StatusCodes.FORBIDDEN);
-    }
-    const events = await req.kick.events.fetch();
-    res.json(events);
-  });
-
-  router.get('/subscribe', async (req, res) => {
-    if (!req.kick) {
-      return res.sendStatus(StatusCodes.FORBIDDEN);
-    }
-    const me = await req.kick.users.me();
-    const subscription = await req.kick.events.subscribe({
-      broadcasterUserId: me.userId,
-      event: { name: WebhookEvents.CHAT_MESSAGE_SENT, version: 1 },
-      method: EventSubscriptionMethod.WEBHOOK,
-    });
-    if (subscription.error) {
-      logger.error(`Failed to subscribe to event`, { subscription });
-      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
-    }
-    logger.info(subscription);
-    return res.json(subscription);
-  });
-
-  router.get('/delete', async (req, res) => {
-    if (!req.kick) {
-      return res.sendStatus(StatusCodes.FORBIDDEN);
-    }
-    const subscriptions = await req.kick.events.fetch();
-    await req.kick.events.unsubscribeMultiple(subscriptions.map((sub) => sub.id));
-    res.sendStatus(StatusCodes.NO_CONTENT);
-  });
+  router.post('/test', validateData(testValidator), testController.getTest);
+  router.get('/events', testController.getEvents);
+  router.get('/subscribe', testController.getSubscribe);
+  router.get('/delete', testController.getDelete);
 
   return router;
 }

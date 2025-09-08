@@ -93,6 +93,7 @@ export class EventsService {
   }
 
   async unsubscribeMultiple(ids: string[]): Promise<void> {
+    if (ids.length === 0) return;
     const url = new URL(this.EVENTS_URL);
     ids.forEach((id) => url.searchParams.append('id', id));
     const response = await fetch(url.toString(), {

@@ -88,7 +88,7 @@ app.use(passport.session());
 app.use('/webhooks', createWebhookRouter()); // kick webhooks
 app.use('/oauth', createOAuthRouter());
 // Test route to verify auth and validation
-app.use('', createTestRouter());
+app.use('/dashboard', createTestRouter());
 // Simple hello world route to test view engine
 app.get('/hello', (req, res) => {
   res.render('hello', { message: 'Hello World!' });
