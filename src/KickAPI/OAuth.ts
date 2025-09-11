@@ -22,24 +22,43 @@ export enum TokenHintType {
 }
 
 export class OAuth {
+  private static instance: OAuth;
   private OAUTH_URL: string = 'https://id.kick.com';
 
   private clientId: string;
   private clientSecret: string;
-  private codeVerifier: string;
 
-  constructor(clientId: string, clientSecret: string, codeVerifier?: string) {
+  private constructor(clientId: string, clientSecret: string) {
     this.clientId = clientId;
     this.clientSecret = clientSecret;
-    this.codeVerifier = codeVerifier || generateCodeVerifier();
   }
 
-  async generateAuthorizeURL(): Promise<string> {
+  /**
+   * Get the singleton instance of the OAuth class
+   * @param [clientId] The client ID (can be omitted if instance already exists)
+   * @param [clientSecret] The client secret (can be omitted if instance already exists)
+   * @returns The OAuth instance
+   */
+  static getInstance(clientId?: string, clientSecret?: string): OAuth {
+    if (!this.instance) {
+      if (!clientId || !clientSecret) {
+        throw new Error('OAuth not initialized. Provide clientId and clientSecret.');
+      }
+      this.instance = new OAuth(clientId, clientSecret);
+    }
+    return this.instance;
+  }
+
+  async generateAuthorizeURL(): Promise<{
+    url: string;
+    codeVerifier: string;
+  }> {
     const authorizeUrl = new URL(`${this.OAUTH_URL}/oauth/authorize`);
     const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
 
     // Generate a code challenge from the verifier (async)
-    const codeChallenge = generateCodeChallenge(this.codeVerifier);
+    const codeVerifier = generateCodeVerifier();
+    const codeChallenge = generateCodeChallenge(codeVerifier);
 
     authorizeUrl.searchParams.append('client_id', this.clientId);
     authorizeUrl.searchParams.append('response_type', 'code');
@@ -48,10 +67,10 @@ export class OAuth {
     authorizeUrl.searchParams.append('scope', scopes.join(' '));
     authorizeUrl.searchParams.append('code_challenge', codeChallenge);
     authorizeUrl.searchParams.append('code_challenge_method', 'S256');
-    return authorizeUrl.toString();
+    return { url: authorizeUrl.toString(), codeVerifier };
   }
 
-  async exchangeToken(code: string): Promise<Token> {
+  async exchangeToken(code: string, codeVerifier: string): Promise<Token> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/token`;
     const response = await fetch(tokenUrl, {
       method: 'POST',
@@ -64,7 +83,7 @@ export class OAuth {
         grant_type: 'authorization_code',
         code,
         redirect_uri: process.env.KICK_CALLBACK_URL,
-        code_verifier: this.codeVerifier,
+        code_verifier: codeVerifier,
       }),
     });
 
