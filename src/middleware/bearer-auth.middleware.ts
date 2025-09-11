@@ -2,8 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
 import { UserModel } from '@/models/User';
-
-import { verifyAccessToken } from '../utils/jwt';
+import { jwtService } from '@/services/jwt.service';
 
 /**
  * HTTP Bearer token authentication middleware.
@@ -41,7 +40,11 @@ export async function bearerAuthMiddleware(req: Request, res: Response, next: Ne
   }
 
   try {
-    const payload = verifyAccessToken(token);
+    const payload = jwtService.verifyAccessToken(token);
+    const isRevoked = await jwtService.isRevoked(payload.jti);
+    if (isRevoked) {
+      return res.status(StatusCodes.FORBIDDEN).json({ error: 'token_revoked' });
+    }
     // load user from database and attach to req object
     const user = await UserModel.findById(payload.sub);
     req.user = user;
