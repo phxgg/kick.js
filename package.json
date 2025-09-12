@@ -17,7 +17,7 @@
     "start": "node ./dist/app.js",
     "type:check": "tsc --noEmit",
     "build:tsc": "npm run clean && tsc && tsc-alias",
-    "build": "npm run clean && npm run type:check && swc src -d dist --strip-leading-paths",
+    "build": "npm run clean && npm run type:check && swc src -d dist --copy-files --strip-leading-paths",
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\"",
