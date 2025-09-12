@@ -16,6 +16,7 @@
     "dev": "tsx watch ./src/app.ts",
     "start": "node ./dist/app.js",
     "type:check": "tsc --noEmit",
+    "build:tsc": "npm run clean && tsc && tsc-alias",
     "build": "npm run clean && npm run type:check && swc src -d dist --strip-leading-paths",
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
@@ -71,6 +72,7 @@
     "jiti": "^2.5.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.20.5",
     "typescript-eslint": "^8.43.0"
   }
