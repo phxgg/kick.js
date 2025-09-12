@@ -1,8 +1,10 @@
-import logger from '@/winston.logger';
+import { createLogger } from '@/winston.logger';
 
 import { KickClient } from '@/KickAPI/KickClient';
 import { EventSubscriptionMethod } from '@/KickAPI/services/EventsService';
 import { WebhookEventNames } from '@/KickAPI/webhooks/WebhookEvents';
+
+const logger = createLogger('TestService');
 
 class TestService {
   async getSubscribedEvents(kick: KickClient) {

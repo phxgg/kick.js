@@ -11,7 +11,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import passport from 'passport';
 
-import logger from '@/winston.logger';
+import { createLogger } from '@/winston.logger';
 import { connectMongo } from '@/db';
 
 import { initCronJobs } from './cron';
@@ -19,6 +19,8 @@ import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { createOAuthRouter } from './routers/oauth.router';
 import { createTestRouter } from './routers/test.router';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
+
+const logger = createLogger('App');
 
 morgan.token('remote-user', (req: any) => {
   return req.user ? req.user.email : 'guest';

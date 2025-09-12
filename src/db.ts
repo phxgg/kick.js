@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 
-import logger from '@/winston.logger';
+import { createLogger } from '@/winston.logger';
+
+const logger = createLogger('MongoDB');
 
 let connecting: Promise<typeof mongoose> | null = null;
 
@@ -9,9 +11,9 @@ export function connectMongo(uri = process.env.MONGODB_URI!) {
   if (mongoose.connection.readyState === 1) return Promise.resolve(mongoose); // already connected
   if (connecting) return connecting;
 
-  mongoose.connection.on('connected', () => logger.info('[MongoDB] connected'));
-  mongoose.connection.on('error', (err) => logger.error('[MongoDB] error', err));
-  mongoose.connection.on('disconnected', () => logger.warn('[MongoDB] disconnected'));
+  mongoose.connection.on('connected', () => logger.info('Connected'));
+  mongoose.connection.on('error', (err) => logger.error('Error', err));
+  mongoose.connection.on('disconnected', () => logger.warn('Disconnected'));
 
   connecting = mongoose.connect(uri).finally(() => {
     connecting = null;
