@@ -4,7 +4,6 @@ import logger from '@/winston.logger';
 
 import { TokenModel } from '@/models/Token';
 
-// FIXME: cronjobs error when bulding and running npm start
 const job = CronJob.from({
   cronTime: '0 0 * * *', // Every day at midnight
   // do not use arrow function here to preserve `this`

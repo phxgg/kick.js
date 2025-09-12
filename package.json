@@ -15,7 +15,8 @@
     "clean": "rimraf tsconfig.tsbuildinfo ./dist",
     "dev": "tsx watch ./src/app.ts",
     "start": "node ./dist/app.js",
-    "build": "npm run clean && tsc && tsc-alias",
+    "type:check": "tsc --noEmit",
+    "build": "npm run clean && npm run type:check && swc src -d dist --strip-leading-paths",
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\"",
@@ -48,6 +49,8 @@
   "devDependencies": {
     "@eslint/js": "^9.35.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
+    "@swc/cli": "^0.7.8",
+    "@swc/core": "^1.13.5",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
@@ -68,7 +71,6 @@
     "jiti": "^2.5.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.0.1",
-    "tsc-alias": "^1.8.16",
     "tsx": "^4.20.5",
     "typescript-eslint": "^8.43.0"
   }
