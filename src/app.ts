@@ -14,7 +14,7 @@ import passport from 'passport';
 import { createLogger } from '@/winston.logger';
 import { connectMongo } from '@/db';
 
-import { initCronJobs } from './cron';
+import { initCronJobs } from './cron-jobs';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { createOAuthRouter } from './routers/oauth.router';
 import { createTestRouter } from './routers/test.router';
