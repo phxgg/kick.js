@@ -3,13 +3,17 @@ import DailyRotateFile from 'winston-daily-rotate-file';
 
 import winston from 'winston';
 
+const _BLUE = '\x1b[34m';
+const _CYAN = '\x1b[36m';
+const _RESET = '\x1b[0m';
+
 const transports: winston.transport[] = [];
 
 // Add console transport for non-production environments
 const isProduction = process.env.NODE_ENV === 'production';
 if (!isProduction) {
   const consoleFormat = winston.format.printf((info) => {
-    const { timestamp, level, label } = info;
+    const { timestamp, level, label, service } = info;
     let msg: string;
 
     // Smart stringify like console.log
@@ -27,8 +31,9 @@ if (!isProduction) {
     if (meta && Object.keys(meta).length) {
       metaStr = ' ' + inspect(meta, { colors: true, depth: null, compact: false });
     }
-
-    return `${timestamp} [${level}]${label ? ' [' + label + ']' : ''} ${msg}${metaStr}`;
+    // Colorize service name in cyan
+    const serviceStr = service ? ` [${_CYAN}${service}${_RESET}]` : '';
+    return `${timestamp} [${level}]${label ? ' [' + label + ']' : ''}${serviceStr} ${msg}${metaStr}`;
   });
 
   transports.push(
@@ -87,8 +92,15 @@ transports.push(
 export const winstonInstance = winston.createLogger({
   level: isProduction ? 'info' : 'debug',
   format: winston.format.combine(winston.format.timestamp(), winston.format.json()),
-  defaultMeta: { service: 'kick-api' },
   transports: transports,
 });
+
+/**
+ * Returns a child logger with a specific service or label.
+ * @param service The name of the service or label for the logger.
+ */
+export function createLogger(service: string) {
+  return winstonInstance.child({ service: service });
+}
 
 export default winstonInstance;

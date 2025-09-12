@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import ms, { type StringValue } from 'ms';
 import passport from 'passport';
 
-import { signAccessToken, signRefreshToken } from '@/utils/jwt';
+import { oauthController } from '@/controllers/oauth.controller';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
-
-// import { signAccessToken, signRefreshToken } from '@/utils/jwt';
+import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
+import { validateData } from '@/middleware/validate-data.middleware';
+import { revokeTokenValidator, type RevokeTokenInput } from '@/validators/revoke-token.validator';
 
 export function createOAuthRouter() {
   const router = Router();
@@ -16,17 +16,11 @@ export function createOAuthRouter() {
     '/kick/callback',
     passport.authenticate('kick', { session: false }),
     attachKickClientToReq,
-    async (req, res) => {
-      const userId = req.user._id.toString();
-      const accessToken = signAccessToken({ sub: userId });
-      const refreshToken = signRefreshToken({ sub: userId });
-      return res.json({
-        accessToken,
-        refreshToken,
-        expiresIn: Math.floor(ms(process.env.JWT_ACCESS_EXPIRATION! as StringValue) / 1000),
-      });
-    }
+    oauthController.kickCallback
   );
+
+  router.post('/token/revoke', validateData(revokeTokenValidator), oauthController.revokeToken);
+  router.post('/token/revoke-all', bearerAuthMiddleware, oauthController.revokeAllUserTokens);
 
   return router;
 }

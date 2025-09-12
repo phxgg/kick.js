@@ -2,11 +2,13 @@ import crypto from 'crypto';
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import logger from '@/winston.logger';
+import { createLogger } from '@/winston.logger';
 
 import { getKickPublicKey } from '../services/PublicKeyService';
 import { handleChatMessageSent } from './WebhookEventHandlers';
 import { WebhookEvents, type WebhookEventNames } from './WebhookEvents';
+
+const logger = createLogger('KickAPI.WebhookRouter');
 
 export function createWebhookRouter() {
   const router = express.Router();

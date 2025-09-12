@@ -23,7 +23,7 @@ export class KickClient {
   public events: EventsService;
 
   constructor(clientId: string, clientSecret: string) {
-    this.oauth = new OAuth(clientId, clientSecret);
+    this.oauth = OAuth.getInstance(clientId, clientSecret);
     this.categories = new CategoriesService(this);
     this.channels = new ChannelsService(this);
     this.users = new UsersService(this);
