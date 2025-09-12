@@ -26,7 +26,7 @@ const TokenSchema = new Schema(
     revokedAt: { type: Date, default: null, index: true },
     reason: { type: String },
     // Ensure automatic cleanup after token expiration
-    expiresAt: { type: Date, required: true, index: true },
+    expiresAt: { type: Date, required: true },
   },
   {
     timestamps: true,
