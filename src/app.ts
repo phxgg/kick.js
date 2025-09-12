@@ -14,6 +14,7 @@ import passport from 'passport';
 import logger from '@/winston.logger';
 import { connectMongo } from '@/db';
 
+import { initCronJobs } from './cron';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { createOAuthRouter } from './routers/oauth.router';
 import { createTestRouter } from './routers/test.router';
@@ -94,11 +95,14 @@ app.get('/hello', (req, res) => {
   res.render('hello', { message: 'Hello World!' });
 });
 
-// Connect to MongoDB
-// Start only after DB connect (optional: remove await to start immediately)
+// Initialize in order
 (async () => {
   try {
+    // Connect to MongoDB
     await connectMongo();
+    // Initialize cron jobs
+    initCronJobs();
+    // Start web server
     app.listen(3000, () => {
       logger.info('Server started on http://localhost:3000');
     });
