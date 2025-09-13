@@ -26,7 +26,7 @@ export class UsersService {
    * Get information about the token that is passed in via the Authorization header.
    * This function is implements part of the on the OAuth 2.0 spec for token introspection.
    * Find the full spec here: https://datatracker.ietf.org/doc/html/rfc7662
-   * When active=false there is no additional information added in the response.
+   * When `active=false` there is no additional information added in the response.
    */
   async introspect(): Promise<TokenIntrospect> {
     const response = await fetch(`${KICK_BASE_URL}/token/introspect`, {
@@ -47,7 +47,9 @@ export class UsersService {
    * Retrieve user information based on provided user IDs.
    * If no user IDs are specified, the information
    * for the currently authorised user will be returned by default.
-   * @param id The ID of the user to fetch
+   *
+   * @param ids (Optional) Array of user IDs
+   * @returns An array of User instances.
    */
   async fetch(ids?: number[]): Promise<User[]> {
     const url = new URL(this.USERS_URL);

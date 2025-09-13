@@ -6,7 +6,7 @@ import { KICK_BASE_URL, KickClient } from '../KickClient';
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 
 export type UpdateChannelDto = {
-  categoryId: number;
+  categoryId?: number;
   customTags?: string[];
   streamTitle?: string;
 };
@@ -21,16 +21,30 @@ export class ChannelsService {
 
   /**
    * Retrieve channel information based on provided broadcaster user IDs or channel slugs. You can either:
-   * Provide no parameters (returns information for the currently authenticated user)
-   * Provide only `broadcasterUserId` parameters (up to 50)
-   * Provide only `slug` parameters (up to 50, each max 25 characters) Note: You cannot mix `broadcasterUserId` and `slug` parameters in the same request.
+   * 1. Provide no parameters (returns information for the currently authenticated user)
+   * 2. Provide only `broadcasterUserId` parameters (up to 50)
+   * 3. Provide only `slug` parameters (up to 50, each max 25 characters) Note: You cannot mix `broadcasterUserId` and `slug` parameters in the same request.
+   *
    * @param options The options for fetching the channel
+   * @param options.broadcasterUserId (Optional) Array of broadcaster user IDs (up to 50)
+   * @param options.slug (Optional) Array of channel slugs (up to 50, each max 25 characters)
+   * @returns An array of Channel instances.
    */
   async fetch({ broadcasterUserId, slug }: { broadcasterUserId?: number[]; slug?: string[] }): Promise<Channel[]> {
-    const url = new URL(this.CHANNELS_URL);
     if (broadcasterUserId && broadcasterUserId.length > 0 && slug && slug.length > 0) {
       throw new Error('Cannot mix broadcasterUserId and slug parameters');
     }
+    if (broadcasterUserId && broadcasterUserId.length > 50) {
+      throw new Error('You can only request up to 50 broadcasterUserId values at a time.');
+    }
+    if (slug && slug.length > 50) {
+      throw new Error('You can only request up to 50 slug values at a time.');
+    }
+    if (slug && slug.some((s) => s.length > 25)) {
+      throw new Error('Each slug can be a maximum of 25 characters long.');
+    }
+
+    const url = new URL(this.CHANNELS_URL);
     if (broadcasterUserId && broadcasterUserId.length > 0) {
       url.searchParams.append('broadcaster_user_id', broadcasterUserId.join(' '));
     }
@@ -50,14 +64,35 @@ export class ChannelsService {
     return channels;
   }
 
+  /**
+   * Fetch a channel by its ID.
+   *
+   * @param id The ID of the channel to fetch
+   * @returns The Channel instance.
+   */
   async fetchById(id: number): Promise<Channel> {
     return (await this.fetch({ broadcasterUserId: [id] }))[0];
   }
 
+  /**
+   * Fetch a channel by its slug.
+   *
+   * @param slug The slug of the channel to fetch
+   * @returns The Channel instance.
+   */
   async fetchBySlug(slug: string): Promise<Channel> {
     return (await this.fetch({ slug: [slug] }))[0];
   }
 
+  /**
+   * Update the authenticated user's channel information.
+   *
+   * @param options The options for updating the channel
+   * @param options.categoryId (Optional) The ID of the category to set for the channel
+   * @param options.customTags (Optional) An array of custom tags to set for the channel
+   * @param options.streamTitle (Optional) The title of the stream
+   * @returns A promise that resolves when the update is complete
+   */
   async update({ categoryId, customTags, streamTitle }: UpdateChannelDto): Promise<void> {
     const response = await fetch(this.CHANNELS_URL, {
       method: 'PATCH',
