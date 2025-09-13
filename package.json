@@ -16,7 +16,6 @@
     "dev": "tsx watch ./src/app.ts",
     "start": "node ./dist/app.js",
     "type:check": "tsc --noEmit",
-    "generate-types": "tsc -p tsconfig.declaration.json && tsc-alias",
     "build:tsc": "npm run clean && tsc && tsc-alias",
     "build": "npm run clean && npm run type:check && swc src -d dist --copy-files --strip-leading-paths",
     "lint:check": "eslint \"{src,apps,libs,test}/**/*.ts\"",
