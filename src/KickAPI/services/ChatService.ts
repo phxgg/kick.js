@@ -25,6 +25,19 @@ export class ChatService {
     this.client = client;
   }
 
+  /**
+   * Post a chat message to a channel as a user or a bot.
+   * When sending as a user, the broadcaster_user_id is required.
+   * Whereas when sending as a bot, the broadcaster_user_id is not required and is ignored.
+   * As a bot, the message will always be sent to the channel attached to your token.
+   *
+   * @param options The options for sending a message
+   * @param options.broadcasterUserId (Optional) The ID of the broadcaster to whom the message is sent
+   * @param options.content The content of the message (max 500 characters)
+   * @param options.replyToMessageId (Optional) The ID of the message being replied to
+   * @param options.type The type of message (user or bot)
+   * @returns The sent Message instance.
+   */
   async send({
     broadcasterUserId,
     content,
@@ -34,6 +47,7 @@ export class ChatService {
     if (content.length > 500) {
       throw new Error('Message content exceeds maximum length of 500 characters');
     }
+
     const response = await fetch(this.CHAT_URL, {
       method: 'POST',
       headers: {

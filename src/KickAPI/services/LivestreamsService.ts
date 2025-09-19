@@ -26,6 +26,17 @@ export class LivestreamsService {
     this.client = client;
   }
 
+  /**
+   * Fetches livestreams from the Kick API.
+   *
+   * @param options Options for fetching livestreams.
+   * @param options.broadcaster_user_id (Optional) Array of broadcaster user IDs to filter by. Max: 50 IDs.
+   * @param options.category_id (Optional) Category ID to filter by.
+   * @param options.language (Optional) Language code to filter by.
+   * @param options.limit (Optional) Maximum number of results to return. Min: 1, Max: 100.
+   * @param options.sort (Optional) Sort order.
+   * @returns An array of Livestream instances.
+   */
   async fetch({
     broadcaster_user_id,
     category_id,
@@ -33,6 +44,13 @@ export class LivestreamsService {
     limit,
     sort,
   }: FetchLivestreamsParams): Promise<Livestream[]> {
+    if (broadcaster_user_id && broadcaster_user_id.length > 50) {
+      throw new Error('You can only request up to 50 broadcaster_user_id values at a time.');
+    }
+    if (limit && (limit < 1 || limit > 100)) {
+      throw new Error('The limit must be between 1 and 100.');
+    }
+
     const url = new URL(this.LIVESTREAMS_URL);
     if (broadcaster_user_id && broadcaster_user_id.length > 0) {
       broadcaster_user_id.forEach((id) => url.searchParams.append('broadcaster_user_id', String(id)));

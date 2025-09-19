@@ -33,11 +33,6 @@ export class KickClient {
     this.events = new EventsService(this);
   }
 
-  async initializeAppToken() {
-    this.appToken = await this.oauth.generateAppToken();
-    console.log('[KickClient] App token initialized');
-  }
-
   setToken(token: Token) {
     this.token = token;
   }

@@ -11,8 +11,7 @@
   "jsc": {
     "parser": {
       "syntax": "typescript",
-      "tsx": false,
-      "decorators": false,
+      "decorators": true,
       "dynamicImport": true
     },
     "target": "es2024",
@@ -21,5 +20,6 @@
       "@/*": ["src/*"]
     }
   },
-  "sourceMaps": true
+  "sourceMaps": true,
+  "minify": false
 }

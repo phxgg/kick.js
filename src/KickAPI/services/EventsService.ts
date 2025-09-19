@@ -41,6 +41,11 @@ export class EventsService {
     this.client = client;
   }
 
+  /**
+   * Fetch all event subscriptions for the authenticated user.
+   *
+   * @returns An array of EventSubscription instances.
+   */
   async fetch(): Promise<EventSubscription[]> {
     const response = await fetch(this.EVENTS_URL, {
       headers: {
@@ -57,6 +62,15 @@ export class EventsService {
     return data;
   }
 
+  /**
+   * Subscribe to multiple events.
+   *
+   * @param options The options for subscribing to multiple events
+   * @param options.broadcasterUserId (Optional) The ID of the broadcaster to whom the events are related
+   * @param options.events An array of event details (name and version)
+   * @param options.method (Optional) The method of subscription (default is 'webhook')
+   * @returns An array of PostEventSubscriptionData instances.
+   */
   async subscribeMultiple({
     broadcasterUserId,
     events,
@@ -83,6 +97,15 @@ export class EventsService {
     return json.data;
   }
 
+  /**
+   * Subscribe to a single event.
+   *
+   * @param options The options for subscribing to a single event
+   * @param options.broadcasterUserId (Optional) The ID of the broadcaster to whom the event is related
+   * @param options.event The event details (name and version)
+   * @param options.method (Optional) The method of subscription (default is 'webhook')
+   * @returns The created PostEventSubscriptionData instance.
+   */
   async subscribe({ broadcasterUserId, event, method }: SubscribeToSingleEventDto): Promise<PostEventSubscriptionData> {
     const results = await this.subscribeMultiple({
       broadcasterUserId,
@@ -92,6 +115,12 @@ export class EventsService {
     return results[0];
   }
 
+  /**
+   * Unsubscribe from multiple events.
+   *
+   * @param ids Array of subscription IDs to unsubscribe from
+   * @returns void
+   */
   async unsubscribeMultiple(ids: string[]): Promise<void> {
     if (ids.length === 0) return;
     const url = new URL(this.EVENTS_URL);
@@ -108,6 +137,12 @@ export class EventsService {
     }
   }
 
+  /**
+   * Unsubscribe from a single event.
+   *
+   * @param id The subscription ID to unsubscribe from
+   * @returns void
+   */
   async unsubscribe(id: string): Promise<void> {
     return this.unsubscribeMultiple([id]);
   }

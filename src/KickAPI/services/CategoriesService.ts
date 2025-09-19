@@ -22,9 +22,10 @@ export class CategoriesService {
   /**
    * Get Categories based on the search word.
    * Returns up to 100 results at a time; use the page parameter to get more results.
+   *
    * @param options The search parameters
    * @param options.q Search query
-   * @param options.page Page (defaults to 1 if not provided)
+   * @param options.page (Optional) Page (defaults to 1 if not provided)
    */
   async search({ q, page }: SearchCategoryParams): Promise<Category[]> {
     const url = new URL(this.CATEGORIES_URL);
@@ -47,6 +48,7 @@ export class CategoriesService {
 
   /**
    * Get information about a specific category.
+   *
    * @param id The ID of the category to fetch
    */
   async fetch(id: number): Promise<Category> {

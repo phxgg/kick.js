@@ -12,7 +12,7 @@
     "ncu:check": "npx npm-check-updates -x @types/node",
     "ncu:update": "npx npm-check-updates -u -x @types/node",
     "bump-deps": "npm run ncu:update && npm i && git add . && git commit -m \"chore: bump deps\"",
-    "clean": "rimraf tsconfig.tsbuildinfo ./dist",
+    "clean": "rimraf tsconfig.*.tsbuildinfo ./dist",
     "dev": "tsx watch ./src/app.ts",
     "start": "node ./dist/app.js",
     "type:check": "tsc --noEmit",
@@ -41,14 +41,13 @@
     "passport": "^0.7.0",
     "passport-jwt": "^4.0.1",
     "passport-oauth2": "^1.8.0",
-    "typescript": "^5.9.2",
     "ulid": "^3.0.1",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0",
-    "zod": "^4.1.8"
+    "zod": "^4.1.9"
   },
   "devDependencies": {
-    "@eslint/js": "^9.35.0",
+    "@eslint/js": "^9.36.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.13.5",
@@ -63,9 +62,9 @@
     "@types/passport": "^1.0.17",
     "@types/passport-jwt": "^4.0.1",
     "@types/passport-oauth2": "^1.8.0",
-    "@typescript-eslint/eslint-plugin": "^8.43.0",
-    "@typescript-eslint/parser": "^8.43.0",
-    "eslint": "^9.35.0",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
+    "@typescript-eslint/parser": "^8.44.0",
+    "eslint": "^9.36.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.4.0",
@@ -74,6 +73,7 @@
     "rimraf": "^6.0.1",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.20.5",
-    "typescript-eslint": "^8.43.0"
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.44.0"
   }
 }

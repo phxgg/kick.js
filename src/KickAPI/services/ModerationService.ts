@@ -25,7 +25,20 @@ export class ModerationService {
     this.client = client;
   }
 
+  /**
+   * Ban a user from a channel.
+   *
+   * @param options The options for banning a user
+   * @param options.broadcasterUserId The ID of the broadcaster from whose channel the user is being banned
+   * @param options.userId The ID of the user to be banned
+   * @param options.reason (Optional) The reason for the ban
+   * @returns void
+   */
   async banUser({ broadcasterUserId, userId, reason }: BanUserDto): Promise<void> {
+    if (reason && reason.length > 100) {
+      throw new Error('Reason exceeds maximum length of 100 characters');
+    }
+
     const response = await fetch(`${this.MODERATION_URL}/bans`, {
       method: 'POST',
       headers: {
@@ -43,7 +56,24 @@ export class ModerationService {
     }
   }
 
+  /**
+   * Timeout a user in a channel.
+   *
+   * @param options The options for timing out a user
+   * @param options.broadcasterUserId The ID of the broadcaster from whose channel the user is being timed out
+   * @param options.userId The ID of the user to be timed out
+   * @param options.reason (Optional) The reason for the timeout
+   * @param options.duration The duration of the timeout in seconds (max 7 days)
+   * @returns void
+   */
   async timeoutUser({ broadcasterUserId, userId, reason, duration }: TimeoutUserDto): Promise<void> {
+    if (reason && reason.length > 100) {
+      throw new Error('Reason exceeds maximum length of 100 characters');
+    }
+    if (duration < 1 || duration > 10080) {
+      throw new Error('Duration must be between 1 and 10080 seconds (7 days)');
+    }
+
     const response = await fetch(`${this.MODERATION_URL}/bans`, {
       method: 'POST',
       headers: {
@@ -62,6 +92,14 @@ export class ModerationService {
     }
   }
 
+  /**
+   * Remove a ban or timeout from a user in a channel.
+   *
+   * @param options The options for removing a ban or timeout
+   * @param options.broadcasterUserId The ID of the broadcaster from whose channel the ban/timeout is being removed
+   * @param options.userId The ID of the user whose ban/timeout is being removed
+   * @returns void
+   */
   async removeBan({ broadcasterUserId, userId }: RemoveBanDto): Promise<void> {
     const response = await fetch(`${this.MODERATION_URL}/bans`, {
       method: 'DELETE',
