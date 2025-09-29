@@ -12,7 +12,7 @@
     "ncu:check": "npx npm-check-updates -x @types/node",
     "ncu:update": "npx npm-check-updates -u -x @types/node",
     "bump-deps": "npm run ncu:update && npm i && git add . && git commit -m \"chore: bump deps\"",
-    "clean": "rimraf tsconfig.*.tsbuildinfo ./dist",
+    "clean": "rimraf tsconfig.tsbuildinfo ./dist",
     "dev": "tsx watch ./src/app.ts",
     "start": "node ./dist/app.js",
     "type:check": "tsc --noEmit",
