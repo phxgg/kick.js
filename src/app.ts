@@ -27,8 +27,10 @@ morgan.token('remote-user', (req: any) => {
 });
 
 const app = express();
-// If you have your node.js behind a proxy and are using secure: true, you need to set "trust proxy" in express:
-// app.set('trust proxy', 1);
+
+if (process.env.EXPRESS_ENABLE_TRUST_PROXY === 'true') {
+  app.set('trust proxy', 1);
+}
 
 // view engine
 app.set('view engine', 'ejs');
