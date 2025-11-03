@@ -47,7 +47,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@eslint/js": "^9.38.0",
+    "@eslint/js": "^9.39.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.7.0",
     "@swc/cli": "^0.7.8",
     "@swc/core": "^1.14.0",
@@ -64,10 +64,10 @@
     "@types/passport-oauth2": "^1.8.0",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
-    "eslint": "^9.38.0",
+    "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
-    "globals": "^16.4.0",
+    "globals": "^16.5.0",
     "jiti": "^2.6.1",
     "prettier": "^3.6.2",
     "rimraf": "^6.1.0",
