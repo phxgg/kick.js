@@ -7,6 +7,7 @@ export enum WebhookEvents {
   LIVESTREAM_STATUS_UPDATED = 'livestream.status.updated',
   LIVESTREAM_METADATA_UPDATED = 'livestream.metadata.updated',
   MODERATION_BANNED = 'moderation.banned',
+  KICKS_GIFTED = 'kicks.gifted',
 }
 
 export type WebhookEventNames = (typeof WebhookEvents)[keyof typeof WebhookEvents];
