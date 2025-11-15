@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { Channel, ChannelDto } from '../Channel';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { handleError, parseJSON } from '../utils';
 
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 
@@ -51,15 +51,18 @@ export class ChannelsService {
     if (slug && slug.length > 0) {
       slug.forEach((s) => url.searchParams.append('slug', s));
     }
+
     const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchChannelsResponse;
+
+    const json = await parseJSON<FetchChannelsResponse>(response);
     const channels = json.data.map((channel) => new Channel(this.client, channel));
     return channels;
   }

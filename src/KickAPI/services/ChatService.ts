@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Message, MessageDto } from '../Message';
+import { handleError, parseJSON } from '../utils';
 
 export enum ChatMessageType {
   USER = 'user',
@@ -61,10 +61,12 @@ export class ChatService {
         type,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as SendMessageResponse;
+
+    const json = await parseJSON<SendMessageResponse>(response);
     const message = new Message(this.client, json.data);
     return message;
   }

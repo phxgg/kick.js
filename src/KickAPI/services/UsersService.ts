@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { User, type UserDto } from '../User';
+import { handleError, parseJSON } from '../utils';
 
 type TokenIntrospect = {
   active: boolean;
@@ -35,10 +35,12 @@ export class UsersService {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as TokenIntrospectResponse;
+
+    const json = await parseJSON<TokenIntrospectResponse>(response);
     const token = json.data;
     return token;
   }
@@ -56,15 +58,18 @@ export class UsersService {
     if (ids) {
       ids.forEach((id) => url.searchParams.append('id', String(id)));
     }
+
     const response = await fetch(url, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchUserResponse;
+
+    const json = await parseJSON<FetchUserResponse>(response);
     const data = json.data.map((user) => new User(this.client, user));
     return data;
   }

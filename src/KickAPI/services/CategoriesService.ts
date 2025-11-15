@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { Category, CategoryDto } from '../Category';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { handleError, parseJSON } from '../utils';
 
 export type SearchCategoryParams = {
   q: string;
@@ -33,15 +33,18 @@ export class CategoriesService {
     if (page) {
       url.searchParams.append('page', page.toString());
     }
+
     const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as SearchCategoryResponse;
+
+    const json = await parseJSON<SearchCategoryResponse>(response);
     const categories = json.data.map((category) => new Category(this.client, category));
     return categories;
   }
@@ -57,10 +60,12 @@ export class CategoriesService {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchCategoryResponse;
+
+    const json = await parseJSON<FetchCategoryResponse>(response);
     const category = new Category(this.client, json.data);
     return category;
   }

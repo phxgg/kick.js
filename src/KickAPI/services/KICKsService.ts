@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Leaderboard, type LeaderboardDto } from '../Leaderboard';
+import { handleError, parseJSON } from '../utils';
 
 export enum Sort {
   VIEWER_COUNT = 'viewer_count',
@@ -39,10 +39,12 @@ export class KICKsService {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchLeaderboardResponse;
+
+    const json = await parseJSON<FetchLeaderboardResponse>(response);
     const leaderboard = new Leaderboard(this.client, json.data);
     return leaderboard;
   }

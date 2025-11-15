@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { EventSubscription, EventSubscriptionDto } from '../EventSubscription';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { handleError, parseJSON } from '../utils';
 
 export enum EventSubscriptionMethod {
   WEBHOOK = 'webhook',
@@ -57,7 +57,7 @@ export class EventsService {
       handleError(response);
     }
 
-    const json = (await response.json()) as FetchEventsResponse;
+    const json = await parseJSON<FetchEventsResponse>(response);
     const data = json.data.map((item) => new EventSubscription(this.client, item));
     return data;
   }
@@ -93,7 +93,7 @@ export class EventsService {
       handleError(response);
     }
 
-    const json = (await response.json()) as EventSubscriptionResponse;
+    const json = await parseJSON<EventSubscriptionResponse>(response);
     return json.data;
   }
 

@@ -1,6 +1,5 @@
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { Message } from '../Message';
+import { handleError } from '../utils';
 
 export type BanUserDto = {
   broadcasterUserId: number;
@@ -51,6 +50,7 @@ export class ModerationService {
         reason,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }
@@ -87,6 +87,7 @@ export class ModerationService {
         duration,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }
@@ -112,6 +113,7 @@ export class ModerationService {
         user_id: userId,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }

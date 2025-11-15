@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Livestream, type LivestreamDto } from '../Livestream';
+import { handleError, parseJSON } from '../utils';
 
 export enum Sort {
   VIEWER_COUNT = 'viewer_count',
@@ -67,15 +67,18 @@ export class LivestreamsService {
     if (sort) {
       url.searchParams.append('sort', sort);
     }
+
     const response = await fetch(url.toString(), {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchLivestreamsResponse;
+
+    const json = await parseJSON<FetchLivestreamsResponse>(response);
     const livestreams = json.data.map((livestream) => new Livestream(this.client, livestream));
     return livestreams;
   }
