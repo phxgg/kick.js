@@ -35,7 +35,7 @@ export class Livestream extends Serializable {
     return this.dto.broadcaster_user_id;
   }
 
-  get category(): CategoryDto {
+  get category() {
     return new Category(this.client, this.dto.category);
   }
 
