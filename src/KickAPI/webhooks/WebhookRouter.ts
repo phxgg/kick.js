@@ -5,7 +5,17 @@ import { StatusCodes } from 'http-status-codes';
 import { createLogger } from '@/winston.logger';
 
 import { getKickPublicKey } from '../services/PublicKeyService';
-import { handleChatMessageSent } from './WebhookEventHandlers';
+import {
+  handleChannelFollowed,
+  handleChannelSubscriptionGifts,
+  handleChannelSubscriptionNew,
+  handleChannelSubscriptionRenewal,
+  handleChatMessageSent,
+  handleKicksGifted,
+  handleLivestreamMetadataUpdated,
+  handleLivestreamStatusUpdated,
+  handleModerationBanned,
+} from './WebhookEventHandlers';
 import { WebhookEvents, type WebhookEventNames } from './WebhookEvents';
 
 const logger = createLogger('KickAPI.WebhookRouter');
@@ -39,13 +49,40 @@ export function createWebhookRouter() {
         logger.warn('Webhook signature verification failed');
         return res.sendStatus(StatusCodes.FORBIDDEN);
       }
-      const parsedBody = JSON.parse(rawBody);
-      logger.info('Received Kick webhook event', { event: parsedBody });
+      const payload = JSON.parse(rawBody);
+      logger.info('Received Kick webhook event', { event: payload });
 
       // Handle event
       switch (eventType) {
         case WebhookEvents.CHAT_MESSAGE_SENT:
-          handleChatMessageSent(parsedBody);
+          handleChatMessageSent(payload);
+          break;
+        case WebhookEvents.CHANNEL_FOLLOWED:
+          handleChannelFollowed(payload);
+          break;
+        case WebhookEvents.CHANNEL_SUBSCRIPTION_RENEWAL:
+          handleChannelSubscriptionRenewal(payload);
+          break;
+        case WebhookEvents.CHANNEL_SUBSCRIPTION_GIFTS:
+          handleChannelSubscriptionGifts(payload);
+          break;
+        case WebhookEvents.CHANNEL_SUBSCRIPTION_NEW:
+          handleChannelSubscriptionNew(payload);
+          break;
+        case WebhookEvents.LIVESTREAM_STATUS_UPDATED:
+          handleLivestreamStatusUpdated(payload);
+          break;
+        case WebhookEvents.LIVESTREAM_METADATA_UPDATED:
+          handleLivestreamMetadataUpdated(payload);
+          break;
+        case WebhookEvents.MODERATION_BANNED:
+          handleModerationBanned(payload);
+          break;
+        case WebhookEvents.KICKS_GIFTED:
+          handleKicksGifted(payload);
+          break;
+        default:
+          logger.warn(`Unhandled Kick webhook event type: ${eventType}`);
           break;
       }
 
