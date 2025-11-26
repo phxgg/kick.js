@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { Livestream, type LivestreamDto } from '../Livestream';
+import { Livestream, type LivestreamDto, type LivestreamStatsDto } from '../Livestream';
+import { handleError, parseJSON } from '../utils';
 
 export enum Sort {
   VIEWER_COUNT = 'viewer_count',
@@ -17,6 +17,7 @@ export type FetchLivestreamsParams = {
 };
 
 export type FetchLivestreamsResponse = BaseResponse<LivestreamDto[]>;
+export type FetchLivestreamStatsResponse = BaseResponse<LivestreamStatsDto>;
 
 export class LivestreamsService {
   private LIVESTREAMS_URL: string = KICK_BASE_URL + '/livestreams';
@@ -51,32 +52,53 @@ export class LivestreamsService {
       throw new Error('The limit must be between 1 and 100.');
     }
 
-    const url = new URL(this.LIVESTREAMS_URL);
+    const endpoint = new URL(this.LIVESTREAMS_URL);
+
     if (broadcaster_user_id && broadcaster_user_id.length > 0) {
-      broadcaster_user_id.forEach((id) => url.searchParams.append('broadcaster_user_id', String(id)));
+      broadcaster_user_id.forEach((id) => endpoint.searchParams.append('broadcaster_user_id', String(id)));
     }
     if (category_id) {
-      url.searchParams.append('category_id', String(category_id));
+      endpoint.searchParams.append('category_id', String(category_id));
     }
     if (language) {
-      url.searchParams.append('language', language);
+      endpoint.searchParams.append('language', language);
     }
     if (limit) {
-      url.searchParams.append('limit', String(limit));
+      endpoint.searchParams.append('limit', String(limit));
     }
     if (sort) {
-      url.searchParams.append('sort', sort);
+      endpoint.searchParams.append('sort', sort);
     }
-    const response = await fetch(url.toString(), {
+
+    const response = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchLivestreamsResponse;
+
+    const json = await parseJSON<FetchLivestreamsResponse>(response);
     const livestreams = json.data.map((livestream) => new Livestream(this.client, livestream));
     return livestreams;
+  }
+
+  async fetchStats(): Promise<{ total_count: number }> {
+    const endpoint = new URL(this.LIVESTREAMS_URL + '/stats');
+
+    const response = await fetch(endpoint, {
+      headers: {
+        Authorization: `Bearer ${this.client.token?.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      handleError(response);
+    }
+
+    const json = await parseJSON<FetchLivestreamStatsResponse>(response);
+    return json.data;
   }
 }

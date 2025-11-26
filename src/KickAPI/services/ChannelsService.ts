@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { Channel, ChannelDto } from '../Channel';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { handleError, parseJSON } from '../utils';
 
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 
@@ -44,22 +44,25 @@ export class ChannelsService {
       throw new Error('Each slug can be a maximum of 25 characters long.');
     }
 
-    const url = new URL(this.CHANNELS_URL);
+    const endpoint = new URL(this.CHANNELS_URL);
     if (broadcasterUserId && broadcasterUserId.length > 0) {
-      url.searchParams.append('broadcaster_user_id', broadcasterUserId.join(' '));
+      endpoint.searchParams.append('broadcaster_user_id', broadcasterUserId.join(' '));
     }
     if (slug && slug.length > 0) {
-      slug.forEach((s) => url.searchParams.append('slug', s));
+      slug.forEach((s) => endpoint.searchParams.append('slug', s));
     }
-    const response = await fetch(url.toString(), {
+
+    const response = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchChannelsResponse;
+
+    const json = await parseJSON<FetchChannelsResponse>(response);
     const channels = json.data.map((channel) => new Channel(this.client, channel));
     return channels;
   }
@@ -94,7 +97,9 @@ export class ChannelsService {
    * @returns A promise that resolves when the update is complete
    */
   async update({ categoryId, customTags, streamTitle }: UpdateChannelDto): Promise<void> {
-    const response = await fetch(this.CHANNELS_URL, {
+    const endpoint = new URL(this.CHANNELS_URL);
+
+    const response = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -106,6 +111,7 @@ export class ChannelsService {
         stream_title: streamTitle,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }

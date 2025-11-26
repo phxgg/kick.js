@@ -1,6 +1,6 @@
 import { generateCodeChallenge, generateCodeVerifier } from '@/utils/pkce';
 
-import { handleError } from './errors';
+import { handleError } from './utils';
 
 export type AppToken = {
   access_token: string;
@@ -54,7 +54,15 @@ export class OAuth {
     codeVerifier: string;
   }> {
     const authorizeUrl = new URL(`${this.OAUTH_URL}/oauth/authorize`);
-    const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
+    const scopes = [
+      'user:read',
+      'channel:read',
+      'channel:write',
+      'chat:write',
+      'events:subscribe',
+      'moderation:ban',
+      'kicks:read',
+    ];
 
     // Generate a code challenge from the verifier (async)
     const codeVerifier = generateCodeVerifier();

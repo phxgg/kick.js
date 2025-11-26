@@ -9,4 +9,4 @@ export const revokeTokenValidator = z.object({
   provider: z.string().min(1).max(100).optional(),
 });
 
-export type RevokeTokenInput = z.infer<typeof revokeTokenValidator>;
+export type RevokeTokenSchema = z.infer<typeof revokeTokenValidator>;

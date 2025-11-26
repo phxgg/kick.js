@@ -1,6 +1,5 @@
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { Message } from '../Message';
+import { handleError } from '../utils';
 
 export type BanUserDto = {
   broadcasterUserId: number;
@@ -39,7 +38,9 @@ export class ModerationService {
       throw new Error('Reason exceeds maximum length of 100 characters');
     }
 
-    const response = await fetch(`${this.MODERATION_URL}/bans`, {
+    const endpoint = new URL(this.MODERATION_URL + '/bans');
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -51,6 +52,7 @@ export class ModerationService {
         reason,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }
@@ -74,7 +76,9 @@ export class ModerationService {
       throw new Error('Duration must be between 1 and 10080 seconds (7 days)');
     }
 
-    const response = await fetch(`${this.MODERATION_URL}/bans`, {
+    const endpoint = new URL(this.MODERATION_URL + '/bans');
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -87,6 +91,7 @@ export class ModerationService {
         duration,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }
@@ -101,7 +106,9 @@ export class ModerationService {
    * @returns void
    */
   async removeBan({ broadcasterUserId, userId }: RemoveBanDto): Promise<void> {
-    const response = await fetch(`${this.MODERATION_URL}/bans`, {
+    const endpoint = new URL(this.MODERATION_URL + '/bans');
+
+    const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -112,6 +119,7 @@ export class ModerationService {
         user_id: userId,
       }),
     });
+
     if (!response.ok) {
       handleError(response);
     }

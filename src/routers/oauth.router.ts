@@ -5,7 +5,7 @@ import { oauthController } from '@/controllers/oauth.controller';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
 import { validateData } from '@/middleware/validate-data.middleware';
-import { revokeTokenValidator, type RevokeTokenInput } from '@/validators/revoke-token.validator';
+import { revokeTokenValidator, type RevokeTokenSchema } from '@/validators/revoke-token.validator';
 
 export function createOAuthRouter() {
   const router = Router();

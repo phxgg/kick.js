@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { Category, CategoryDto } from '../Category';
-import { handleError } from '../errors';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { handleError, parseJSON } from '../utils';
 
 export type SearchCategoryParams = {
   q: string;
@@ -28,20 +28,24 @@ export class CategoriesService {
    * @param options.page (Optional) Page (defaults to 1 if not provided)
    */
   async search({ q, page }: SearchCategoryParams): Promise<Category[]> {
-    const url = new URL(this.CATEGORIES_URL);
-    url.searchParams.append('q', q);
+    const endpoint = new URL(this.CATEGORIES_URL);
+
+    endpoint.searchParams.append('q', q);
     if (page) {
-      url.searchParams.append('page', page.toString());
+      endpoint.searchParams.append('page', page.toString());
     }
-    const response = await fetch(url.toString(), {
+
+    const response = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as SearchCategoryResponse;
+
+    const json = await parseJSON<SearchCategoryResponse>(response);
     const categories = json.data.map((category) => new Category(this.client, category));
     return categories;
   }
@@ -52,15 +56,19 @@ export class CategoriesService {
    * @param id The ID of the category to fetch
    */
   async fetch(id: number): Promise<Category> {
-    const response = await fetch(`${this.CATEGORIES_URL}/${String(id)}`, {
+    const endpoint = new URL(this.CATEGORIES_URL + `/${String(id)}`);
+
+    const response = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
     });
+
     if (!response.ok) {
       handleError(response);
     }
-    const json = (await response.json()) as FetchCategoryResponse;
+
+    const json = await parseJSON<FetchCategoryResponse>(response);
     const category = new Category(this.client, json.data);
     return category;
   }

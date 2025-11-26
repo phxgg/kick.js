@@ -1,7 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { EventSubscription, EventSubscriptionDto } from '../EventSubscription';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { handleError, parseJSON } from '../utils';
 
 export enum EventSubscriptionMethod {
   WEBHOOK = 'webhook',
@@ -57,7 +57,7 @@ export class EventsService {
       handleError(response);
     }
 
-    const json = (await response.json()) as FetchEventsResponse;
+    const json = await parseJSON<FetchEventsResponse>(response);
     const data = json.data.map((item) => new EventSubscription(this.client, item));
     return data;
   }
@@ -76,7 +76,9 @@ export class EventsService {
     events,
     method,
   }: SubscribeToMultipleEventsDto): Promise<PostEventSubscriptionData[]> {
-    const response = await fetch(this.EVENTS_URL, {
+    const endpoint = new URL(this.EVENTS_URL);
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -93,7 +95,7 @@ export class EventsService {
       handleError(response);
     }
 
-    const json = (await response.json()) as EventSubscriptionResponse;
+    const json = await parseJSON<EventSubscriptionResponse>(response);
     return json.data;
   }
 
@@ -123,9 +125,12 @@ export class EventsService {
    */
   async unsubscribeMultiple(ids: string[]): Promise<void> {
     if (ids.length === 0) return;
-    const url = new URL(this.EVENTS_URL);
-    ids.forEach((id) => url.searchParams.append('id', id));
-    const response = await fetch(url.toString(), {
+
+    const endpoint = new URL(this.EVENTS_URL);
+
+    ids.forEach((id) => endpoint.searchParams.append('id', id));
+
+    const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,

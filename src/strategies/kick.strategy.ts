@@ -6,7 +6,15 @@ import { FetchUserResponse } from '@/KickAPI/services/UsersService';
 import { AccountModel } from '@/models/Account';
 import { UserModel } from '@/models/User';
 
-const scopes = ['user:read', 'channel:read', 'channel:write', 'chat:write', 'events:subscribe', 'moderation:ban'];
+const scopes = [
+  'user:read',
+  'channel:read',
+  'channel:write',
+  'chat:write',
+  'events:subscribe',
+  'moderation:ban',
+  'kicks:read',
+];
 
 export function initKickPassportOAuthStrategy() {
   passport.use(

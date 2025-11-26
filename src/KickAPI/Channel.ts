@@ -11,6 +11,7 @@ export type ChannelDto = {
   channel_description: string;
   slug: string;
   stream: {
+    custom_tags: string[];
     is_live: boolean;
     is_mature: boolean;
     key: string;
@@ -56,6 +57,7 @@ export class Channel extends Serializable {
 
   get stream() {
     return {
+      customTags: this.dto.stream.custom_tags,
       isLive: this.dto.stream.is_live,
       isMature: this.dto.stream.is_mature,
       key: this.dto.stream.key,

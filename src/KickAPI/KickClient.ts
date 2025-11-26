@@ -3,6 +3,7 @@ import { CategoriesService } from './services/CategoriesService';
 import { ChannelsService } from './services/ChannelsService';
 import { ChatService } from './services/ChatService';
 import { EventsService } from './services/EventsService';
+import { KICKsService } from './services/KICKsService';
 import { LivestreamsService } from './services/LivestreamsService';
 import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
@@ -21,6 +22,7 @@ export class KickClient {
   public moderation: ModerationService;
   public livestreams: LivestreamsService;
   public events: EventsService;
+  public kicks: KICKsService;
 
   constructor(clientId: string, clientSecret: string) {
     this.oauth = OAuth.getInstance(clientId, clientSecret);
@@ -31,6 +33,7 @@ export class KickClient {
     this.moderation = new ModerationService(this);
     this.livestreams = new LivestreamsService(this);
     this.events = new EventsService(this);
+    this.kicks = new KICKsService(this);
   }
 
   setToken(token: Token) {

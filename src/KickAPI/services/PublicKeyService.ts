@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
-import { handleError } from '../errors';
 import { KICK_BASE_URL } from '../KickClient';
+import { handleError, parseJSON } from '../utils';
 
 export type PublicKeyDto = { public_key: string };
 export type PublicKeyResponse = BaseResponse<PublicKeyDto>;
@@ -41,14 +41,19 @@ export class PublicKeyService {
       return this.inFlight;
     }
     this.inFlight = (async () => {
-      const response = await fetch(KICK_BASE_URL + '/public-key');
+      const endpoint = new URL(KICK_BASE_URL + '/public-key');
+      const response = await fetch(endpoint);
+
       if (!response.ok) {
         handleError(response);
       }
-      const json = (await response.json()) as PublicKeyResponse;
+
+      const json = await parseJSON<PublicKeyResponse>(response);
       const key = json.data.public_key;
+
       this.cache = { key, fetchedAt: Date.now() };
       this.inFlight = undefined;
+
       return key;
     })().catch((err) => {
       this.inFlight = undefined;

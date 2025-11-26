@@ -5,7 +5,7 @@ import { ulid } from 'ulid';
 
 import { TokenType } from '@/models/Token';
 import { jwtService, type JwtPayload } from '@/services/jwt.service';
-import { type RevokeTokenInput } from '@/validators/revoke-token.validator';
+import { type RevokeTokenSchema } from '@/validators/revoke-token.validator';
 
 class OAuthController {
   async kickCallback(req: Request, res: Response) {
@@ -44,7 +44,7 @@ class OAuthController {
   }
 
   async revokeToken(req: Request, res: Response) {
-    const { token, type, reason } = req.body as RevokeTokenInput;
+    const { token, type, reason } = req.body as RevokeTokenSchema;
 
     let payload: JwtPayload | null = null;
     let resolvedType: TokenType | undefined = type;

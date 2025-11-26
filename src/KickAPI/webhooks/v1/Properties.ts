@@ -37,3 +37,11 @@ export type LivestreamMetadataEventProperty = {
   has_mature_content: boolean;
   category: CategoryDto;
 };
+
+export type GiftEventProperty = {
+  amount: number;
+  name: string;
+  type: string;
+  tier: string;
+  message: string;
+};
