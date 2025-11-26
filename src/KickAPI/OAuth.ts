@@ -1,6 +1,6 @@
 import { generateCodeChallenge, generateCodeVerifier } from '@/utils/pkce';
 
-import { handleError } from './errors';
+import { handleError } from './utils';
 
 export type AppToken = {
   access_token: string;
