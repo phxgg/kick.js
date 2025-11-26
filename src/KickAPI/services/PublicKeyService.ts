@@ -41,7 +41,8 @@ export class PublicKeyService {
       return this.inFlight;
     }
     this.inFlight = (async () => {
-      const response = await fetch(KICK_BASE_URL + '/public-key');
+      const endpoint = new URL(KICK_BASE_URL + '/public-key');
+      const response = await fetch(endpoint);
 
       if (!response.ok) {
         handleError(response);
@@ -49,8 +50,10 @@ export class PublicKeyService {
 
       const json = await parseJSON<PublicKeyResponse>(response);
       const key = json.data.public_key;
+
       this.cache = { key, fetchedAt: Date.now() };
       this.inFlight = undefined;
+
       return key;
     })().catch((err) => {
       this.inFlight = undefined;

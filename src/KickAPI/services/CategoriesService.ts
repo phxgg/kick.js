@@ -28,13 +28,14 @@ export class CategoriesService {
    * @param options.page (Optional) Page (defaults to 1 if not provided)
    */
   async search({ q, page }: SearchCategoryParams): Promise<Category[]> {
-    const url = new URL(this.CATEGORIES_URL);
-    url.searchParams.append('q', q);
+    const endpoint = new URL(this.CATEGORIES_URL);
+
+    endpoint.searchParams.append('q', q);
     if (page) {
-      url.searchParams.append('page', page.toString());
+      endpoint.searchParams.append('page', page.toString());
     }
 
-    const response = await fetch(url.toString(), {
+    const response = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },
@@ -55,7 +56,9 @@ export class CategoriesService {
    * @param id The ID of the category to fetch
    */
   async fetch(id: number): Promise<Category> {
-    const response = await fetch(`${this.CATEGORIES_URL}/${String(id)}`, {
+    const endpoint = new URL(this.CATEGORIES_URL + `/${String(id)}`);
+
+    const response = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },

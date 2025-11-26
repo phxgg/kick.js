@@ -48,7 +48,9 @@ export class ChatService {
       throw new Error('Message content exceeds maximum length of 500 characters');
     }
 
-    const response = await fetch(this.CHAT_URL, {
+    const endpoint = new URL(this.CHAT_URL);
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,

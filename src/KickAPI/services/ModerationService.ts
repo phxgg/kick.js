@@ -38,7 +38,9 @@ export class ModerationService {
       throw new Error('Reason exceeds maximum length of 100 characters');
     }
 
-    const response = await fetch(`${this.MODERATION_URL}/bans`, {
+    const endpoint = new URL(this.MODERATION_URL + '/bans');
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -74,7 +76,9 @@ export class ModerationService {
       throw new Error('Duration must be between 1 and 10080 seconds (7 days)');
     }
 
-    const response = await fetch(`${this.MODERATION_URL}/bans`, {
+    const endpoint = new URL(this.MODERATION_URL + '/bans');
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -102,7 +106,9 @@ export class ModerationService {
    * @returns void
    */
   async removeBan({ broadcasterUserId, userId }: RemoveBanDto): Promise<void> {
-    const response = await fetch(`${this.MODERATION_URL}/bans`, {
+    const endpoint = new URL(this.MODERATION_URL + '/bans');
+
+    const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,

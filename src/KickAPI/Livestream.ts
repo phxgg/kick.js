@@ -6,6 +6,7 @@ export type LivestreamDto = {
   broadcaster_user_id: number;
   category: CategoryDto;
   channel_id: number;
+  custom_tags: string[];
   has_mature_content: boolean;
   language: string;
   slug: string;
@@ -13,6 +14,10 @@ export type LivestreamDto = {
   stream_title: string;
   thumbnail: string;
   viewer_count: number;
+};
+
+export type LivestreamStatsDto = {
+  total_count: number;
 };
 
 export class Livestream extends Serializable {
@@ -36,6 +41,10 @@ export class Livestream extends Serializable {
 
   get channelId(): number {
     return this.dto.channel_id;
+  }
+
+  get customTags(): string[] {
+    return this.dto.custom_tags;
   }
 
   get hasMatureContent(): boolean {

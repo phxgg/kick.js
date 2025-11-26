@@ -34,7 +34,9 @@ export class KICKsService {
       throw new Error('You can only request up to 100 top values at a time.');
     }
 
-    const response = await fetch(`${this.KICKS_URL}/leaderboard`, {
+    const endpoint = new URL(this.KICKS_URL + '/leaderboard');
+
+    const response = await fetch(endpoint, {
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
       },

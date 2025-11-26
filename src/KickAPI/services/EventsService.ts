@@ -76,7 +76,9 @@ export class EventsService {
     events,
     method,
   }: SubscribeToMultipleEventsDto): Promise<PostEventSubscriptionData[]> {
-    const response = await fetch(this.EVENTS_URL, {
+    const endpoint = new URL(this.EVENTS_URL);
+
+    const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
@@ -123,9 +125,12 @@ export class EventsService {
    */
   async unsubscribeMultiple(ids: string[]): Promise<void> {
     if (ids.length === 0) return;
-    const url = new URL(this.EVENTS_URL);
-    ids.forEach((id) => url.searchParams.append('id', id));
-    const response = await fetch(url.toString(), {
+
+    const endpoint = new URL(this.EVENTS_URL);
+
+    ids.forEach((id) => endpoint.searchParams.append('id', id));
+
+    const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${this.client.token?.access_token}`,
