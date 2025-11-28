@@ -44,4 +44,5 @@ export type GiftEventProperty = {
   type: string;
   tier: string;
   message: string;
+  pinned_time_seconds: number;
 };
