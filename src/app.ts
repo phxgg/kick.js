@@ -12,7 +12,7 @@ import morgan from 'morgan';
 import passport from 'passport';
 
 import { createLogger } from '@/winston.logger';
-import { connectMongo } from '@/db';
+import { connectMongo, disconnectMongo } from '@/db';
 
 import { initCronJobs } from './cron-jobs';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
@@ -121,7 +121,7 @@ app.get('/hello', (req, res) => {
   process.on(sig as NodeJS.Signals, async () => {
     logger.info(`Received ${sig}, shutting down...`);
     try {
-      (await import('./db')).disconnectMongo();
+      await disconnectMongo();
     } finally {
       process.exit(0);
     }

@@ -6,7 +6,7 @@
   "author": "phxgg",
   "main": "dist/app.js",
   "engines": {
-    "node": ">=22.15.0"
+    "node": ">=24.11.1"
   },
   "scripts": {
     "ncu:check": "npx npm-check-updates -x @types/node",
@@ -69,7 +69,7 @@
     "eslint-plugin-prettier": "^5.5.4",
     "globals": "^16.5.0",
     "jiti": "^2.6.1",
-    "prettier": "^3.6.2",
+    "prettier": "^3.7.1",
     "rimraf": "^6.1.2",
     "tsc-alias": "^1.8.16",
     "tsx": "^4.20.6",
