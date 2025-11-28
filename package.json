@@ -6,7 +6,7 @@
   "author": "phxgg",
   "main": "dist/app.js",
   "engines": {
-    "node": ">=22.15.0"
+    "node": ">=24.11.1"
   },
   "scripts": {
     "ncu:check": "npx npm-check-updates -x @types/node",
