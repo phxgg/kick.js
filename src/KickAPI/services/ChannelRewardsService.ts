@@ -134,8 +134,8 @@ export class ChannelRewardsService {
    *
    * @param rewardId The ID of the reward to delete
    */
-  async delete(rewardId: number): Promise<void> {
-    const endpoint = new URL(this.CHANNEL_REWARDS_URL + `/${rewardId}`);
+  async delete(rewardId: string): Promise<void> {
+    const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/${rewardId}`);
 
     const response = await fetch(endpoint, {
       method: 'DELETE',
@@ -149,14 +149,14 @@ export class ChannelRewardsService {
     }
   }
 
-  async update(rewardId: number, data: UpdateChannelRewardDto): Promise<void> {
+  async update(rewardId: string, data: UpdateChannelRewardDto): Promise<void> {
     const schema = updateChannelRewardSchema.safeParse(data);
 
     if (!schema.success) {
       throw new Error(`Invalid data: ${schema.error.message}`);
     }
 
-    const endpoint = new URL(this.CHANNEL_REWARDS_URL + `/${rewardId}`);
+    const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/${rewardId}`);
 
     const response = await fetch(endpoint, {
       method: 'PATCH',
