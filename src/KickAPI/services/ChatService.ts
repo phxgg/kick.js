@@ -72,4 +72,24 @@ export class ChatService {
     const message = new Message(this.client, json.data);
     return message;
   }
+
+  /**
+   * Delete a chat message from a channel.
+   * @param messageId The ID of the message to delete
+   */
+  async delete(messageId: string): Promise<void> {
+    const endpoint = new URL(`${this.CHAT_URL}/${messageId}`);
+
+    const response = await fetch(endpoint, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${this.client.token?.access_token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      handleError(response);
+    }
+  }
 }
