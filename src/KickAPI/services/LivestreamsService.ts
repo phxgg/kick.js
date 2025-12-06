@@ -36,7 +36,7 @@ export class LivestreamsService {
    * @param options.language (Optional) Language code to filter by.
    * @param options.limit (Optional) Maximum number of results to return. Min: 1, Max: 100.
    * @param options.sort (Optional) Sort order.
-   * @returns An array of Livestream instances.
+   * @returns An array of `Livestream` instances.
    */
   async fetch({
     broadcaster_user_id,

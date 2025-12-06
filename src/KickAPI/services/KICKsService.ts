@@ -1,3 +1,5 @@
+import z from 'zod';
+
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Leaderboard, type LeaderboardDto } from '../Leaderboard';
@@ -8,9 +10,10 @@ export enum Sort {
   STARTED_AT = 'started_at',
 }
 
-export type FetchLeaderboardParams = {
-  top?: number;
-};
+export const fetchLeaderboardSchema = z.object({
+  top: z.number().int().min(1).max(100).optional(),
+});
+export type FetchLeaderboardParams = z.infer<typeof fetchLeaderboardSchema>;
 
 export type FetchLeaderboardResponse = BaseResponse<LeaderboardDto>;
 
@@ -23,18 +26,27 @@ export class KICKsService {
   }
 
   /**
-   * Fetches livestreams from the Kick API.
+   * Gets the KICKs leaderboard for the authenticated broadcaster.
    *
-   * @param options Options for fetching livestreams.
+   * Required scopes:
+   * `kicks:read`
+   *
+   * @param options Options for fetching leaderboard.
    * @param options.top (Optional) The number of entries from the top of the leaderboard to return. For example, 10 will fetch the top 10 entries.
-   * @returns A Leaderboard instance.
+   * @returns A `Leaderboard` instance.
    */
   async fetchLeaderboard({ top }: FetchLeaderboardParams): Promise<Leaderboard> {
-    if (top && (top < 1 || top > 100)) {
-      throw new Error('You can only request up to 100 top values at a time.');
+    const schema = fetchLeaderboardSchema.safeParse({ top });
+
+    if (!schema.success) {
+      throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
     const endpoint = new URL(this.KICKS_URL + '/leaderboard');
+
+    if (schema.data.top) {
+      endpoint.searchParams.append('top', schema.data.top.toString());
+    }
 
     const response = await fetch(endpoint, {
       headers: {

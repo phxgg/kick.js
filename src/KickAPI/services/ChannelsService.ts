@@ -1,3 +1,5 @@
+import z from 'zod';
+
 import { BaseResponse } from '../BaseResponse';
 import { Channel, ChannelDto } from '../Channel';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
@@ -5,11 +7,31 @@ import { handleError, parseJSON } from '../utils';
 
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 
-export type UpdateChannelDto = {
-  categoryId?: number;
-  customTags?: string[];
-  streamTitle?: string;
-};
+export const updateChannelSchema = z.object({
+  categoryId: z.number().optional(),
+  customTags: z.array(z.string()).optional(),
+  streamTitle: z.string().optional(),
+});
+export type UpdateChannelDto = z.infer<typeof updateChannelSchema>;
+
+export const fetchChannelParamsSchema = z
+  .object({
+    broadcasterUserId: z.array(z.number()).max(50).optional(),
+    slug: z.array(z.string().max(25)).max(50).optional(),
+  })
+  .refine(
+    (data) => {
+      // Cannot mix broadcasterUserId and slug
+      if (data.broadcasterUserId && data.slug) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: 'Cannot mix broadcasterUserId and slug parameters',
+    }
+  );
+export type FetchChannelParamsDto = z.infer<typeof fetchChannelParamsSchema>;
 
 export class ChannelsService {
   private readonly CHANNELS_URL: string = KICK_BASE_URL + '/channels';
@@ -25,31 +47,31 @@ export class ChannelsService {
    * 2. Provide only `broadcasterUserId` parameters (up to 50)
    * 3. Provide only `slug` parameters (up to 50, each max 25 characters) Note: You cannot mix `broadcasterUserId` and `slug` parameters in the same request.
    *
+   * Required scopes:
+   * `channel:read`
+   *
    * @param options The options for fetching the channel
    * @param options.broadcasterUserId (Optional) Array of broadcaster user IDs (up to 50)
    * @param options.slug (Optional) Array of channel slugs (up to 50, each max 25 characters)
-   * @returns An array of Channel instances.
+   * @returns An array of `Channel` instances.
    */
-  async fetch({ broadcasterUserId, slug }: { broadcasterUserId?: number[]; slug?: string[] }): Promise<Channel[]> {
-    if (broadcasterUserId && broadcasterUserId.length > 0 && slug && slug.length > 0) {
-      throw new Error('Cannot mix broadcasterUserId and slug parameters');
-    }
-    if (broadcasterUserId && broadcasterUserId.length > 50) {
-      throw new Error('You can only request up to 50 broadcasterUserId values at a time.');
-    }
-    if (slug && slug.length > 50) {
-      throw new Error('You can only request up to 50 slug values at a time.');
-    }
-    if (slug && slug.some((s) => s.length > 25)) {
-      throw new Error('Each slug can be a maximum of 25 characters long.');
+  async fetch({ broadcasterUserId, slug }: FetchChannelParamsDto): Promise<Channel[]> {
+    const schema = fetchChannelParamsSchema.safeParse({
+      broadcasterUserId,
+      slug,
+    });
+
+    if (!schema.success) {
+      throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
     const endpoint = new URL(this.CHANNELS_URL);
-    if (broadcasterUserId && broadcasterUserId.length > 0) {
-      endpoint.searchParams.append('broadcaster_user_id', broadcasterUserId.join(' '));
+
+    if (schema.data.broadcasterUserId && schema.data.broadcasterUserId.length > 0) {
+      endpoint.searchParams.append('broadcaster_user_id', schema.data.broadcasterUserId.join(' '));
     }
-    if (slug && slug.length > 0) {
-      slug.forEach((s) => endpoint.searchParams.append('slug', s));
+    if (schema.data.slug && schema.data.slug.length > 0) {
+      schema.data.slug.forEach((s) => endpoint.searchParams.append('slug', s));
     }
 
     const response = await fetch(endpoint, {
@@ -71,7 +93,7 @@ export class ChannelsService {
    * Fetch a channel by its ID.
    *
    * @param id The ID of the channel to fetch
-   * @returns The Channel instance.
+   * @returns The `Channel` instance.
    */
   async fetchById(id: number): Promise<Channel> {
     return (await this.fetch({ broadcasterUserId: [id] }))[0];
@@ -81,7 +103,7 @@ export class ChannelsService {
    * Fetch a channel by its slug.
    *
    * @param slug The slug of the channel to fetch
-   * @returns The Channel instance.
+   * @returns The `Channel` instance.
    */
   async fetchBySlug(slug: string): Promise<Channel> {
     return (await this.fetch({ slug: [slug] }))[0];
@@ -90,13 +112,26 @@ export class ChannelsService {
   /**
    * Update the authenticated user's channel information.
    *
+   * Required scopes:
+   * `channel:write`
+   *
    * @param options The options for updating the channel
    * @param options.categoryId (Optional) The ID of the category to set for the channel
    * @param options.customTags (Optional) An array of custom tags to set for the channel
    * @param options.streamTitle (Optional) The title of the stream
-   * @returns A promise that resolves when the update is complete
+   * @returns void
    */
   async update({ categoryId, customTags, streamTitle }: UpdateChannelDto): Promise<void> {
+    const schema = updateChannelSchema.safeParse({
+      categoryId,
+      customTags,
+      streamTitle,
+    });
+
+    if (!schema.success) {
+      throw new Error(`Invalid parameters: ${schema.error.message}`);
+    }
+
     const endpoint = new URL(this.CHANNELS_URL);
 
     const response = await fetch(endpoint, {
