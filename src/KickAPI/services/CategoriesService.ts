@@ -58,7 +58,7 @@ export class CategoriesService {
    * @returns A `Category` instance.
    */
   async fetch(id: number): Promise<Category> {
-    const endpoint = new URL(this.CATEGORIES_URL + `/${String(id)}`);
+    const endpoint = new URL(`${this.CATEGORIES_URL}/${id}`);
 
     const response = await fetch(endpoint, {
       headers: {
