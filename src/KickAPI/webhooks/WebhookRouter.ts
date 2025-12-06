@@ -7,6 +7,7 @@ import { createLogger } from '@/winston.logger';
 import { getKickPublicKey } from '../services/PublicKeyService';
 import {
   handleChannelFollowed,
+  handleChannelRewardRedemptionUpdated,
   handleChannelSubscriptionGifts,
   handleChannelSubscriptionNew,
   handleChannelSubscriptionRenewal,
@@ -68,6 +69,9 @@ export function createWebhookRouter() {
           break;
         case WebhookEvents.CHANNEL_SUBSCRIPTION_NEW:
           handleChannelSubscriptionNew(payload);
+          break;
+        case WebhookEvents.CHANNEL_REWARD_REDEMPTION_UPDATED:
+          handleChannelRewardRedemptionUpdated(payload);
           break;
         case WebhookEvents.LIVESTREAM_STATUS_UPDATED:
           handleLivestreamStatusUpdated(payload);

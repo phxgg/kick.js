@@ -1,4 +1,5 @@
 import type { ChannelFollowedEventPayload } from './ChannelFollowedEvent';
+import type { ChannelRewardRedemptionUpdatedEventPayload } from './ChannelRewardRedemptionUpdated';
 import type { ChannelSubscriptionGiftsEventPayload } from './ChannelSubscriptionGifts';
 import type { ChannelSubscriptionNewEventPayload } from './ChannelSubscriptionNew';
 import type { ChannelSubscriptionRenewalEventPayload } from './ChannelSubscriptionRenewal';
@@ -13,6 +14,7 @@ export {
   ChannelSubscriptionGiftsEventPayload,
   ChannelSubscriptionNewEventPayload,
   ChannelSubscriptionRenewalEventPayload,
+  ChannelRewardRedemptionUpdatedEventPayload,
   ChatMessageSentEventPayload,
   KicksGiftedEventPayload,
   LivestreamMetadataUpdatedEventPayload,

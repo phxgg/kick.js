@@ -2,7 +2,7 @@
   "name": "kick.js",
   "version": "1.0.0",
   "description": "A JavaScript library for interacting with the Kick API.",
-  "license": "SEE LICENSE IN LICENSE",
+  "license": "MIT",
   "author": "phxgg",
   "main": "dist/app.js",
   "engines": {

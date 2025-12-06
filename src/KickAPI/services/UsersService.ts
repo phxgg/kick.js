@@ -27,6 +27,8 @@ export class UsersService {
    * This function is implements part of the on the OAuth 2.0 spec for token introspection.
    * Find the full spec here: https://datatracker.ietf.org/doc/html/rfc7662
    * When `active=false` there is no additional information added in the response.
+   *
+   * @returns Token information.
    */
   async introspect(): Promise<TokenIntrospect> {
     const endpoint = new URL(KICK_BASE_URL + '/token/introspect');
@@ -52,8 +54,11 @@ export class UsersService {
    * If no user IDs are specified, the information
    * for the currently authorised user will be returned by default.
    *
+   * Required scopes:
+   * `user:read`
+   *
    * @param ids (Optional) Array of user IDs
-   * @returns An array of User instances.
+   * @returns An array of `User` instances.
    */
   async fetch(ids?: number[]): Promise<User[]> {
     const endpoint = new URL(this.USERS_URL);

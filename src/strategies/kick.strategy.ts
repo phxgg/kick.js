@@ -1,20 +1,12 @@
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
 
-import { KICK_BASE_URL } from '@/KickAPI/KickClient';
+import { KICK_BASE_URL, Scope } from '@/KickAPI/KickClient';
 import { FetchUserResponse } from '@/KickAPI/services/UsersService';
 import { AccountModel } from '@/models/Account';
 import { UserModel } from '@/models/User';
 
-const scopes = [
-  'user:read',
-  'channel:read',
-  'channel:write',
-  'chat:write',
-  'events:subscribe',
-  'moderation:ban',
-  'kicks:read',
-];
+const scopes = Object.values(Scope);
 
 export function initKickPassportOAuthStrategy() {
   passport.use(

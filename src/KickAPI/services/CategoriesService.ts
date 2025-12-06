@@ -26,6 +26,7 @@ export class CategoriesService {
    * @param options The search parameters
    * @param options.q Search query
    * @param options.page (Optional) Page (defaults to 1 if not provided)
+   * @returns An array of `Category` instances.
    */
   async search({ q, page }: SearchCategoryParams): Promise<Category[]> {
     const endpoint = new URL(this.CATEGORIES_URL);
@@ -54,6 +55,7 @@ export class CategoriesService {
    * Get information about a specific category.
    *
    * @param id The ID of the category to fetch
+   * @returns A `Category` instance.
    */
   async fetch(id: number): Promise<Category> {
     const endpoint = new URL(this.CATEGORIES_URL + `/${String(id)}`);

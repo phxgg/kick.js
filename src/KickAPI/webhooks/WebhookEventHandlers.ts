@@ -1,5 +1,6 @@
 import type {
   ChannelFollowedEventPayload,
+  ChannelRewardRedemptionUpdatedEventPayload,
   ChannelSubscriptionGiftsEventPayload,
   ChannelSubscriptionNewEventPayload,
   ChannelSubscriptionRenewalEventPayload,
@@ -27,6 +28,10 @@ export async function handleChannelSubscriptionGifts(data: ChannelSubscriptionGi
 }
 
 export async function handleChannelSubscriptionNew(data: ChannelSubscriptionNewEventPayload) {
+  //
+}
+
+export async function handleChannelRewardRedemptionUpdated(data: ChannelRewardRedemptionUpdatedEventPayload) {
   //
 }
 
