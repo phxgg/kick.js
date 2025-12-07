@@ -1,3 +1,6 @@
+import EventEmitter from 'events';
+
+import { eventManager } from './EventManager';
 import { AppToken, OAuth, Token } from './OAuth';
 import { CategoriesService } from './services/CategoriesService';
 import { ChannelRewardsService } from './services/ChannelRewardsService';
@@ -8,6 +11,8 @@ import { KICKsService } from './services/KICKsService';
 import { LivestreamsService } from './services/LivestreamsService';
 import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
+import { User } from './User';
+import { WebhookEventNames } from './webhooks/WebhookEvents';
 
 export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
 
@@ -26,10 +31,14 @@ export enum Scope {
 }
 
 export class KickClient {
+  private me: User | null = null;
+  private eventEmitter = new EventEmitter();
+
   public token: Token | null = null;
   public appToken: AppToken | null = null;
   public oauth: OAuth;
 
+  // Services
   public categories: CategoriesService;
   public channels: ChannelsService;
   public channelRewards: ChannelRewardsService;
@@ -55,5 +64,39 @@ export class KickClient {
 
   setToken(token: Token) {
     this.token = token;
+    // register event emitter in the global event manager
+    if (!this.me) {
+      this.users
+        .me()
+        .then((me) => {
+          this.me = me;
+          eventManager.register(this.me.userId.toString(), this.eventEmitter);
+        })
+        .catch((err) => {
+          console.error('Failed to fetch authenticated user for KickClient:', err);
+        });
+    }
+  }
+
+  destroy() {
+    if (this.me) {
+      eventManager.destroy(this.me.userId.toString());
+    }
+  }
+
+  on(event: WebhookEventNames, listener: (...args: any[]) => void) {
+    this.eventEmitter.on(event, listener);
+  }
+
+  off(event: WebhookEventNames, listener: (...args: any[]) => void) {
+    this.eventEmitter.off(event, listener);
+  }
+
+  once(event: WebhookEventNames, listener: (...args: any[]) => void) {
+    this.eventEmitter.once(event, listener);
+  }
+
+  removeAllListeners() {
+    this.eventEmitter.removeAllListeners();
   }
 }
