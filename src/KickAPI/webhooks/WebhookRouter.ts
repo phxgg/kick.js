@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes';
 
 import { createLogger } from '@/winston.logger';
 
+import { eventManager } from '../EventManager';
 import { getKickPublicKey } from '../services/PublicKeyService';
 import {
   handleChannelFollowed,
@@ -20,6 +21,15 @@ import {
 import { WebhookEvents, type WebhookEventNames } from './WebhookEvents';
 
 const logger = createLogger('KickAPI.WebhookRouter');
+
+// Helper function to extract unique identifier from different event types
+function extractUniqueId(eventType: WebhookEventNames, payload: any): string | null {
+  // Try user_id, then username, then channel_slug
+  if (payload.broadcaster?.user_id) return payload.broadcaster.user_id.toString();
+  if (payload.broadcaster?.username) return payload.broadcaster.username.toString();
+  if (payload.broadcaster?.channel_slug) return payload.broadcaster.channel_slug.toString();
+  return null;
+}
 
 export function createWebhookRouter() {
   const router = express.Router();
@@ -52,6 +62,14 @@ export function createWebhookRouter() {
       }
       const payload = JSON.parse(rawBody);
       logger.info('Received Kick webhook event', { event: payload });
+
+      // Extract unique identifier from payload to route to correct client
+      const uniqueId = extractUniqueId(eventType, payload);
+
+      if (uniqueId) {
+        // Emit to specific client for this channel/user
+        eventManager.emit(uniqueId, eventType, payload);
+      }
 
       // Handle event
       switch (eventType) {
