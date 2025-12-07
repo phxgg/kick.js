@@ -11,6 +11,6 @@ export type ChannelRewardRedemptionUpdatedEventPayload = {
     costs: number;
     description: string;
   };
-  redeemer: WithIdentityNull<UserEventProperty>;
-  broadcaster: WithIdentityNull<UserEventProperty>;
+  redeemer: Omit<UserEventProperty, 'identity' | 'is_anonymous'>;
+  broadcaster: Omit<UserEventProperty, 'identity' | 'is_anonymous'>;
 };
