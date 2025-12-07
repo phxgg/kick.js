@@ -15,5 +15,6 @@ This library is currently under active development. This is what I am aiming for
 - Comprehensive API Coverage: Access a wide range of Kick.com API endpoints with ease.
 - TypeScript Support: Fully typed interfaces and types for better developer experience.
 - Webhook Handling: Built-in support for managing and responding to Kick.com webhooks.
+- Event Management: Efficient event handling system for real-time updates.
 - Modular Design: Easily extend and customize the library to fit your needs.
 - Active Maintenance: Regular updates to keep up with Kick.com's API changes.
