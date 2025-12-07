@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
-import { Category, CategoryDto } from '../Category';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { Category, CategoryDto } from '../resources/Category';
 import { handleError, parseJSON } from '../utils';
 
 export type SearchCategoryParams = {

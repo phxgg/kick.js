@@ -1,8 +1,8 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
-import { EventSubscription, EventSubscriptionDto } from '../EventSubscription';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { EventSubscription, EventSubscriptionDto } from '../resources/EventSubscription';
 import { handleError, parseJSON } from '../utils';
 
 export enum EventSubscriptionMethod {

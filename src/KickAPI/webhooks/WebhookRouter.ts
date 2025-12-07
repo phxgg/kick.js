@@ -63,11 +63,11 @@ export function createWebhookRouter() {
       const payload = JSON.parse(rawBody);
       logger.info('Received Kick webhook event', { event: payload });
 
-      // Extract unique identifier from payload to route to correct client
+      // Handle client event emitter listeners.
+      // Extract unique identifier from payload to route to correct client.
+      // Then, emit to specific client for this channel/user.
       const uniqueId = extractUniqueId(eventType, payload);
-
       if (uniqueId) {
-        // Emit to specific client for this channel/user
         eventManager.emit(uniqueId, eventType, payload);
       }
 

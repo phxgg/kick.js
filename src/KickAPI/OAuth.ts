@@ -1,6 +1,5 @@
-import { generateCodeChallenge, generateCodeVerifier } from '@/utils/pkce';
-
-import { handleError } from './utils';
+import { Scope } from './KickClient';
+import { generateCodeChallenge, generateCodeVerifier, handleError } from './utils';
 
 export type AppToken = {
   access_token: string;
@@ -54,15 +53,7 @@ export class OAuth {
     codeVerifier: string;
   }> {
     const authorizeUrl = new URL(`${this.OAUTH_URL}/oauth/authorize`);
-    const scopes = [
-      'user:read',
-      'channel:read',
-      'channel:write',
-      'chat:write',
-      'events:subscribe',
-      'moderation:ban',
-      'kicks:read',
-    ];
+    const scopes = Object.values(Scope);
 
     // Generate a code challenge from the verifier (async)
     const codeVerifier = generateCodeVerifier();

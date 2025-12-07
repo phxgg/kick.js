@@ -15,6 +15,7 @@ import { createLogger } from '@/winston.logger';
 import { connectMongo, disconnectMongo } from '@/db';
 
 import { initCronJobs } from './cron-jobs';
+import { eventManager } from './KickAPI/EventManager';
 import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
 import { createOAuthRouter } from './routers/oauth.router';
 import { createTestRouter } from './routers/test.router';
@@ -121,6 +122,7 @@ app.get('/hello', (req, res) => {
   process.on(sig as NodeJS.Signals, async () => {
     logger.info(`Received ${sig}, shutting down...`);
     try {
+      eventManager.destroyAll();
       await disconnectMongo();
     } finally {
       process.exit(0);

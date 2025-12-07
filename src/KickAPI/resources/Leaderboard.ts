@@ -1,5 +1,5 @@
-import { KickClient } from './KickClient';
-import { Serializable } from './Serializable';
+import { KickClient } from '../KickClient';
+import { Serializable } from '../Serializable';
 
 export type LeaderboardEntry = {
   gifted_amount: number;

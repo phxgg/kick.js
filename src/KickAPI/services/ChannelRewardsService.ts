@@ -1,8 +1,8 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
-import { ChannelReward, ChannelRewardDto } from '../ChannelReward';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { ChannelReward, ChannelRewardDto } from '../resources/ChannelReward';
 import { handleError, parseJSON } from '../utils';
 
 export type FetchChannelRewardsResponse = BaseResponse<ChannelRewardDto[]>;

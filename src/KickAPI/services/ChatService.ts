@@ -2,7 +2,7 @@ import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { Message, MessageDto } from '../Message';
+import { Message, MessageDto } from '../resources/Message';
 import { handleError, parseJSON } from '../utils';
 
 export enum ChatMessageType {

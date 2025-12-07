@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 
 import { eventManager } from './EventManager';
 import { AppToken, OAuth, Token } from './OAuth';
+import { User } from './resources/User';
 import { CategoriesService } from './services/CategoriesService';
 import { ChannelRewardsService } from './services/ChannelRewardsService';
 import { ChannelsService } from './services/ChannelsService';
@@ -11,7 +12,6 @@ import { KICKsService } from './services/KICKsService';
 import { LivestreamsService } from './services/LivestreamsService';
 import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
-import { User } from './User';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
 
 export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
