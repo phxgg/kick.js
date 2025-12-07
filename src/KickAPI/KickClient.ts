@@ -16,7 +16,7 @@ import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEve
 
 export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
 
-export enum Scope {
+export enum Scopes {
   USER_READ = 'user:read',
   CHANNEL_READ = 'channel:read',
   CHANNEL_WRITE = 'channel:write',
