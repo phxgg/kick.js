@@ -149,7 +149,17 @@ export class ChannelRewardsService {
     }
   }
 
-  async update(rewardId: string, data: UpdateChannelRewardDto): Promise<void> {
+  /**
+   * Updates a channel reward in the broadcaster's channel. Note that only the app that created the reward can update it.
+   *
+   * Required scopes:
+   * `channel:rewards:write`
+   *
+   * @param rewardId The ID of the reward to update
+   * @param data The data to update the reward with
+   * @returns The updated `ChannelReward` instance.
+   */
+  async update(rewardId: string, data: UpdateChannelRewardDto): Promise<ChannelReward> {
     const schema = updateChannelRewardSchema.safeParse(data);
 
     if (!schema.success) {
@@ -179,5 +189,9 @@ export class ChannelRewardsService {
     if (!response.ok) {
       handleError(response);
     }
+
+    const json = await parseJSON<CreateChannelRewardResponse>(response);
+    const reward = new ChannelReward(this.client, json.data);
+    return reward;
   }
 }
