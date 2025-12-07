@@ -1,12 +1,12 @@
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
 
-import { KICK_BASE_URL, Scope } from '@/KickAPI/KickClient';
+import { KICK_BASE_URL, Scopes } from '@/KickAPI/KickClient';
 import { FetchUserResponse } from '@/KickAPI/services/UsersService';
 import { AccountModel } from '@/models/Account';
 import { UserModel } from '@/models/User';
 
-const scopes = Object.values(Scope);
+const scopes = Object.values(Scopes);
 
 export function initKickPassportOAuthStrategy() {
   passport.use(
