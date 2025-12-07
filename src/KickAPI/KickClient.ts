@@ -12,7 +12,7 @@ import { LivestreamsService } from './services/LivestreamsService';
 import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
 import { User } from './User';
-import { WebhookEventNames } from './webhooks/WebhookEvents';
+import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
 
 export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
 
@@ -84,15 +84,15 @@ export class KickClient {
     }
   }
 
-  on(event: WebhookEventNames, listener: (...args: any[]) => void) {
+  on<E extends WebhookEventNames>(event: E, listener: (payload: WebhookEventPayloadMap[E]) => void) {
     this.eventEmitter.on(event, listener);
   }
 
-  off(event: WebhookEventNames, listener: (...args: any[]) => void) {
+  off<E extends WebhookEventNames>(event: E, listener: (payload: WebhookEventPayloadMap[E]) => void) {
     this.eventEmitter.off(event, listener);
   }
 
-  once(event: WebhookEventNames, listener: (...args: any[]) => void) {
+  once<E extends WebhookEventNames>(event: E, listener: (payload: WebhookEventPayloadMap[E]) => void) {
     this.eventEmitter.once(event, listener);
   }
 
