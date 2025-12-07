@@ -1,4 +1,4 @@
-import type { ChannelFollowedEventPayload } from './ChannelFollowedEvent';
+import type { ChannelFollowedEventPayload } from './ChannelFollowed';
 import type { ChannelRewardRedemptionUpdatedEventPayload } from './ChannelRewardRedemptionUpdated';
 import type { ChannelSubscriptionGiftsEventPayload } from './ChannelSubscriptionGifts';
 import type { ChannelSubscriptionNewEventPayload } from './ChannelSubscriptionNew';

@@ -2,13 +2,8 @@ import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { Leaderboard, type LeaderboardDto } from '../Leaderboard';
+import { Leaderboard, type LeaderboardDto } from '../resources/Leaderboard';
 import { handleError, parseJSON } from '../utils';
-
-export enum Sort {
-  VIEWER_COUNT = 'viewer_count',
-  STARTED_AT = 'started_at',
-}
 
 export const fetchLeaderboardSchema = z.object({
   top: z.number().int().min(1).max(100).optional(),

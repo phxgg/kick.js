@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { Livestream, type LivestreamDto, type LivestreamStatsDto } from '../Livestream';
+import { Livestream, type LivestreamDto, type LivestreamStatsDto } from '../resources/Livestream';
 import { handleError, parseJSON } from '../utils';
 
 export enum Sort {

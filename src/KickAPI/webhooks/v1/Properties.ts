@@ -1,4 +1,4 @@
-import type { CategoryDto } from '../../Category';
+import type { CategoryDto } from '../../resources/Category';
 
 export type UserIdentityEventProperty = {
   username_color: string;

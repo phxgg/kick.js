@@ -1,3 +1,5 @@
+import crypto from 'crypto';
+
 import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, UnauthorizedError } from './errors';
 
 export function handleError(response: Response) {
@@ -22,4 +24,14 @@ export async function parseJSON<T>(response: Response): Promise<T> {
   } catch (error) {
     throw new Error('Failed to parse response body as JSON.');
   }
+}
+
+export function generateCodeVerifier(length = 64) {
+  const rnd = crypto.randomBytes(length);
+  return rnd.toString('base64url');
+}
+
+export function generateCodeChallenge(codeVerifier: string) {
+  const hash = crypto.createHash('sha256').update(codeVerifier).digest();
+  return hash.toString('base64url');
 }

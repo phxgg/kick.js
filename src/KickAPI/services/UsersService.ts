@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { User, type UserDto } from '../User';
+import { User, type UserDto } from '../resources/User';
 import { handleError, parseJSON } from '../utils';
 
 type TokenIntrospect = {

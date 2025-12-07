@@ -1,8 +1,8 @@
+import { KickClient } from '../KickClient';
+import { Serializable } from '../Serializable';
+import { ChatMessageType } from '../services/ChatService';
 import { Category, type CategoryDto } from './Category';
-import { KickClient } from './KickClient';
 import { Message } from './Message';
-import { Serializable } from './Serializable';
-import { ChatMessageType } from './services/ChatService';
 
 export type ChannelDto = {
   banner_picture: string;

@@ -27,6 +27,13 @@ class EventManager {
     this.clientsByUniqueId.delete(uniqueId);
   }
 
+  destroyAll() {
+    for (const [uniqueId, client] of this.clientsByUniqueId) {
+      client.removeAllListeners();
+      this.clientsByUniqueId.delete(uniqueId);
+    }
+  }
+
   emit(uniqueId: string, event: WebhookEventNames, payload: any) {
     const client = this.clientsByUniqueId.get(uniqueId);
     if (client) {
