@@ -106,7 +106,7 @@ app.get('/hello', (req, res) => {
     // Connect to MongoDB
     await connectMongo();
     // Initialize cron jobs
-    initCronJobs();
+    await initCronJobs();
     // Start web server
     app.listen(3000, () => {
       logger.info('Server started on http://localhost:3000');
