@@ -60,7 +60,7 @@ app.use(
   express.json({
     // Attach rawBody to request if we're handling webhooks
     verify: (req, res, buf) => {
-      if (req.url.startsWith('/webhooks')) {
+      if (req.url?.startsWith('/webhooks')) {
         (req as any).rawBody = buf;
       }
     },
