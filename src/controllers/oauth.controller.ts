@@ -9,7 +9,7 @@ import { type RevokeTokenSchema } from '@/validators/revoke-token.validator';
 
 class OAuthController {
   async kickCallback(req: Request, res: Response) {
-    const userId = req.user._id.toString();
+    const userId = req.user!._id.toString();
     const jtiAccess = ulid();
     const jtiRefresh = ulid();
 

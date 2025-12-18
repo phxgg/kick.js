@@ -1,15 +1,19 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
+import { createLogger } from '@/winston.logger';
+
 import { UserModel } from '@/models/User';
 import { jwtService } from '@/services/jwt.service';
+
+const logger = createLogger('Middleware.BearerAuth');
 
 /**
  * HTTP Bearer token authentication middleware.
  * Supports token in `Authorization` header, request body, or query string as `access_token`.
  */
 export async function bearerAuthMiddleware(req: Request, res: Response, next: NextFunction) {
-  let token: string;
+  let token: string | undefined;
   const authorization = req.header('authorization');
 
   if (authorization) {
@@ -47,9 +51,13 @@ export async function bearerAuthMiddleware(req: Request, res: Response, next: Ne
     }
     // load user from database and attach to req object
     const user = await UserModel.findById(payload.sub);
+    if (!user) {
+      throw new Error('User not found');
+    }
     req.user = user;
     next();
-  } catch {
+  } catch (err) {
+    logger.warn('Bearer token verification failed', { error: err });
     return res.status(StatusCodes.FORBIDDEN).json({ error: 'invalid_token' });
   }
 }
