@@ -4,7 +4,7 @@ import passport from 'passport';
 import { oauthController } from '@/controllers/oauth.controller';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
-import { validateData } from '@/middleware/validate-data.middleware';
+import { validateBody } from '@/middleware/validate-body.middleware';
 import { revokeTokenValidator, type RevokeTokenSchema } from '@/validators/revoke-token.validator';
 
 export function createOAuthRouter() {
@@ -19,7 +19,7 @@ export function createOAuthRouter() {
     oauthController.kickCallback
   );
 
-  router.post('/token/revoke', validateData(revokeTokenValidator), oauthController.revokeToken);
+  router.post('/token/revoke', validateBody(revokeTokenValidator), oauthController.revokeToken);
   router.post('/token/revoke-all', bearerAuthMiddleware, oauthController.revokeAllUserTokens);
 
   return router;
