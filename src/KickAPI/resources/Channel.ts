@@ -69,7 +69,7 @@ export class Channel extends Serializable {
     };
   }
 
-  get streamTitle() {
+  get streamTitle(): string {
     return this.dto.stream_title;
   }
 
