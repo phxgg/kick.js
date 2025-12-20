@@ -32,8 +32,8 @@ export class Category extends Serializable {
     return this.dto.tags;
   }
 
-  get thumbnail() {
-    return this.dto.thumbnail;
+  get thumbnail(): URL {
+    return new URL(this.dto.thumbnail);
   }
 
   get viewerCount() {

@@ -56,24 +56,24 @@ export class Livestream extends Serializable {
     return this.dto.language;
   }
 
-  get profilePicture(): string {
-    return this.dto.profile_picture;
+  get profilePicture(): URL {
+    return new URL(this.dto.profile_picture);
   }
 
   get slug(): string {
     return this.dto.slug;
   }
 
-  get startedAt(): string {
-    return this.dto.started_at;
+  get startedAt(): Date {
+    return new Date(this.dto.started_at);
   }
 
   get streamTitle(): string {
     return this.dto.stream_title;
   }
 
-  get thumbnail(): string {
-    return this.dto.thumbnail;
+  get thumbnail(): URL {
+    return new URL(this.dto.thumbnail);
   }
 
   get viewerCount(): number {

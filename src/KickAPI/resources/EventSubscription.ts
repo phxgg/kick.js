@@ -23,35 +23,35 @@ export class EventSubscription extends Serializable {
     this.client = client;
   }
 
-  get appId() {
+  get appId(): string {
     return this.dto.app_id;
   }
 
-  get broadcasterUserId() {
+  get broadcasterUserId(): number {
     return this.dto.broadcaster_user_id;
   }
 
-  get createdAt() {
-    return this.dto.created_at;
+  get createdAt(): Date {
+    return new Date(this.dto.created_at);
   }
 
-  get event() {
+  get event(): string {
     return this.dto.event;
   }
 
-  get id() {
+  get id(): string {
     return this.dto.id;
   }
 
-  get method() {
+  get method(): string {
     return this.dto.method;
   }
 
-  get updatedAt() {
-    return this.dto.updated_at;
+  get updatedAt(): Date {
+    return new Date(this.dto.updated_at);
   }
 
-  get version() {
+  get version(): number {
     return this.dto.version;
   }
 }

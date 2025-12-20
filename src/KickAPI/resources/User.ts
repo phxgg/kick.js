@@ -19,19 +19,19 @@ export class User extends Serializable {
     this.client = client;
   }
 
-  get email() {
+  get email(): string {
     return this.dto.email;
   }
 
-  get name() {
+  get name(): string {
     return this.dto.name;
   }
 
-  get profilePicture() {
-    return this.dto.profile_picture;
+  get profilePicture(): URL {
+    return new URL(this.dto.profile_picture);
   }
 
-  get userId() {
+  get userId(): number {
     return this.dto.user_id;
   }
 }

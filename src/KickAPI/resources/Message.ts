@@ -17,11 +17,11 @@ export class Message extends Serializable {
     this.client = client;
   }
 
-  get isSent() {
+  get isSent(): boolean {
     return this.dto.is_sent;
   }
 
-  get messageId() {
+  get messageId(): string {
     return this.dto.message_id;
   }
 }

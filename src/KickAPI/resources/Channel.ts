@@ -35,23 +35,23 @@ export class Channel extends Serializable {
     this.client = client;
   }
 
-  get bannerPicture() {
-    return this.dto.banner_picture;
+  get bannerPicture(): URL {
+    return new URL(this.dto.banner_picture);
   }
 
-  get broadcasterUserId() {
+  get broadcasterUserId(): number {
     return this.dto.broadcaster_user_id;
   }
 
-  get category() {
+  get category(): Category {
     return new Category(this.client, this.dto.category);
   }
 
-  get channelDescription() {
+  get channelDescription(): string {
     return this.dto.channel_description;
   }
 
-  get slug() {
+  get slug(): string {
     return this.dto.slug;
   }
 
@@ -62,8 +62,8 @@ export class Channel extends Serializable {
       isMature: this.dto.stream.is_mature,
       key: this.dto.stream.key,
       language: this.dto.stream.language,
-      startTime: this.dto.stream.start_time,
-      thumbnail: this.dto.stream.thumbnail,
+      startTime: new Date(this.dto.stream.start_time),
+      thumbnail: new URL(this.dto.stream.thumbnail),
       url: this.dto.stream.url,
       viewerCount: this.dto.stream.viewer_count,
     };
