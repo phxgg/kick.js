@@ -1,6 +1,7 @@
 import crypto from 'crypto';
 
 import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, UnauthorizedError } from './errors';
+import { WebhookEventNames } from './webhooks/WebhookEvents';
 
 export function handleError(response: Response) {
   switch (response.status) {
@@ -34,4 +35,13 @@ export function generateCodeVerifier(length = 64) {
 export function generateCodeChallenge(codeVerifier: string) {
   const hash = crypto.createHash('sha256').update(codeVerifier).digest();
   return hash.toString('base64url');
+}
+
+// Helper function to extract the event unique identifier from different event types
+export function extractUniqueId(eventType: WebhookEventNames, payload: any): string | null {
+  // Try user_id, then username, then channel_slug
+  if (payload.broadcaster?.user_id) return payload.broadcaster.user_id.toString();
+  if (payload.broadcaster?.username) return payload.broadcaster.username.toString();
+  if (payload.broadcaster?.channel_slug) return payload.broadcaster.channel_slug.toString();
+  return null;
 }

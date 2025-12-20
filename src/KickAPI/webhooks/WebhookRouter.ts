@@ -6,6 +6,7 @@ import { createLogger } from '@/winston.logger';
 
 import { eventManager } from '../EventManager';
 import { getKickPublicKey } from '../services/PublicKeyService';
+import { extractUniqueId } from '../utils';
 import {
   handleChannelFollowed,
   handleChannelRewardRedemptionUpdated,
@@ -21,15 +22,6 @@ import {
 import { WebhookEvents, type WebhookEventNames } from './WebhookEvents';
 
 const logger = createLogger('KickAPI.WebhookRouter');
-
-// Helper function to extract unique identifier from different event types
-function extractUniqueId(eventType: WebhookEventNames, payload: any): string | null {
-  // Try user_id, then username, then channel_slug
-  if (payload.broadcaster?.user_id) return payload.broadcaster.user_id.toString();
-  if (payload.broadcaster?.username) return payload.broadcaster.username.toString();
-  if (payload.broadcaster?.channel_slug) return payload.broadcaster.channel_slug.toString();
-  return null;
-}
 
 export function createWebhookRouter() {
   const router = express.Router();
