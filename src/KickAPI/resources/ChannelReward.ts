@@ -24,39 +24,39 @@ export class ChannelReward extends Serializable {
     this.client = client;
   }
 
-  get backgroundColor() {
+  get backgroundColor(): string {
     return this.dto.background_color;
   }
 
-  get cost() {
+  get cost(): number {
     return this.dto.cost;
   }
 
-  get description() {
+  get description(): string {
     return this.dto.description;
   }
 
-  get id() {
+  get id(): string {
     return this.dto.id;
   }
 
-  get isEnabled() {
+  get isEnabled(): boolean {
     return this.dto.is_enabled;
   }
 
-  get isPaused() {
+  get isPaused(): boolean {
     return this.dto.is_paused;
   }
 
-  get isUserInputRequired() {
+  get isUserInputRequired(): boolean {
     return this.dto.is_user_input_required;
   }
 
-  get shouldRedemptionsSkipRequestQueue() {
+  get shouldRedemptionsSkipRequestQueue(): boolean {
     return this.dto.should_redemptions_skip_request_queue;
   }
 
-  get title() {
+  get title(): string {
     return this.dto.title;
   }
 }

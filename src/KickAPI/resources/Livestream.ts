@@ -9,6 +9,7 @@ export type LivestreamDto = {
   custom_tags: string[];
   has_mature_content: boolean;
   language: string;
+  profile_picture: string;
   slug: string;
   started_at: string;
   stream_title: string;
@@ -55,20 +56,24 @@ export class Livestream extends Serializable {
     return this.dto.language;
   }
 
+  get profilePicture(): URL {
+    return new URL(this.dto.profile_picture);
+  }
+
   get slug(): string {
     return this.dto.slug;
   }
 
-  get startedAt(): string {
-    return this.dto.started_at;
+  get startedAt(): Date {
+    return new Date(this.dto.started_at);
   }
 
   get streamTitle(): string {
     return this.dto.stream_title;
   }
 
-  get thumbnail(): string {
-    return this.dto.thumbnail;
+  get thumbnail(): URL {
+    return new URL(this.dto.thumbnail);
   }
 
   get viewerCount(): number {

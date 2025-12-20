@@ -3,7 +3,7 @@ import { Router } from 'express';
 import { testController } from '@/controllers/test.controller';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
-import { validateData } from '@/middleware/validate-data.middleware';
+import { validateBody } from '@/middleware/validate-body.middleware';
 import { testValidator } from '@/validators/test.validator';
 
 export function createTestRouter() {
@@ -12,7 +12,7 @@ export function createTestRouter() {
   router.use(bearerAuthMiddleware);
   router.use(attachKickClientToReq);
 
-  router.post('/test', validateData(testValidator), testController.getTest);
+  router.post('/test', validateBody(testValidator), testController.getTest);
   router.get('/events', testController.getEvents);
   router.get('/subscribe', testController.getSubscribe);
   router.get('/delete', testController.getDelete);
