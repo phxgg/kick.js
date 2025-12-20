@@ -2,6 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { z, ZodError } from 'zod';
 
+/**
+ * Validate request query parameters against a Zod schema.
+ * @param schema Zod schema to validate against
+ * @returns Express middleware function
+ */
 export function validateQuery(schema: z.ZodObject<any, any>) {
   return (req: Request, res: Response, next: NextFunction) => {
     try {
