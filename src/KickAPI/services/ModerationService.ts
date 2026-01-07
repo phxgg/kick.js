@@ -1,6 +1,7 @@
 import z from 'zod';
 
 import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { Scopes } from '../Scopes';
 import { handleError } from '../utils';
 
 export const banUserSchema = z.object({
@@ -42,6 +43,8 @@ export class ModerationService {
    * @returns void
    */
   async banUser({ broadcasterUserId, userId, reason }: BanUserDto): Promise<void> {
+    this.client.requiresScope(Scopes.MODERATION_BAN);
+
     const schema = banUserSchema.safeParse({ broadcasterUserId, userId, reason });
 
     if (!schema.success) {
@@ -82,6 +85,8 @@ export class ModerationService {
    * @returns void
    */
   async timeoutUser({ broadcasterUserId, userId, reason, duration }: TimeoutUserDto): Promise<void> {
+    this.client.requiresScope(Scopes.MODERATION_BAN);
+
     const schema = timeoutUserSchema.safeParse({ broadcasterUserId, userId, reason, duration });
 
     if (!schema.success) {
@@ -121,6 +126,8 @@ export class ModerationService {
    * @returns void
    */
   async removeBan({ broadcasterUserId, userId }: RemoveBanDto): Promise<void> {
+    this.client.requiresScope(Scopes.MODERATION_BAN);
+
     const schema = removeBanSchema.safeParse({ broadcasterUserId, userId });
 
     if (!schema.success) {

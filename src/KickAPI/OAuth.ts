@@ -1,4 +1,4 @@
-import { Scopes } from './KickClient';
+import { Scopes } from './Scopes';
 import { generateCodeChallenge, generateCodeVerifier, handleError } from './utils';
 
 export type AppToken = {

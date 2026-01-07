@@ -1,8 +1,10 @@
 import EventEmitter from 'events';
 
+import { MissingScopeError, NoTokenSetError } from './errors';
 import { eventManager } from './EventManager';
 import { AppToken, OAuth, Token } from './OAuth';
 import { User } from './resources/User';
+import { Scopes } from './Scopes';
 import { CategoriesService } from './services/CategoriesService';
 import { ChannelRewardsService } from './services/ChannelRewardsService';
 import { ChannelsService } from './services/ChannelsService';
@@ -15,20 +17,6 @@ import { UsersService } from './services/UsersService';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
 
 export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
-
-export enum Scopes {
-  USER_READ = 'user:read',
-  CHANNEL_READ = 'channel:read',
-  CHANNEL_WRITE = 'channel:write',
-  CHANNEL_REWARDS_READ = 'channel:rewards:read',
-  CHANNEL_REWARDS_WRITE = 'channel:rewards:write',
-  CHAT_WRITE = 'chat:write',
-  STREAMKEY_READ = 'streamkey:read',
-  EVENTS_SUBSCRIBE = 'events:subscribe',
-  MODERATION_BAN = 'moderation:ban',
-  MODERATION_CHAT_MESSAGE_MANAGE = 'moderation:chat_message:manage',
-  KICKS_READ = 'kicks:read',
-}
 
 export class KickClient {
   private me: User | null = null;
@@ -98,5 +86,15 @@ export class KickClient {
 
   removeAllListeners() {
     this.eventEmitter.removeAllListeners();
+  }
+
+  requiresScope(scope: Scopes) {
+    if (!this.token) {
+      throw new NoTokenSetError('No user token set on KickClient.');
+    }
+    const tokenScopes = this.token.scope ? this.token.scope.split(' ') : [];
+    if (!tokenScopes.includes(scope)) {
+      throw new MissingScopeError(`Missing required scope: ${scope}`);
+    }
   }
 }

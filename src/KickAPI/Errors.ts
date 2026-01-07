@@ -32,3 +32,24 @@ export class BadRequestError extends Error {
     this.name = 'BadRequestError';
   }
 }
+
+export class RateLimitError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'RateLimitError';
+  }
+}
+
+export class NoTokenSetError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'NoTokenSetError';
+  }
+}
+
+export class MissingScopeError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'MissingScopeError';
+  }
+}
