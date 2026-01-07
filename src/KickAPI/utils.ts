@@ -1,6 +1,13 @@
 import crypto from 'crypto';
 
-import { BadRequestError, ForbiddenError, InternalServerError, NotFoundError, UnauthorizedError } from './errors';
+import {
+  BadRequestError,
+  ForbiddenError,
+  InternalServerError,
+  NotFoundError,
+  RateLimitError,
+  UnauthorizedError,
+} from './errors';
 import { WebhookEventNames } from './webhooks/WebhookEvents';
 
 export function handleError(response: Response) {
@@ -13,6 +20,8 @@ export function handleError(response: Response) {
       throw new ForbiddenError();
     case 404:
       throw new NotFoundError();
+    case 429:
+      throw new RateLimitError();
     case 500:
       throw new InternalServerError();
   }
