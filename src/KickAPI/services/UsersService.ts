@@ -1,6 +1,7 @@
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { User, type UserDto } from '../resources/User';
+import { Scopes } from '../Scopes';
 import { handleError, parseJSON } from '../utils';
 
 type TokenIntrospect = {
@@ -61,6 +62,8 @@ export class UsersService {
    * @returns An array of `User` instances.
    */
   async fetch(ids?: number[]): Promise<User[]> {
+    this.client.requiresScope(Scopes.USER_READ);
+
     const endpoint = new URL(this.USERS_URL);
 
     if (ids) {

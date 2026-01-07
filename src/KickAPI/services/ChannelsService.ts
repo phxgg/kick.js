@@ -3,6 +3,7 @@ import z from 'zod';
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { Channel, ChannelDto } from '../resources/Channel';
+import { Scopes } from '../Scopes';
 import { handleError, parseJSON } from '../utils';
 
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
@@ -56,6 +57,8 @@ export class ChannelsService {
    * @returns An array of `Channel` instances.
    */
   async fetch({ broadcasterUserId, slug }: FetchChannelParamsDto): Promise<Channel[]> {
+    this.client.requiresScope(Scopes.CHANNEL_READ);
+
     const schema = fetchChannelParamsSchema.safeParse({
       broadcasterUserId,
       slug,
@@ -122,6 +125,8 @@ export class ChannelsService {
    * @returns void
    */
   async update({ categoryId, customTags, streamTitle }: UpdateChannelDto): Promise<void> {
+    this.client.requiresScope(Scopes.CHANNEL_WRITE);
+
     const schema = updateChannelSchema.safeParse({
       categoryId,
       customTags,

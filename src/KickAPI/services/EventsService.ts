@@ -3,6 +3,7 @@ import z from 'zod';
 import { BaseResponse } from '../BaseResponse';
 import { KICK_BASE_URL, KickClient } from '../KickClient';
 import { EventSubscription, EventSubscriptionDto } from '../resources/EventSubscription';
+import { Scopes } from '../Scopes';
 import { handleError, parseJSON } from '../utils';
 
 export enum EventSubscriptionMethod {
@@ -84,6 +85,8 @@ export class EventsService {
     events,
     method,
   }: SubscribeToMultipleEventsDto): Promise<PostEventSubscriptionData[]> {
+    this.client.requiresScope(Scopes.EVENTS_SUBSCRIBE);
+
     const schema = subscribeToMultipleEventsSchema.safeParse({
       broadcasterUserId,
       events,
@@ -148,6 +151,8 @@ export class EventsService {
    * @returns void
    */
   async unsubscribeMultiple(ids: string[]): Promise<void> {
+    this.client.requiresScope(Scopes.EVENTS_SUBSCRIBE);
+
     if (ids.length === 0) return;
 
     const endpoint = new URL(this.EVENTS_URL);
