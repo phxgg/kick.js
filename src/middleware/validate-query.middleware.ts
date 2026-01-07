@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { z, ZodError } from 'zod';
 
+// `req.query` is read-only in express.js 5, so we need to use Object.defineProperty to update it
 function patchQuery(req: Request, validated: any) {
   Object.defineProperty(req, 'query', {
     ...Object.getOwnPropertyDescriptor(req, 'query'),
