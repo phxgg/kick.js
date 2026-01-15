@@ -9,7 +9,7 @@ export type SearchCategoryParams = {
   page?: number;
 };
 
-export type SearchCategoryResponse = BaseResponse<CategoryDto[]>;
+export type SearchCategoryResponse = BaseResponse<Omit<CategoryDto, 'viewer_count'>[]>;
 export type FetchCategoryResponse = BaseResponse<CategoryDto>;
 
 export class CategoriesService {
@@ -29,7 +29,7 @@ export class CategoriesService {
    * @param options.page (Optional) Page (defaults to 1 if not provided)
    * @returns An array of `Category` instances.
    */
-  async search({ q, page }: SearchCategoryParams): Promise<Category[]> {
+  async search({ q, page }: SearchCategoryParams): Promise<Omit<Category, 'viewerCount'>[]> {
     const endpoint = new URL(this.CATEGORIES_URL);
 
     endpoint.searchParams.append('q', q);
@@ -49,7 +49,7 @@ export class CategoriesService {
 
     const json = await parseJSON<SearchCategoryResponse>(response);
     const categories = json.data.map((category) => new Category(this.client, category));
-    return categories;
+    return categories as Omit<Category, 'viewerCount'>[];
   }
 
   /**
