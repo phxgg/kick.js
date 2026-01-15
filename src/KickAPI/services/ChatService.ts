@@ -18,7 +18,7 @@ export const sendMessageSchema = z.object({
   replyToMessageId: z.string().optional(),
   type: z.enum(ChatMessageType).default(ChatMessageType.BOT),
 });
-export type SendMessageDto = z.infer<typeof sendMessageSchema>;
+export type SendMessageParams = z.infer<typeof sendMessageSchema>;
 
 export type SendMessageResponse = BaseResponse<MessageDto>;
 
@@ -39,32 +39,23 @@ export class ChatService {
    * Required scopes:
    * `chat:write`
    *
-   * @param options The options for sending a message
-   * @param options.broadcasterUserId (Optional) The ID of the broadcaster to whom the message is sent
-   * @param options.content The content of the message (max 500 characters)
-   * @param options.replyToMessageId (Optional) The ID of the message being replied to
-   * @param options.type The type of message (user or bot)
+   * @param params The parameters for sending a message
+   * @param params.broadcasterUserId (Optional) The ID of the broadcaster to whom the message is sent
+   * @param params.content The content of the message (max 500 characters)
+   * @param params.replyToMessageId (Optional) The ID of the message being replied to
+   * @param params.type The type of message (user or bot)
    * @returns The sent `Message` instance.
    */
-  async send({
-    broadcasterUserId,
-    content,
-    replyToMessageId,
-    type = ChatMessageType.BOT,
-  }: SendMessageDto): Promise<Message> {
+  async send(params: SendMessageParams): Promise<Message> {
     this.client.requiresScope(Scope.CHAT_WRITE);
 
-    const schema = sendMessageSchema.safeParse({
-      broadcasterUserId,
-      content,
-      replyToMessageId,
-      type,
-    });
+    const schema = sendMessageSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
+    const { broadcasterUserId, content, replyToMessageId, type } = schema.data;
     const endpoint = new URL(this.CHAT_URL);
 
     const response = await fetch(endpoint, {
@@ -74,10 +65,10 @@ export class ChatService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        broadcaster_user_id: schema.data.broadcasterUserId,
-        content: schema.data.content,
-        reply_to_message_id: schema.data.replyToMessageId,
-        type: schema.data.type,
+        broadcaster_user_id: broadcasterUserId,
+        content: content,
+        reply_to_message_id: replyToMessageId,
+        type: type,
       }),
     });
 

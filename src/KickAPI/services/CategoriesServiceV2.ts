@@ -1,16 +1,19 @@
+import z from 'zod';
+
 import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse';
 import { KickClient } from '../KickClient';
 import { Category, CategoryDto } from '../resources/Category';
 import { constructEndpoint, handleError, parseJSON } from '../utils';
 import { Version } from '../Version';
 
-export type SearchCategoryParamsV2 = {
-  cursor?: string;
-  limit?: number;
-  name?: string[];
-  tag?: string[];
-  id?: number | number[];
-};
+export const searchCategoryParamsV2Schema = z.object({
+  cursor: z.string().optional(),
+  limit: z.number().min(1).max(100).optional(),
+  name: z.array(z.string()).optional(),
+  tag: z.array(z.string()).optional(),
+  id: z.union([z.number(), z.array(z.number())]).optional(),
+});
+export type SearchCategoryParamsV2 = z.infer<typeof searchCategoryParamsV2Schema>;
 
 export type SearchCategoryResponseV2 = BaseResponseWithPagination<Omit<CategoryDto, 'viewer_count'>[]>;
 export type FetchCategoryResponseV2 = BaseResponse<CategoryDto>;
@@ -26,41 +29,47 @@ export class CategoriesServiceV2 {
   /**
    * Get Categories based on the cursor, limit, names, and tags; or ids.
    *
-   * @param options The search parameters
-   * @param options.cursor (Optional) Cursor for pagination
-   * @param options.limit (Optional) Number of results to return (max 100)
-   * @param options.name (Optional) Array of category names to filter by
-   * @param options.tag (Optional) Array of tags to filter by
-   * @param options.id (Optional) Single ID or array of IDs to filter by
+   * @param params The search parameters
+   * @param params.cursor (Optional) Cursor for pagination
+   * @param params.limit (Optional) Number of results to return (max 100)
+   * @param params.name (Optional) Array of category names to filter by
+   * @param params.tag (Optional) Array of tags to filter by
+   * @param params.id (Optional) Single ID or array of IDs to filter by
    * @returns An array of `Category` instances.
    */
   async search(params: SearchCategoryParamsV2): Promise<Omit<Category, 'viewerCount'>[]> {
+    const schema = searchCategoryParamsV2Schema.safeParse(params);
+
+    if (!schema.success) {
+      throw new Error(`Invalid search parameters: ${schema.error.message}`);
+    }
+    const { cursor, limit, name, tag, id } = schema.data;
     const endpoint = new URL(this.CATEGORIES_URL);
 
     // Append params
-    if (params.cursor) {
-      endpoint.searchParams.append('cursor', params.cursor);
+    if (cursor) {
+      endpoint.searchParams.append('cursor', cursor);
     }
-    if (params.limit) {
-      endpoint.searchParams.append('limit', params.limit.toString());
+    if (limit) {
+      endpoint.searchParams.append('limit', limit.toString());
     }
-    if (params.name) {
-      for (const name of params.name) {
-        endpoint.searchParams.append('name', name);
+    if (name) {
+      for (const n of name) {
+        endpoint.searchParams.append('name', n);
       }
     }
-    if (params.tag) {
-      for (const tag of params.tag) {
-        endpoint.searchParams.append('tag', tag);
+    if (tag) {
+      for (const t of tag) {
+        endpoint.searchParams.append('tag', t);
       }
     }
-    if (params.id) {
-      if (Array.isArray(params.id)) {
-        for (const id of params.id) {
-          endpoint.searchParams.append('id', id.toString());
+    if (id) {
+      if (Array.isArray(id)) {
+        for (const i of id) {
+          endpoint.searchParams.append('id', i.toString());
         }
       } else {
-        endpoint.searchParams.append('id', params.id.toString());
+        endpoint.searchParams.append('id', id.toString());
       }
     }
 

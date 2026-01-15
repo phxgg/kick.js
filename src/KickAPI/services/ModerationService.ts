@@ -10,18 +10,18 @@ export const banUserSchema = z.object({
   userId: z.number().int().positive(),
   reason: z.string().max(100).optional(),
 });
-export type BanUserDto = z.infer<typeof banUserSchema>;
+export type BanUserParams = z.infer<typeof banUserSchema>;
 
 export const timeoutUserSchema = banUserSchema.extend({
   duration: z.number().int().min(1).max(10080), // max 7 days
 });
-export type TimeoutUserDto = z.infer<typeof timeoutUserSchema>;
+export type TimeoutUserParams = z.infer<typeof timeoutUserSchema>;
 
 export const removeBanSchema = z.object({
   broadcasterUserId: z.number().int().positive(),
   userId: z.number().int().positive(),
 });
-export type RemoveBanDto = z.infer<typeof removeBanSchema>;
+export type RemoveBanParams = z.infer<typeof removeBanSchema>;
 
 export class ModerationService {
   private readonly MODERATION_URL = constructEndpoint(Version.V1, 'moderation');
@@ -37,21 +37,22 @@ export class ModerationService {
    * Required scopes:
    * `moderation:ban`
    *
-   * @param options The options for banning a user
-   * @param options.broadcasterUserId The ID of the broadcaster from whose channel the user is being banned
-   * @param options.userId The ID of the user to be banned
-   * @param options.reason (Optional) The reason for the ban
+   * @param params The parameters for banning a user
+   * @param params.broadcasterUserId The ID of the broadcaster from whose channel the user is being banned
+   * @param params.userId The ID of the user to be banned
+   * @param params.reason (Optional) The reason for the ban
    * @returns void
    */
-  async banUser({ broadcasterUserId, userId, reason }: BanUserDto): Promise<void> {
+  async banUser(params: BanUserParams): Promise<void> {
     this.client.requiresScope(Scope.MODERATION_BAN);
 
-    const schema = banUserSchema.safeParse({ broadcasterUserId, userId, reason });
+    const schema = banUserSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
+    const { broadcasterUserId, userId, reason } = schema.data;
     const endpoint = new URL(this.MODERATION_URL + '/bans');
 
     const response = await fetch(endpoint, {
@@ -61,9 +62,9 @@ export class ModerationService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        broadcaster_user_id: schema.data.broadcasterUserId,
-        user_id: schema.data.userId,
-        reason: schema.data.reason,
+        broadcaster_user_id: broadcasterUserId,
+        user_id: userId,
+        reason: reason,
       }),
     });
 
@@ -78,22 +79,23 @@ export class ModerationService {
    * Required scopes:
    * `moderation:ban`
    *
-   * @param options The options for timing out a user
-   * @param options.broadcasterUserId The ID of the broadcaster from whose channel the user is being timed out
-   * @param options.userId The ID of the user to be timed out
-   * @param options.reason (Optional) The reason for the timeout
-   * @param options.duration The duration of the timeout in seconds (max 7 days)
+   * @param params The parameters for timing out a user
+   * @param params.broadcasterUserId The ID of the broadcaster from whose channel the user is being timed out
+   * @param params.userId The ID of the user to be timed out
+   * @param params.reason (Optional) The reason for the timeout
+   * @param params.duration The duration of the timeout in seconds (max 7 days)
    * @returns void
    */
-  async timeoutUser({ broadcasterUserId, userId, reason, duration }: TimeoutUserDto): Promise<void> {
+  async timeoutUser(params: TimeoutUserParams): Promise<void> {
     this.client.requiresScope(Scope.MODERATION_BAN);
 
-    const schema = timeoutUserSchema.safeParse({ broadcasterUserId, userId, reason, duration });
+    const schema = timeoutUserSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
+    const { broadcasterUserId, userId, reason, duration } = schema.data;
     const endpoint = new URL(this.MODERATION_URL + '/bans');
 
     const response = await fetch(endpoint, {
@@ -103,10 +105,10 @@ export class ModerationService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        broadcaster_user_id: schema.data.broadcasterUserId,
-        user_id: schema.data.userId,
-        reason: schema.data.reason,
-        duration: schema.data.duration,
+        broadcaster_user_id: broadcasterUserId,
+        user_id: userId,
+        reason: reason,
+        duration: duration,
       }),
     });
 
@@ -126,15 +128,16 @@ export class ModerationService {
    * @param options.userId The ID of the user whose ban/timeout is being removed
    * @returns void
    */
-  async removeBan({ broadcasterUserId, userId }: RemoveBanDto): Promise<void> {
+  async removeBan(params: RemoveBanParams): Promise<void> {
     this.client.requiresScope(Scope.MODERATION_BAN);
 
-    const schema = removeBanSchema.safeParse({ broadcasterUserId, userId });
+    const schema = removeBanSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
+    const { broadcasterUserId, userId } = schema.data;
     const endpoint = new URL(this.MODERATION_URL + '/bans');
 
     const response = await fetch(endpoint, {
@@ -144,8 +147,8 @@ export class ModerationService {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        broadcaster_user_id: schema.data.broadcasterUserId,
-        user_id: schema.data.userId,
+        broadcaster_user_id: broadcasterUserId,
+        user_id: userId,
       }),
     });
 

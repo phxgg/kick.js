@@ -14,7 +14,7 @@ export const updateChannelSchema = z.object({
   customTags: z.array(z.string()).optional(),
   streamTitle: z.string().optional(),
 });
-export type UpdateChannelDto = z.infer<typeof updateChannelSchema>;
+export type UpdateChannelParams = z.infer<typeof updateChannelSchema>;
 
 export const fetchChannelParamsSchema = z
   .object({
@@ -52,30 +52,28 @@ export class ChannelsService {
    * Required scopes:
    * `channel:read`
    *
-   * @param options The options for fetching the channel
-   * @param options.broadcasterUserId (Optional) Array of broadcaster user IDs (up to 50)
-   * @param options.slug (Optional) Array of channel slugs (up to 50, each max 25 characters)
+   * @param params The parameters for fetching the channel
+   * @param params.broadcasterUserId (Optional) Array of broadcaster user IDs (up to 50)
+   * @param params.slug (Optional) Array of channel slugs (up to 50, each max 25 characters)
    * @returns An array of `Channel` instances.
    */
-  async fetch({ broadcasterUserId, slug }: FetchChannelParamsDto): Promise<Channel[]> {
+  async fetch(params: FetchChannelParamsDto): Promise<Channel[]> {
     this.client.requiresScope(Scope.CHANNEL_READ);
 
-    const schema = fetchChannelParamsSchema.safeParse({
-      broadcasterUserId,
-      slug,
-    });
+    const schema = fetchChannelParamsSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
+    const { broadcasterUserId, slug } = schema.data;
     const endpoint = new URL(this.CHANNELS_URL);
 
-    if (schema.data.broadcasterUserId && schema.data.broadcasterUserId.length > 0) {
-      endpoint.searchParams.append('broadcaster_user_id', schema.data.broadcasterUserId.join(' '));
+    if (broadcasterUserId && broadcasterUserId.length > 0) {
+      endpoint.searchParams.append('broadcaster_user_id', broadcasterUserId.join(' '));
     }
-    if (schema.data.slug && schema.data.slug.length > 0) {
-      schema.data.slug.forEach((s) => endpoint.searchParams.append('slug', s));
+    if (slug && slug.length > 0) {
+      slug.forEach((s) => endpoint.searchParams.append('slug', s));
     }
 
     const response = await fetch(endpoint, {
@@ -119,25 +117,22 @@ export class ChannelsService {
    * Required scopes:
    * `channel:write`
    *
-   * @param options The options for updating the channel
-   * @param options.categoryId (Optional) The ID of the category to set for the channel
-   * @param options.customTags (Optional) An array of custom tags to set for the channel
-   * @param options.streamTitle (Optional) The title of the stream
+   * @param params The parameters for updating the channel
+   * @param params.categoryId (Optional) The ID of the category to set for the channel
+   * @param params.customTags (Optional) An array of custom tags to set for the channel
+   * @param params.streamTitle (Optional) The title of the stream
    * @returns void
    */
-  async update({ categoryId, customTags, streamTitle }: UpdateChannelDto): Promise<void> {
+  async update(params: UpdateChannelParams): Promise<void> {
     this.client.requiresScope(Scope.CHANNEL_WRITE);
 
-    const schema = updateChannelSchema.safeParse({
-      categoryId,
-      customTags,
-      streamTitle,
-    });
+    const schema = updateChannelSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
+    const { categoryId, customTags, streamTitle } = schema.data;
     const endpoint = new URL(this.CHANNELS_URL);
 
     const response = await fetch(endpoint, {
