@@ -1,4 +1,4 @@
-import { Scopes } from './Scopes';
+import { Scope } from './Scope';
 import { generateCodeChallenge, generateCodeVerifier, handleError } from './utils';
 
 export type AppToken = {
@@ -53,7 +53,7 @@ export class OAuth {
     codeVerifier: string;
   }> {
     const authorizeUrl = new URL(`${this.OAUTH_URL}/oauth/authorize`);
-    const scopes = Object.values(Scopes);
+    const scopes = Object.values(Scope);
 
     // Generate a code challenge from the verifier (async)
     const codeVerifier = generateCodeVerifier();

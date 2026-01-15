@@ -1,4 +1,4 @@
-export enum Scopes {
+export enum Scope {
   USER_READ = 'user:read',
   CHANNEL_READ = 'channel:read',
   CHANNEL_WRITE = 'channel:write',

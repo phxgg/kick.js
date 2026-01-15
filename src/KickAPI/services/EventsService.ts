@@ -1,10 +1,11 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { EventSubscription, EventSubscriptionDto } from '../resources/EventSubscription';
-import { Scopes } from '../Scopes';
-import { handleError, parseJSON } from '../utils';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export enum EventSubscriptionMethod {
   WEBHOOK = 'webhook',
@@ -40,7 +41,7 @@ export type EventSubscriptionResponse = BaseResponse<PostEventSubscriptionData[]
 export type FetchEventsResponse = BaseResponse<EventSubscriptionDto[]>;
 
 export class EventsService {
-  private EVENTS_URL: string = KICK_BASE_URL + '/events/subscriptions';
+  private readonly EVENTS_URL = constructEndpoint(Version.V1, 'events/subscriptions');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -85,7 +86,7 @@ export class EventsService {
     events,
     method,
   }: SubscribeToMultipleEventsDto): Promise<PostEventSubscriptionData[]> {
-    this.client.requiresScope(Scopes.EVENTS_SUBSCRIBE);
+    this.client.requiresScope(Scope.EVENTS_SUBSCRIBE);
 
     const schema = subscribeToMultipleEventsSchema.safeParse({
       broadcasterUserId,
@@ -151,7 +152,7 @@ export class EventsService {
    * @returns void
    */
   async unsubscribeMultiple(ids: string[]): Promise<void> {
-    this.client.requiresScope(Scopes.EVENTS_SUBSCRIBE);
+    this.client.requiresScope(Scope.EVENTS_SUBSCRIBE);
 
     if (ids.length === 0) return;
 

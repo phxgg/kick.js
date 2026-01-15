@@ -1,8 +1,9 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { User, type UserDto } from '../resources/User';
-import { Scopes } from '../Scopes';
-import { handleError, parseJSON } from '../utils';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 type TokenIntrospect = {
   active: boolean;
@@ -16,7 +17,7 @@ export type TokenIntrospectResponse = BaseResponse<TokenIntrospect>;
 export type FetchUserResponse = BaseResponse<UserDto[]>;
 
 export class UsersService {
-  private readonly USERS_URL: string = KICK_BASE_URL + '/users';
+  private readonly USERS_URL = constructEndpoint(Version.V1, 'users');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -32,7 +33,8 @@ export class UsersService {
    * @returns Token information.
    */
   async introspect(): Promise<TokenIntrospect> {
-    const endpoint = new URL(KICK_BASE_URL + '/token/introspect');
+    const TOKEN_INTROSPECT_ENDPOINT = constructEndpoint(Version.V1, 'token/introspect');
+    const endpoint = new URL(TOKEN_INTROSPECT_ENDPOINT);
 
     const response = await fetch(endpoint, {
       method: 'POST',
@@ -62,7 +64,7 @@ export class UsersService {
    * @returns An array of `User` instances.
    */
   async fetch(ids?: number[]): Promise<User[]> {
-    this.client.requiresScope(Scopes.USER_READ);
+    this.client.requiresScope(Scope.USER_READ);
 
     const endpoint = new URL(this.USERS_URL);
 

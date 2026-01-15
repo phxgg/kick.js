@@ -1,7 +1,8 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { Livestream, type LivestreamDto, type LivestreamStatsDto } from '../resources/Livestream';
-import { handleError, parseJSON } from '../utils';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export enum Sort {
   VIEWER_COUNT = 'viewer_count',
@@ -20,7 +21,7 @@ export type FetchLivestreamsResponse = BaseResponse<LivestreamDto[]>;
 export type FetchLivestreamStatsResponse = BaseResponse<LivestreamStatsDto>;
 
 export class LivestreamsService {
-  private LIVESTREAMS_URL: string = KICK_BASE_URL + '/livestreams';
+  private readonly LIVESTREAMS_URL = constructEndpoint(Version.V1, 'livestreams');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {

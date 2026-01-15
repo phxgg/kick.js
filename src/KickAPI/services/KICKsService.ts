@@ -1,10 +1,11 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { Leaderboard, type LeaderboardDto } from '../resources/Leaderboard';
-import { Scopes } from '../Scopes';
-import { handleError, parseJSON } from '../utils';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export const fetchLeaderboardSchema = z.object({
   top: z.number().int().min(1).max(100).optional(),
@@ -14,7 +15,7 @@ export type FetchLeaderboardParams = z.infer<typeof fetchLeaderboardSchema>;
 export type FetchLeaderboardResponse = BaseResponse<LeaderboardDto>;
 
 export class KICKsService {
-  private KICKS_URL: string = KICK_BASE_URL + '/kicks';
+  private readonly KICKS_URL = constructEndpoint(Version.V1, 'kicks');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -32,7 +33,7 @@ export class KICKsService {
    * @returns A `Leaderboard` instance.
    */
   async fetchLeaderboard({ top }: FetchLeaderboardParams): Promise<Leaderboard> {
-    this.client.requiresScope(Scopes.KICKS_READ);
+    this.client.requiresScope(Scope.KICKS_READ);
 
     const schema = fetchLeaderboardSchema.safeParse({ top });
 

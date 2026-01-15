@@ -1,10 +1,11 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { Channel, ChannelDto } from '../resources/Channel';
-import { Scopes } from '../Scopes';
-import { handleError, parseJSON } from '../utils';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 
@@ -35,7 +36,7 @@ export const fetchChannelParamsSchema = z
 export type FetchChannelParamsDto = z.infer<typeof fetchChannelParamsSchema>;
 
 export class ChannelsService {
-  private readonly CHANNELS_URL: string = KICK_BASE_URL + '/channels';
+  private readonly CHANNELS_URL = constructEndpoint(Version.V1, 'channels');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -57,7 +58,7 @@ export class ChannelsService {
    * @returns An array of `Channel` instances.
    */
   async fetch({ broadcasterUserId, slug }: FetchChannelParamsDto): Promise<Channel[]> {
-    this.client.requiresScope(Scopes.CHANNEL_READ);
+    this.client.requiresScope(Scope.CHANNEL_READ);
 
     const schema = fetchChannelParamsSchema.safeParse({
       broadcasterUserId,
@@ -125,7 +126,7 @@ export class ChannelsService {
    * @returns void
    */
   async update({ categoryId, customTags, streamTitle }: UpdateChannelDto): Promise<void> {
-    this.client.requiresScope(Scopes.CHANNEL_WRITE);
+    this.client.requiresScope(Scope.CHANNEL_WRITE);
 
     const schema = updateChannelSchema.safeParse({
       categoryId,

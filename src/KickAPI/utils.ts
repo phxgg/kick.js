@@ -8,6 +8,8 @@ import {
   RateLimitError,
   UnauthorizedError,
 } from './errors';
+import { KICK_BASE_URL } from './KickClient';
+import { Version } from './Version';
 import { WebhookEventNames } from './webhooks/WebhookEvents';
 
 export function handleError(response: Response) {
@@ -53,4 +55,12 @@ export function extractUniqueId(eventType: WebhookEventNames, payload: any): str
   if (payload.broadcaster?.username) return payload.broadcaster.username.toString();
   if (payload.broadcaster?.channel_slug) return payload.broadcaster.channel_slug.toString();
   return null;
+}
+
+export function constructEndpoint(version: Version, path: string): string {
+  // if path starts with '/', remove it
+  if (path.startsWith('/')) {
+    path = path.slice(1);
+  }
+  return `${KICK_BASE_URL}/${version}/${path}`;
 }

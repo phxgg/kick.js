@@ -1,7 +1,8 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { Category, CategoryDto } from '../resources/Category';
-import { handleError, parseJSON } from '../utils';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export type SearchCategoryParams = {
   q: string;
@@ -12,7 +13,7 @@ export type SearchCategoryResponse = BaseResponse<CategoryDto[]>;
 export type FetchCategoryResponse = BaseResponse<CategoryDto>;
 
 export class CategoriesService {
-  private readonly CATEGORIES_URL: string = KICK_BASE_URL + '/categories';
+  private readonly CATEGORIES_URL = constructEndpoint(Version.V1, 'categories');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {

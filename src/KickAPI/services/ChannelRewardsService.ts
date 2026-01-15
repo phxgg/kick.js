@@ -1,10 +1,11 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { ChannelReward, ChannelRewardDto } from '../resources/ChannelReward';
-import { Scopes } from '../Scopes';
-import { handleError, parseJSON } from '../utils';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export type FetchChannelRewardsResponse = BaseResponse<ChannelRewardDto[]>;
 export type CreateChannelRewardResponse = BaseResponse<ChannelRewardDto>;
@@ -33,7 +34,7 @@ export const updateChannelRewardSchema = z.object({
 export type UpdateChannelRewardDto = z.infer<typeof updateChannelRewardSchema>;
 
 export class ChannelRewardsService {
-  private readonly CHANNEL_REWARDS_URL: string = KICK_BASE_URL + '/channels/rewards';
+  private readonly CHANNEL_REWARDS_URL = constructEndpoint(Version.V1, 'channels/rewards');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -50,7 +51,7 @@ export class ChannelRewardsService {
    * @returns An array of `ChannelReward` instances.
    */
   async fetch(): Promise<ChannelReward[]> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_READ);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_READ);
 
     const endpoint = new URL(this.CHANNEL_REWARDS_URL);
 
@@ -87,7 +88,7 @@ export class ChannelRewardsService {
     shouldRedemptionsSkipRequestQueue,
     title,
   }: CreateChannelRewardDto): Promise<ChannelReward> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_WRITE);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = createChannelRewardSchema.safeParse({
       backgroundColor,
@@ -140,7 +141,7 @@ export class ChannelRewardsService {
    * @param rewardId The ID of the reward to delete
    */
   async delete(rewardId: string): Promise<void> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_WRITE);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/${rewardId}`);
 
@@ -167,7 +168,7 @@ export class ChannelRewardsService {
    * @returns The updated `ChannelReward` instance.
    */
   async update(rewardId: string, data: UpdateChannelRewardDto): Promise<ChannelReward> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_WRITE);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = updateChannelRewardSchema.safeParse(data);
 

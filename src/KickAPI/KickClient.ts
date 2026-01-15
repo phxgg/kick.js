@@ -4,7 +4,7 @@ import { MissingScopeError, NoTokenSetError } from './errors';
 import { eventManager } from './EventManager';
 import { AppToken, OAuth, Token } from './OAuth';
 import { User } from './resources/User';
-import { Scopes } from './Scopes';
+import { Scope } from './Scope';
 import { CategoriesService } from './services/CategoriesService';
 import { ChannelRewardsService } from './services/ChannelRewardsService';
 import { ChannelsService } from './services/ChannelsService';
@@ -16,7 +16,7 @@ import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
 
-export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
+export const KICK_BASE_URL: string = 'https://api.kick.com/public';
 
 export class KickClient {
   private me: User | null = null;
@@ -88,7 +88,7 @@ export class KickClient {
     this.eventEmitter.removeAllListeners();
   }
 
-  requiresScope(scope: Scopes) {
+  requiresScope(scope: Scope) {
     if (!this.token) {
       throw new NoTokenSetError('No user token set on KickClient.');
     }
