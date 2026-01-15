@@ -1,14 +1,27 @@
 import z from 'zod';
 
-import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse';
+import { KickClient } from '../KickClient';
 import { ChannelReward, ChannelRewardDto } from '../resources/ChannelReward';
-import { Scopes } from '../Scopes';
-import { handleError, parseJSON } from '../utils';
+import {
+  ChannelRewardAcceptRedemptionDto,
+  ChannelRewardRedemption,
+  ChannelRewardRedemptionDto,
+  ChannelRewardRedemptionStatus,
+  ChannelRewardRejectRedemptionDto,
+} from '../resources/ChannelRewardRedemption';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
+// Responses
 export type FetchChannelRewardsResponse = BaseResponse<ChannelRewardDto[]>;
 export type CreateChannelRewardResponse = BaseResponse<ChannelRewardDto>;
+export type GetChannelRewardRedemptionsResponse = BaseResponseWithPagination<ChannelRewardRedemptionDto[]>;
+export type AcceptRedemptionsResponse = BaseResponse<ChannelRewardAcceptRedemptionDto[]>;
+export type RejectRedemptionsResponse = BaseResponse<ChannelRewardRejectRedemptionDto[]>;
 
+// Schemas
 export const createChannelRewardSchema = z.object({
   backgroundColor: z.string().optional(),
   cost: z.number().min(1),
@@ -32,8 +45,24 @@ export const updateChannelRewardSchema = z.object({
 });
 export type UpdateChannelRewardDto = z.infer<typeof updateChannelRewardSchema>;
 
+export type GetChannelRewardRedemptionsParams = {
+  reward_id?: string;
+  status?: ChannelRewardRedemptionStatus;
+  id?: string[];
+  cursor?: string;
+};
+
+export const acceptRedemptionsSchema = z.object({
+  ids: z.array(z.string()).min(1).max(25),
+});
+export type AcceptRedemptionsDto = z.infer<typeof acceptRedemptionsSchema>;
+
+export const rejectRedemptionsSchema = acceptRedemptionsSchema;
+export type RejectRedemptionsDto = z.infer<typeof rejectRedemptionsSchema>;
+
+// Service
 export class ChannelRewardsService {
-  private readonly CHANNEL_REWARDS_URL: string = KICK_BASE_URL + '/channels/rewards';
+  private readonly CHANNEL_REWARDS_URL = constructEndpoint(Version.V1, 'channels/rewards');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -50,7 +79,7 @@ export class ChannelRewardsService {
    * @returns An array of `ChannelReward` instances.
    */
   async fetch(): Promise<ChannelReward[]> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_READ);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_READ);
 
     const endpoint = new URL(this.CHANNEL_REWARDS_URL);
 
@@ -87,7 +116,7 @@ export class ChannelRewardsService {
     shouldRedemptionsSkipRequestQueue,
     title,
   }: CreateChannelRewardDto): Promise<ChannelReward> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_WRITE);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = createChannelRewardSchema.safeParse({
       backgroundColor,
@@ -140,7 +169,7 @@ export class ChannelRewardsService {
    * @param rewardId The ID of the reward to delete
    */
   async delete(rewardId: string): Promise<void> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_WRITE);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/${rewardId}`);
 
@@ -167,7 +196,7 @@ export class ChannelRewardsService {
    * @returns The updated `ChannelReward` instance.
    */
   async update(rewardId: string, data: UpdateChannelRewardDto): Promise<ChannelReward> {
-    this.client.requiresScope(Scopes.CHANNEL_REWARDS_WRITE);
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = updateChannelRewardSchema.safeParse(data);
 
@@ -202,5 +231,131 @@ export class ChannelRewardsService {
     const json = await parseJSON<CreateChannelRewardResponse>(response);
     const reward = new ChannelReward(this.client, json.data);
     return reward;
+  }
+
+  /**
+   * Get channel reward redemptions for a broadcaster's channel.
+   *
+   * Required scopes:
+   * `channel:rewards:write`
+   *
+   * @returns An array of `ChannelRewardRedemption` instances.
+   */
+  async getRedemptions({
+    reward_id,
+    status,
+    id,
+    cursor,
+  }: GetChannelRewardRedemptionsParams): Promise<ChannelRewardRedemption[]> {
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+
+    const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/redemptions`);
+
+    if (reward_id) {
+      endpoint.searchParams.append('reward_id', reward_id);
+    }
+    if (status) {
+      endpoint.searchParams.append('status', status);
+    }
+    if (id) {
+      for (const redemptionId of id) {
+        endpoint.searchParams.append('id', redemptionId);
+      }
+    }
+    if (cursor) {
+      endpoint.searchParams.append('cursor', cursor);
+    }
+
+    const response = await fetch(endpoint, {
+      headers: {
+        Authorization: `Bearer ${this.client.token?.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      handleError(response);
+    }
+
+    const json = await parseJSON<GetChannelRewardRedemptionsResponse>(response);
+    const redemptions = json.data.map((redemption) => new ChannelRewardRedemption(this.client, redemption));
+    return redemptions;
+  }
+
+  /**
+   * Accept channel reward redemptions for a broadcaster's channel. The response will only include data for redemptions that failed to be accepted.
+   *
+   * Required scopes:
+   * `channel:rewards:write`
+   *
+   * @param ids The IDs of the redemptions to accept
+   * @returns An array of `ChannelRewardAcceptRedemptionDto` instances for redemptions that failed to be accepted.
+   */
+  async acceptRedemptions({ ids }: AcceptRedemptionsDto): Promise<ChannelRewardAcceptRedemptionDto[]> {
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+
+    const schema = acceptRedemptionsSchema.safeParse({ ids });
+
+    if (!schema.success) {
+      throw new Error(`Invalid data: ${schema.error.message}`);
+    }
+
+    const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/redemptions/accept`);
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.client.token?.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ids: schema.data.ids,
+      }),
+    });
+
+    if (!response.ok) {
+      handleError(response);
+    }
+
+    const json = await parseJSON<AcceptRedemptionsResponse>(response);
+    return json.data;
+  }
+
+  /**
+   * Reject channel reward redemptions for a broadcaster's channel. The response will only include data for redemptions that failed to be rejected.
+   *
+   * Required scopes:
+   * `channel:rewards:write`
+   *
+   * @param ids The IDs of the redemptions to reject
+   * @returns An array of `ChannelRewardRejectRedemptionDto` instances for redemptions that failed to be rejected.
+   */
+  async rejectRedemptions({ ids }: RejectRedemptionsDto): Promise<ChannelRewardRejectRedemptionDto[]> {
+    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+
+    const schema = rejectRedemptionsSchema.safeParse({ ids });
+
+    if (!schema.success) {
+      throw new Error(`Invalid data: ${schema.error.message}`);
+    }
+
+    const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/redemptions/reject`);
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.client.token?.access_token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ids: schema.data.ids,
+      }),
+    });
+
+    if (!response.ok) {
+      handleError(response);
+    }
+
+    const json = await parseJSON<RejectRedemptionsResponse>(response);
+    return json.data;
   }
 }

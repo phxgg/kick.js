@@ -4,8 +4,9 @@ import { MissingScopeError, NoTokenSetError } from './errors';
 import { eventManager } from './EventManager';
 import { AppToken, OAuth, Token } from './OAuth';
 import { User } from './resources/User';
-import { Scopes } from './Scopes';
+import { Scope } from './Scope';
 import { CategoriesService } from './services/CategoriesService';
+import { CategoriesServiceV2 } from './services/CategoriesServiceV2';
 import { ChannelRewardsService } from './services/ChannelRewardsService';
 import { ChannelsService } from './services/ChannelsService';
 import { ChatService } from './services/ChatService';
@@ -16,7 +17,9 @@ import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
 
-export const KICK_BASE_URL: string = 'https://api.kick.com/public/v1';
+export const KICK_BASE_URL = 'https://api.kick.com/public';
+// for some reason it's under the `api.kick.com` subdomain instead of `id.kick.com`
+export const KICK_TOKEN_INTROSPECT_ENDPOINT = 'https://api.kick.com/oauth/token/introspect';
 
 export class KickClient {
   private me: User | null = null;
@@ -28,6 +31,7 @@ export class KickClient {
 
   // Services
   public categories: CategoriesService;
+  public categoriesV2: CategoriesServiceV2;
   public channels: ChannelsService;
   public channelRewards: ChannelRewardsService;
   public users: UsersService;
@@ -40,6 +44,7 @@ export class KickClient {
   constructor(clientId: string, clientSecret: string) {
     this.oauth = OAuth.getInstance(clientId, clientSecret);
     this.categories = new CategoriesService(this);
+    this.categoriesV2 = new CategoriesServiceV2(this);
     this.channels = new ChannelsService(this);
     this.channelRewards = new ChannelRewardsService(this);
     this.users = new UsersService(this);
@@ -88,7 +93,7 @@ export class KickClient {
     this.eventEmitter.removeAllListeners();
   }
 
-  requiresScope(scope: Scopes) {
+  requiresScope(scope: Scope) {
     if (!this.token) {
       throw new NoTokenSetError('No user token set on KickClient.');
     }

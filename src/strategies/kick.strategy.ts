@@ -1,13 +1,14 @@
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
 
-import { KICK_BASE_URL } from '@/KickAPI/KickClient';
-import { Scopes } from '@/KickAPI/Scopes';
+import { Scope } from '@/KickAPI/Scope';
 import { FetchUserResponse } from '@/KickAPI/services/UsersService';
+import { constructEndpoint } from '@/KickAPI/utils';
+import { Version } from '@/KickAPI/Version';
 import { AccountModel } from '@/models/Account';
 import { UserModel } from '@/models/User';
 
-const scopes = Object.values(Scopes);
+const scopes = Object.values(Scope);
 
 export function initKickPassportOAuthStrategy() {
   passport.use(
@@ -27,7 +28,8 @@ export function initKickPassportOAuthStrategy() {
       async function (req, accessToken, refreshToken, params, profile, done) {
         try {
           // Fetch user information from Kick API
-          const res = await fetch(`${KICK_BASE_URL}/users`, {
+          const KICK_USERS_ENDPOINT = constructEndpoint(Version.V1, 'users');
+          const res = await fetch(KICK_USERS_ENDPOINT, {
             headers: {
               Authorization: `Bearer ${accessToken}`,
             },

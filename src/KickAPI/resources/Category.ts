@@ -6,7 +6,7 @@ export type CategoryDto = {
   name: string;
   tags: string[];
   thumbnail: string;
-  viewer_count: number;
+  viewer_count?: number;
 };
 
 export class Category extends Serializable {

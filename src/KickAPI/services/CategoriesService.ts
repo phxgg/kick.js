@@ -1,18 +1,22 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { Category, CategoryDto } from '../resources/Category';
-import { handleError, parseJSON } from '../utils';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export type SearchCategoryParams = {
   q: string;
   page?: number;
 };
 
-export type SearchCategoryResponse = BaseResponse<CategoryDto[]>;
+export type SearchCategoryResponse = BaseResponse<Omit<CategoryDto, 'viewer_count'>[]>;
 export type FetchCategoryResponse = BaseResponse<CategoryDto>;
 
+/**
+ * @deprecated Use `CategoriesServiceV2` instead.
+ */
 export class CategoriesService {
-  private readonly CATEGORIES_URL: string = KICK_BASE_URL + '/categories';
+  private readonly CATEGORIES_URL = constructEndpoint(Version.V1, 'categories');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -27,8 +31,9 @@ export class CategoriesService {
    * @param options.q Search query
    * @param options.page (Optional) Page (defaults to 1 if not provided)
    * @returns An array of `Category` instances.
+   * @deprecated Use `CategoriesServiceV2` instead.
    */
-  async search({ q, page }: SearchCategoryParams): Promise<Category[]> {
+  async search({ q, page }: SearchCategoryParams): Promise<Omit<Category, 'viewerCount'>[]> {
     const endpoint = new URL(this.CATEGORIES_URL);
 
     endpoint.searchParams.append('q', q);
@@ -48,7 +53,7 @@ export class CategoriesService {
 
     const json = await parseJSON<SearchCategoryResponse>(response);
     const categories = json.data.map((category) => new Category(this.client, category));
-    return categories;
+    return categories as Omit<Category, 'viewerCount'>[];
   }
 
   /**
@@ -56,6 +61,7 @@ export class CategoriesService {
    *
    * @param id The ID of the category to fetch
    * @returns A `Category` instance.
+   * @deprecated Use `CategoriesServiceV2` instead.
    */
   async fetch(id: number): Promise<Category> {
     const endpoint = new URL(`${this.CATEGORIES_URL}/${id}`);

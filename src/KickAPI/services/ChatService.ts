@@ -1,10 +1,11 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL, KickClient } from '../KickClient';
+import { KickClient } from '../KickClient';
 import { Message, MessageDto } from '../resources/Message';
-import { Scopes } from '../Scopes';
-import { handleError, parseJSON } from '../utils';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export enum ChatMessageType {
   USER = 'user',
@@ -22,7 +23,7 @@ export type SendMessageDto = z.infer<typeof sendMessageSchema>;
 export type SendMessageResponse = BaseResponse<MessageDto>;
 
 export class ChatService {
-  private readonly CHAT_URL: string = KICK_BASE_URL + '/chat';
+  private readonly CHAT_URL = constructEndpoint(Version.V1, 'chat');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -51,7 +52,7 @@ export class ChatService {
     replyToMessageId,
     type = ChatMessageType.BOT,
   }: SendMessageDto): Promise<Message> {
-    this.client.requiresScope(Scopes.CHAT_WRITE);
+    this.client.requiresScope(Scope.CHAT_WRITE);
 
     const schema = sendMessageSchema.safeParse({
       broadcasterUserId,
@@ -99,7 +100,7 @@ export class ChatService {
    * @returns void
    */
   async delete(messageId: string): Promise<void> {
-    this.client.requiresScope(Scopes.MODERATION_CHAT_MESSAGE_MANAGE);
+    this.client.requiresScope(Scope.MODERATION_CHAT_MESSAGE_MANAGE);
 
     const endpoint = new URL(`${this.CHAT_URL}/${messageId}`);
 

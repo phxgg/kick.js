@@ -1,14 +1,16 @@
+import type { ChannelRewardRedemptionStatus } from '@/KickAPI/resources/ChannelRewardRedemption';
+
 import type { UserEventProperty, WithIdentityNull } from '../Properties';
 
 export type ChannelRewardRedemptionUpdatedEventPayload = {
   id: string;
   user_input: string;
-  status: 'pending' | 'accepted' | 'rejected';
+  status: ChannelRewardRedemptionStatus;
   redeemed_at: string;
   reward: {
     id: string;
     title: string;
-    costs: number;
+    cost: number;
     description: string;
   };
   redeemer: Omit<UserEventProperty, 'identity' | 'is_anonymous'>;

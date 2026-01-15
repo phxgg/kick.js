@@ -1,6 +1,6 @@
 import { BaseResponse } from '../BaseResponse';
-import { KICK_BASE_URL } from '../KickClient';
-import { handleError, parseJSON } from '../utils';
+import { constructEndpoint, handleError, parseJSON } from '../utils';
+import { Version } from '../Version';
 
 export type PublicKeyDto = { public_key: string };
 export type PublicKeyResponse = BaseResponse<PublicKeyDto>;
@@ -11,6 +11,8 @@ interface CacheEntry {
 }
 
 export class PublicKeyService {
+  private readonly KICK_PUBLIC_KEY_URL = constructEndpoint(Version.V1, 'public-key');
+
   private static instance: PublicKeyService;
   private cache: CacheEntry | null = null;
   private inFlight?: Promise<string>;
@@ -41,7 +43,7 @@ export class PublicKeyService {
       return this.inFlight;
     }
     this.inFlight = (async () => {
-      const endpoint = new URL(KICK_BASE_URL + '/public-key');
+      const endpoint = new URL(this.KICK_PUBLIC_KEY_URL);
       const response = await fetch(endpoint);
 
       if (!response.ok) {

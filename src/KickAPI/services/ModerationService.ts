@@ -1,8 +1,9 @@
 import z from 'zod';
 
-import { KICK_BASE_URL, KickClient } from '../KickClient';
-import { Scopes } from '../Scopes';
-import { handleError } from '../utils';
+import { KickClient } from '../KickClient';
+import { Scope } from '../Scope';
+import { constructEndpoint, handleError } from '../utils';
+import { Version } from '../Version';
 
 export const banUserSchema = z.object({
   broadcasterUserId: z.number().int().positive(),
@@ -23,7 +24,7 @@ export const removeBanSchema = z.object({
 export type RemoveBanDto = z.infer<typeof removeBanSchema>;
 
 export class ModerationService {
-  private readonly MODERATION_URL: string = KICK_BASE_URL + '/moderation';
+  private readonly MODERATION_URL = constructEndpoint(Version.V1, 'moderation');
   protected readonly client: KickClient;
 
   constructor(client: KickClient) {
@@ -43,7 +44,7 @@ export class ModerationService {
    * @returns void
    */
   async banUser({ broadcasterUserId, userId, reason }: BanUserDto): Promise<void> {
-    this.client.requiresScope(Scopes.MODERATION_BAN);
+    this.client.requiresScope(Scope.MODERATION_BAN);
 
     const schema = banUserSchema.safeParse({ broadcasterUserId, userId, reason });
 
@@ -85,7 +86,7 @@ export class ModerationService {
    * @returns void
    */
   async timeoutUser({ broadcasterUserId, userId, reason, duration }: TimeoutUserDto): Promise<void> {
-    this.client.requiresScope(Scopes.MODERATION_BAN);
+    this.client.requiresScope(Scope.MODERATION_BAN);
 
     const schema = timeoutUserSchema.safeParse({ broadcasterUserId, userId, reason, duration });
 
@@ -126,7 +127,7 @@ export class ModerationService {
    * @returns void
    */
   async removeBan({ broadcasterUserId, userId }: RemoveBanDto): Promise<void> {
-    this.client.requiresScope(Scopes.MODERATION_BAN);
+    this.client.requiresScope(Scope.MODERATION_BAN);
 
     const schema = removeBanSchema.safeParse({ broadcasterUserId, userId });
 
