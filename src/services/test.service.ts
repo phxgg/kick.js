@@ -3,6 +3,7 @@ import { createLogger } from '@/winston.logger';
 import { KickClient } from '@/KickAPI/KickClient';
 import { EventSubscriptionMethod } from '@/KickAPI/services/EventsService';
 import { WebhookEventNames } from '@/KickAPI/webhooks/WebhookEvents';
+import { CategoriesQuerySchema } from '@/validators/query/categories-query.validator';
 
 const logger = createLogger('TestService');
 
@@ -29,6 +30,17 @@ class TestService {
   async unsubscribeFromAllEvents(kick: KickClient) {
     const subscriptions = await kick.events.fetch();
     await kick.events.unsubscribeMultiple(subscriptions.map((sub) => sub.id));
+  }
+
+  async getCategories(kick: KickClient, query: CategoriesQuerySchema) {
+    // const categories = await kick.categoriesV2.search({ limit: 10 });
+    const categories = await kick.categoriesV2.search(query);
+    return categories;
+  }
+
+  async getCategory(kick: KickClient, id: number) {
+    const category = await kick.categoriesV2.fetch(id);
+    return category;
   }
 }
 

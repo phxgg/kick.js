@@ -6,6 +6,7 @@ import { AppToken, OAuth, Token } from './OAuth';
 import { User } from './resources/User';
 import { Scope } from './Scope';
 import { CategoriesService } from './services/CategoriesService';
+import { CategoriesServiceV2 } from './services/CategoriesServiceV2';
 import { ChannelRewardsService } from './services/ChannelRewardsService';
 import { ChannelsService } from './services/ChannelsService';
 import { ChatService } from './services/ChatService';
@@ -28,6 +29,7 @@ export class KickClient {
 
   // Services
   public categories: CategoriesService;
+  public categoriesV2: CategoriesServiceV2;
   public channels: ChannelsService;
   public channelRewards: ChannelRewardsService;
   public users: UsersService;
@@ -40,6 +42,7 @@ export class KickClient {
   constructor(clientId: string, clientSecret: string) {
     this.oauth = OAuth.getInstance(clientId, clientSecret);
     this.categories = new CategoriesService(this);
+    this.categoriesV2 = new CategoriesServiceV2(this);
     this.channels = new ChannelsService(this);
     this.channelRewards = new ChannelRewardsService(this);
     this.users = new UsersService(this);

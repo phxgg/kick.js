@@ -4,7 +4,11 @@ import { testController } from '@/controllers/test.controller';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
 import { validateBody } from '@/middleware/validate-body.middleware';
-import { testValidator } from '@/validators/test.validator';
+import { validateParams } from '@/middleware/validate-params.middleware';
+import { validateQuery } from '@/middleware/validate-query.middleware';
+import { testBodyValidator } from '@/validators/body/test-body.validator';
+import { getCategoryParamsValidator } from '@/validators/params/get-category-params.validator';
+import { categoriesQueryValidator } from '@/validators/query/categories-query.validator';
 
 export function createTestRouter() {
   const router = Router();
@@ -12,10 +16,12 @@ export function createTestRouter() {
   router.use(bearerAuthMiddleware);
   router.use(attachKickClientToReq);
 
-  router.post('/test', validateBody(testValidator), testController.getTest);
+  router.post('/testbody', [validateBody(testBodyValidator)], testController.getTest);
   router.get('/events', testController.getEvents);
-  router.get('/subscribe', testController.getSubscribe);
-  router.get('/delete', testController.getDelete);
+  router.get('/events/subscribe', testController.getSubscribe);
+  router.get('/events/unsubscribe', testController.getUnsubscribe);
+  router.get('/categories', [validateQuery(categoriesQueryValidator)], testController.getCategories);
+  router.get('/categories/:id', [validateParams(getCategoryParamsValidator)], testController.getCategory);
 
   return router;
 }
