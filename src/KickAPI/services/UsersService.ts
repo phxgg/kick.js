@@ -1,5 +1,5 @@
 import { BaseResponse } from '../BaseResponse';
-import { KickClient } from '../KickClient';
+import { KICK_TOKEN_INTROSPECT_ENDPOINT, KickClient } from '../KickClient';
 import { User, type UserDto } from '../resources/User';
 import { Scope } from '../Scope';
 import { constructEndpoint, handleError, parseJSON } from '../utils';
@@ -33,8 +33,7 @@ export class UsersService {
    * @returns Token information.
    */
   async introspect(): Promise<TokenIntrospect> {
-    const TOKEN_INTROSPECT_ENDPOINT = constructEndpoint(Version.V1, 'token/introspect');
-    const endpoint = new URL(TOKEN_INTROSPECT_ENDPOINT);
+    const endpoint = new URL(KICK_TOKEN_INTROSPECT_ENDPOINT);
 
     const response = await fetch(endpoint, {
       method: 'POST',

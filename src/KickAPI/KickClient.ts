@@ -17,7 +17,9 @@ import { ModerationService } from './services/ModerationService';
 import { UsersService } from './services/UsersService';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
 
-export const KICK_BASE_URL: string = 'https://api.kick.com/public';
+export const KICK_BASE_URL = 'https://api.kick.com/public';
+// for some reason it's under the `api.kick.com` subdomain instead of `id.kick.com`
+export const KICK_TOKEN_INTROSPECT_ENDPOINT = 'https://api.kick.com/oauth/token/introspect';
 
 export class KickClient {
   private me: User | null = null;

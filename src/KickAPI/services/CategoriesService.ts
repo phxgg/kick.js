@@ -12,6 +12,9 @@ export type SearchCategoryParams = {
 export type SearchCategoryResponse = BaseResponse<Omit<CategoryDto, 'viewer_count'>[]>;
 export type FetchCategoryResponse = BaseResponse<CategoryDto>;
 
+/**
+ * @deprecated Use `CategoriesServiceV2` instead.
+ */
 export class CategoriesService {
   private readonly CATEGORIES_URL = constructEndpoint(Version.V1, 'categories');
   protected readonly client: KickClient;
@@ -28,6 +31,7 @@ export class CategoriesService {
    * @param options.q Search query
    * @param options.page (Optional) Page (defaults to 1 if not provided)
    * @returns An array of `Category` instances.
+   * @deprecated Use `CategoriesServiceV2` instead.
    */
   async search({ q, page }: SearchCategoryParams): Promise<Omit<Category, 'viewerCount'>[]> {
     const endpoint = new URL(this.CATEGORIES_URL);
@@ -57,6 +61,7 @@ export class CategoriesService {
    *
    * @param id The ID of the category to fetch
    * @returns A `Category` instance.
+   * @deprecated Use `CategoriesServiceV2` instead.
    */
   async fetch(id: number): Promise<Category> {
     const endpoint = new URL(`${this.CATEGORIES_URL}/${id}`);

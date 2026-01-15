@@ -22,7 +22,7 @@ export enum TokenHintType {
 
 export class OAuth {
   private static instance: OAuth;
-  private OAUTH_URL: string = 'https://id.kick.com';
+  private readonly OAUTH_URL: string = 'https://id.kick.com';
 
   private clientId: string;
   private clientSecret: string;
