@@ -28,23 +28,24 @@ export class KICKsService {
    * Required scopes:
    * `kicks:read`
    *
-   * @param options Options for fetching leaderboard.
-   * @param options.top (Optional) The number of entries from the top of the leaderboard to return. For example, 10 will fetch the top 10 entries.
+   * @param params Parameters for fetching leaderboard.
+   * @param params.top (Optional) The number of entries from the top of the leaderboard to return. For example, 10 will fetch the top 10 entries.
    * @returns A `Leaderboard` instance.
    */
-  async fetchLeaderboard({ top }: FetchLeaderboardParams): Promise<Leaderboard> {
+  async fetchLeaderboard(params: FetchLeaderboardParams): Promise<Leaderboard> {
     this.client.requiresScope(Scope.KICKS_READ);
 
-    const schema = fetchLeaderboardSchema.safeParse({ top });
+    const schema = fetchLeaderboardSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid parameters: ${schema.error.message}`);
     }
 
+    const { top } = schema.data;
     const endpoint = new URL(this.KICKS_URL + '/leaderboard');
 
-    if (schema.data.top) {
-      endpoint.searchParams.append('top', schema.data.top.toString());
+    if (top) {
+      endpoint.searchParams.append('top', top.toString());
     }
 
     const response = await fetch(endpoint, {

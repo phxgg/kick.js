@@ -1,7 +1,11 @@
 import { KickClient } from '../KickClient';
 import { Serializable } from '../Serializable';
 
-export type ChannelRewardRedemptionStatus = 'pending' | 'accepted' | 'rejected';
+export enum ChannelRewardRedemptionStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+}
 
 type RedemptionDto = {
   id: string;

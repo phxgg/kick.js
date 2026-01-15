@@ -1,3 +1,5 @@
+import z from 'zod';
+
 import { BaseResponse } from '../BaseResponse';
 import { KickClient } from '../KickClient';
 import { Livestream, type LivestreamDto, type LivestreamStatsDto } from '../resources/Livestream';
@@ -9,13 +11,14 @@ export enum Sort {
   STARTED_AT = 'started_at',
 }
 
-export type FetchLivestreamsParams = {
-  broadcaster_user_id?: number[];
-  category_id?: number;
-  language?: string;
-  limit?: number;
-  sort?: Sort;
-};
+export const fetchLivestreamsSchema = z.object({
+  broadcasterUserId: z.array(z.number().int().positive()).optional(),
+  categoryId: z.number().int().positive().optional(),
+  language: z.string().optional(),
+  limit: z.number().int().min(1).max(100).optional(),
+  sort: z.enum(Sort).optional(),
+});
+export type FetchLivestreamsParams = z.infer<typeof fetchLivestreamsSchema>;
 
 export type FetchLivestreamsResponse = BaseResponse<LivestreamDto[]>;
 export type FetchLivestreamStatsResponse = BaseResponse<LivestreamStatsDto>;
@@ -31,23 +34,29 @@ export class LivestreamsService {
   /**
    * Fetches livestreams from the Kick API.
    *
-   * @param options Options for fetching livestreams.
-   * @param options.broadcaster_user_id (Optional) Array of broadcaster user IDs to filter by. Max: 50 IDs.
-   * @param options.category_id (Optional) Category ID to filter by.
-   * @param options.language (Optional) Language code to filter by.
-   * @param options.limit (Optional) Maximum number of results to return. Min: 1, Max: 100.
-   * @param options.sort (Optional) Sort order.
+   * @param params Parameters for fetching livestreams.
+   * @param params.broadcaster_user_id (Optional) Array of broadcaster user IDs to filter by. Max: 50 IDs.
+   * @param params.category_id (Optional) Category ID to filter by.
+   * @param params.language (Optional) Language code to filter by.
+   * @param params.limit (Optional) Maximum number of results to return. Min: 1, Max: 100.
+   * @param params.sort (Optional) Sort order.
    * @returns An array of `Livestream` instances.
    */
-  async fetch({
-    broadcaster_user_id,
-    category_id,
-    language,
-    limit,
-    sort,
-  }: FetchLivestreamsParams): Promise<Livestream[]> {
-    if (broadcaster_user_id && broadcaster_user_id.length > 50) {
-      throw new Error('You can only request up to 50 broadcaster_user_id values at a time.');
+  async fetch(params: FetchLivestreamsParams): Promise<Livestream[]> {
+    const schema = fetchLivestreamsSchema.safeParse(params);
+
+    if (!schema.success) {
+      const errorMessages = schema.error.issues.map((issue) => ({
+        key: issue.path.join('.'),
+        message: issue.message,
+      }));
+      throw new Error(`Invalid parameters: ${JSON.stringify(errorMessages)}`);
+    }
+
+    const { broadcasterUserId, categoryId, language, limit, sort } = schema.data;
+
+    if (broadcasterUserId && broadcasterUserId.length > 50) {
+      throw new Error('You can only request up to 50 broadcasterUserId values at a time.');
     }
     if (limit && (limit < 1 || limit > 100)) {
       throw new Error('The limit must be between 1 and 100.');
@@ -55,11 +64,11 @@ export class LivestreamsService {
 
     const endpoint = new URL(this.LIVESTREAMS_URL);
 
-    if (broadcaster_user_id && broadcaster_user_id.length > 0) {
-      broadcaster_user_id.forEach((id) => endpoint.searchParams.append('broadcaster_user_id', String(id)));
+    if (broadcasterUserId && broadcasterUserId.length > 0) {
+      broadcasterUserId.forEach((id) => endpoint.searchParams.append('broadcaster_user_id', String(id)));
     }
-    if (category_id) {
-      endpoint.searchParams.append('category_id', String(category_id));
+    if (categoryId) {
+      endpoint.searchParams.append('category_id', String(categoryId));
     }
     if (language) {
       endpoint.searchParams.append('language', language);

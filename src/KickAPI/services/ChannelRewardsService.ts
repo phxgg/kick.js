@@ -31,7 +31,7 @@ export const createChannelRewardSchema = z.object({
   shouldRedemptionsSkipRequestQueue: z.boolean().optional(),
   title: z.string().max(50),
 });
-export type CreateChannelRewardDto = z.infer<typeof createChannelRewardSchema>;
+export type CreateChannelRewardParams = z.infer<typeof createChannelRewardSchema>;
 
 export const updateChannelRewardSchema = z.object({
   backgroundColor: z.string().optional(),
@@ -43,22 +43,24 @@ export const updateChannelRewardSchema = z.object({
   shouldRedemptionsSkipRequestQueue: z.boolean().optional(),
   title: z.string().max(50).optional(),
 });
-export type UpdateChannelRewardDto = z.infer<typeof updateChannelRewardSchema>;
+export type UpdateChannelRewardParams = z.infer<typeof updateChannelRewardSchema>;
 
-export type GetChannelRewardRedemptionsParams = {
-  reward_id?: string;
-  status?: ChannelRewardRedemptionStatus;
-  id?: string[];
-  cursor?: string;
-};
+export const getChannelRewardRedemptionsSchema = z.object({
+  rewardId: z.string().optional(),
+  status: z.enum(ChannelRewardRedemptionStatus).optional(),
+  // Cannot provide any other filters if filtering by redemption IDs
+  id: z.array(z.string()).max(50).optional(),
+  cursor: z.string().optional(),
+});
+export type GetChannelRewardRedemptionsParams = z.infer<typeof getChannelRewardRedemptionsSchema>;
 
 export const acceptRedemptionsSchema = z.object({
   ids: z.array(z.string()).min(1).max(25),
 });
-export type AcceptRedemptionsDto = z.infer<typeof acceptRedemptionsSchema>;
+export type AcceptRedemptionsParams = z.infer<typeof acceptRedemptionsSchema>;
 
 export const rejectRedemptionsSchema = acceptRedemptionsSchema;
-export type RejectRedemptionsDto = z.infer<typeof rejectRedemptionsSchema>;
+export type RejectRedemptionsParams = z.infer<typeof rejectRedemptionsSchema>;
 
 // Service
 export class ChannelRewardsService {
@@ -115,7 +117,7 @@ export class ChannelRewardsService {
     isUserInputRequired,
     shouldRedemptionsSkipRequestQueue,
     title,
-  }: CreateChannelRewardDto): Promise<ChannelReward> {
+  }: CreateChannelRewardParams): Promise<ChannelReward> {
     this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = createChannelRewardSchema.safeParse({
@@ -195,7 +197,7 @@ export class ChannelRewardsService {
    * @param data The data to update the reward with
    * @returns The updated `ChannelReward` instance.
    */
-  async update(rewardId: string, data: UpdateChannelRewardDto): Promise<ChannelReward> {
+  async update(rewardId: string, data: UpdateChannelRewardParams): Promise<ChannelReward> {
     this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = updateChannelRewardSchema.safeParse(data);
@@ -239,20 +241,32 @@ export class ChannelRewardsService {
    * Required scopes:
    * `channel:rewards:write`
    *
+   * @param params The parameters for fetching redemptions
+   * @param params.rewardId (Optional) Optionally provide a reward ID to list redemptions for that specific reward.
+   * @param params.status (Optional) Optionally provide a specific status to filter by. Defaults to `pending`.
+   * @param params.id (Optional) Optionally provide a list of redemption IDs to filter by. You cannot provide any other filters if you filter by redemption IDs.
+   * @param params.cursor (Optional) Optionally provide a cursor to paginate through the results.
    * @returns An array of `ChannelRewardRedemption` instances.
    */
-  async getRedemptions({
-    reward_id,
-    status,
-    id,
-    cursor,
-  }: GetChannelRewardRedemptionsParams): Promise<ChannelRewardRedemption[]> {
+  async getRedemptions(params: GetChannelRewardRedemptionsParams): Promise<ChannelRewardRedemption[]> {
+    const schema = getChannelRewardRedemptionsSchema.safeParse(params);
+
+    if (!schema.success) {
+      throw new Error(`Invalid data: ${schema.error.message}`);
+    }
+
     this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
+    const { rewardId, status, id, cursor } = schema.data;
     const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/redemptions`);
 
-    if (reward_id) {
-      endpoint.searchParams.append('reward_id', reward_id);
+    // cannot provide any other filters if filtering by redemption IDs
+    if (id && id.length > 0 && (rewardId || status || cursor)) {
+      throw new Error('You cannot provide any other filters if you filter by redemption IDs.');
+    }
+
+    if (rewardId) {
+      endpoint.searchParams.append('reward_id', rewardId);
     }
     if (status) {
       endpoint.searchParams.append('status', status);
@@ -287,10 +301,11 @@ export class ChannelRewardsService {
    * Required scopes:
    * `channel:rewards:write`
    *
-   * @param ids The IDs of the redemptions to accept
+   * @param params The parameters for accepting redemptions
+   * @param params.ids List of redemption IDs to accept. A maximum of 25 redemptions can be accepted per request. IDs must be unique.
    * @returns An array of `ChannelRewardAcceptRedemptionDto` instances for redemptions that failed to be accepted.
    */
-  async acceptRedemptions({ ids }: AcceptRedemptionsDto): Promise<ChannelRewardAcceptRedemptionDto[]> {
+  async acceptRedemptions({ ids }: AcceptRedemptionsParams): Promise<ChannelRewardAcceptRedemptionDto[]> {
     this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = acceptRedemptionsSchema.safeParse({ ids });
@@ -326,10 +341,11 @@ export class ChannelRewardsService {
    * Required scopes:
    * `channel:rewards:write`
    *
-   * @param ids The IDs of the redemptions to reject
+   * @param params The parameters for rejecting redemptions
+   * @param params.ids List of redemption IDs to reject. A maximum of 25 redemptions can be rejected per request. IDs must be unique.
    * @returns An array of `ChannelRewardRejectRedemptionDto` instances for redemptions that failed to be rejected.
    */
-  async rejectRedemptions({ ids }: RejectRedemptionsDto): Promise<ChannelRewardRejectRedemptionDto[]> {
+  async rejectRedemptions({ ids }: RejectRedemptionsParams): Promise<ChannelRewardRejectRedemptionDto[]> {
     this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = rejectRedemptionsSchema.safeParse({ ids });
