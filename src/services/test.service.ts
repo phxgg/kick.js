@@ -42,6 +42,11 @@ class TestService {
     const category = await kick.categoriesV2.fetch(id);
     return category;
   }
+
+  async introspectToken(kick: KickClient) {
+    const introspection = await kick.users.introspect();
+    return introspection;
+  }
 }
 
 export const testService = new TestService();

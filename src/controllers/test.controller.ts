@@ -72,6 +72,18 @@ class TestController {
       return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async postTokenIntrospect(req: Request, res: Response) {
+    if (!req.kick) {
+      return res.sendStatus(StatusCodes.FORBIDDEN);
+    }
+    try {
+      const introspect = await testService.introspectToken(req.kick);
+      return res.json(introspect);
+    } catch (err) {
+      return res.sendStatus(StatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
 
 export const testController = new TestController();

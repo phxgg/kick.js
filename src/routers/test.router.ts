@@ -22,6 +22,7 @@ export function createTestRouter() {
   router.get('/events/unsubscribe', testController.getUnsubscribe);
   router.get('/categories', [validateQuery(categoriesQueryValidator)], testController.getCategories);
   router.get('/categories/:id', [validateParams(getCategoryParamsValidator)], testController.getCategory);
+  router.post('/token/introspect', testController.postTokenIntrospect);
 
   return router;
 }
