@@ -18,8 +18,6 @@ import { UsersService } from './services/UsersService';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
 
 export const KICK_BASE_URL = 'https://api.kick.com/public';
-// for some reason it's under the `api.kick.com` subdomain instead of `id.kick.com`
-export const KICK_TOKEN_INTROSPECT_ENDPOINT = 'https://api.kick.com/oauth/token/introspect';
 
 export class KickClient {
   private me: User | null = null;
@@ -42,7 +40,7 @@ export class KickClient {
   public kicks: KICKsService;
 
   constructor(clientId: string, clientSecret: string) {
-    this.oauth = OAuth.getInstance(clientId, clientSecret);
+    this.oauth = new OAuth(this, clientId, clientSecret);
     this.categories = new CategoriesService(this);
     this.categoriesV2 = new CategoriesServiceV2(this);
     this.channels = new ChannelsService(this);
