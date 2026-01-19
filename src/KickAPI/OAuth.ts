@@ -1,5 +1,7 @@
+import { BaseResponse } from './BaseResponse';
+import { KickClient } from './KickClient';
 import { Scope } from './Scope';
-import { generateCodeChallenge, generateCodeVerifier, handleError } from './utils';
+import { generateCodeChallenge, generateCodeVerifier, handleError, parseJSON } from './utils';
 
 export type AppToken = {
   access_token: string;
@@ -20,34 +22,33 @@ export enum TokenHintType {
   REFRESH_TOKEN = 'refresh_token',
 }
 
+export type TokenIntrospect = {
+  active: boolean;
+  client_id: string;
+  exp: number;
+  scope: string;
+  token_type: string;
+};
+
+export type TokenIntrospectResponse = BaseResponse<TokenIntrospect>;
+
 export class OAuth {
-  private static instance: OAuth;
   private readonly OAUTH_URL: string = 'https://id.kick.com';
+  protected readonly client: KickClient;
 
   private clientId: string;
   private clientSecret: string;
 
-  private constructor(clientId: string, clientSecret: string) {
+  constructor(client: KickClient, clientId: string, clientSecret: string) {
+    this.client = client;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
   }
 
   /**
-   * Get the singleton instance of the OAuth class
-   * @param [clientId] The client ID (can be omitted if instance already exists)
-   * @param [clientSecret] The client secret (can be omitted if instance already exists)
-   * @returns The OAuth instance
+   * Generate the URL where users can authorize your application.
+   * @returns An object containing the authorization URL and the code verifier.
    */
-  static getInstance(clientId?: string, clientSecret?: string): OAuth {
-    if (!this.instance) {
-      if (!clientId || !clientSecret) {
-        throw new Error('OAuth not initialized. Provide clientId and clientSecret.');
-      }
-      this.instance = new OAuth(clientId, clientSecret);
-    }
-    return this.instance;
-  }
-
   async generateAuthorizeURL(): Promise<{
     url: string;
     codeVerifier: string;
@@ -69,6 +70,12 @@ export class OAuth {
     return { url: authorizeUrl.toString(), codeVerifier };
   }
 
+  /**
+   * Exchange an authorization code for an access token.
+   * @param code The authorization code received from the authorization server.
+   * @param codeVerifier The code verifier used to generate the code challenge.
+   * @returns An object containing the access token and related information.
+   */
   async exchangeToken(code: string, codeVerifier: string): Promise<Token> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/token`;
     const response = await fetch(tokenUrl, {
@@ -94,6 +101,10 @@ export class OAuth {
     return data;
   }
 
+  /**
+   * Generate an application token using client credentials.
+   * @returns An object containing the application token and related information.
+   */
   async generateAppToken(): Promise<AppToken> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/token`;
     const response = await fetch(tokenUrl, {
@@ -116,6 +127,11 @@ export class OAuth {
     return data;
   }
 
+  /**
+   * Refresh an access token using a refresh token.
+   * @param refreshToken The refresh token.
+   * @returns An object containing the new access token and related information.
+   */
   async refreshToken(refreshToken: string): Promise<Token> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/token`;
     const response = await fetch(tokenUrl, {
@@ -139,6 +155,11 @@ export class OAuth {
     return data;
   }
 
+  /**
+   * Revoke an access or refresh token.
+   * @param token The token to revoke.
+   * @param tokenHintType The type of token being revoked (access or refresh, defaults to access token).
+   */
   async revokeToken(token: string, tokenHintType: TokenHintType = TokenHintType.ACCESS_TOKEN): Promise<void> {
     const tokenUrl = `${this.OAUTH_URL}/oauth/revoke`;
     const response = await fetch(`${tokenUrl}?token=${token}&token_hint_type=${tokenHintType}`, {
@@ -151,5 +172,32 @@ export class OAuth {
     if (!response.ok) {
       handleError(response);
     }
+  }
+
+  /**
+   * Get information about the token that is passed in via the Authorization header.
+   * This function is implements part of the on the OAuth 2.0 spec for token introspection.
+   * Find the full spec here: https://datatracker.ietf.org/doc/html/rfc7662
+   * When `active=false` there is no additional information added in the response.
+   *
+   * @returns Token information.
+   */
+  async introspect(): Promise<TokenIntrospect> {
+    const endpoint = new URL(`${this.OAUTH_URL}/oauth/token/introspect`);
+
+    const response = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${this.client.token?.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      handleError(response);
+    }
+
+    const json = await parseJSON<TokenIntrospectResponse>(response);
+    const token = json.data;
+    return token;
   }
 }

@@ -44,7 +44,7 @@ class TestService {
   }
 
   async introspectToken(kick: KickClient) {
-    const introspection = await kick.users.introspect();
+    const introspection = await kick.oauth.introspect();
     return introspection;
   }
 }
