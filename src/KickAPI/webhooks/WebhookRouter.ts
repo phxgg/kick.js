@@ -63,7 +63,10 @@ export function createWebhookRouter() {
         eventManager.emit(uniqueId, eventType, payload);
       }
 
-      // Handle event
+      // Globally handle webhook events.
+      // IMPORTANT:
+      // This is to be used for global handling, not per-client.
+      // Per-client handling should be done via the eventManager above.
       switch (eventType) {
         case WebhookEvents.CHAT_MESSAGE_SENT:
           handleChatMessageSent(payload);
