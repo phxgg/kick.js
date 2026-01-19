@@ -48,7 +48,12 @@ export function generateCodeChallenge(codeVerifier: string) {
   return hash.toString('base64url');
 }
 
-// Helper function to extract the event unique identifier from different event types
+/**
+ * Helper function to extract the event unique identifier from different event types
+ * @param eventType The type of the webhook event
+ * @param payload The payload of the webhook event
+ * @returns The unique identifier as a string, or null if not found
+ */
 export function extractUniqueId(eventType: WebhookEventNames, payload: any): string | null {
   // Try user_id, then username, then channel_slug
   if (payload.broadcaster?.user_id) return payload.broadcaster.user_id.toString();
@@ -57,6 +62,12 @@ export function extractUniqueId(eventType: WebhookEventNames, payload: any): str
   return null;
 }
 
+/**
+ * Construct the full API endpoint URL
+ * @param version API version
+ * @param path Endpoint path
+ * @returns Full URL as a string
+ */
 export function constructEndpoint(version: Version, path: string): string {
   // if path starts with '/', remove it
   if (path.startsWith('/')) {
