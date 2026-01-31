@@ -5,6 +5,10 @@ import { AccountModel } from '@/models/Account';
 
 const REFRESH_THRESHOLD_MS = 60 * 1000; // refresh if <60s left
 
+/**
+ * Middleware to attach a KickClient to req.kick based on the authenticated user in req.user.
+ * If no req.user or no Kick account found, does nothing.
+ */
 export async function attachKickClientToReq(req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.user) return next(); // not authenticated

@@ -3,6 +3,7 @@ import { Router } from 'express';
 import { testController } from '@/controllers/test.controller';
 import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
 import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
+import { requireKickClient } from '@/middleware/require-kick-client.middleware';
 import { validateBody } from '@/middleware/validate-body.middleware';
 import { validateParams } from '@/middleware/validate-params.middleware';
 import { validateQuery } from '@/middleware/validate-query.middleware';
@@ -15,6 +16,7 @@ export function createTestRouter() {
 
   router.use(bearerAuthMiddleware);
   router.use(attachKickClientToReq);
+  router.use(requireKickClient);
 
   router.post('/testbody', [validateBody(testBodyValidator)], testController.getTest);
   router.get('/events', testController.getEvents);
