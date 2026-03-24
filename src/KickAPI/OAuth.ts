@@ -1,7 +1,7 @@
-import { BaseResponse } from './BaseResponse';
-import { KickClient } from './KickClient';
-import { Scope } from './Scope';
-import { generateCodeChallenge, generateCodeVerifier, handleError, parseJSON } from './utils';
+import { BaseResponse } from './BaseResponse.js';
+import { KickClient } from './KickClient.js';
+import { Scope } from './Scope.js';
+import { generateCodeChallenge, generateCodeVerifier, handleError, parseJSON } from './utils.js';
 
 export type AppToken = {
   access_token: string;

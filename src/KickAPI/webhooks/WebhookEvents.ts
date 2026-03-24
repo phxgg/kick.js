@@ -1,4 +1,4 @@
-import {
+import type {
   ChannelFollowedEventPayload,
   ChannelRewardRedemptionUpdatedEventPayload,
   ChannelSubscriptionGiftsEventPayload,
@@ -9,7 +9,7 @@ import {
   LivestreamMetadataUpdatedEventPayload,
   LivestreamStatusUpdatedEventPayload,
   ModerationBannedEventPayload,
-} from './v1/payloads';
+} from './v1/payloads/index.js';
 
 export enum WebhookEvents {
   CHAT_MESSAGE_SENT = 'chat.message.sent',

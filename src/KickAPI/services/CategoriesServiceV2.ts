@@ -1,10 +1,10 @@
 import z from 'zod';
 
-import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse';
-import { KickClient } from '../KickClient';
-import { Category, CategoryDto } from '../resources/Category';
-import { constructEndpoint, handleError, parseJSON } from '../utils';
-import { Version } from '../Version';
+import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse.js';
+import type { KickClient } from '../KickClient.js';
+import { Category, CategoryDto } from '../resources/Category.js';
+import { constructEndpoint, handleError, parseJSON } from '../utils.js';
+import { Version } from '../Version.js';
 
 export const searchCategoryParamsV2Schema = z.object({
   cursor: z.string().optional(),

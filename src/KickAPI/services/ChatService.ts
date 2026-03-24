@@ -1,11 +1,11 @@
 import z from 'zod';
 
-import { BaseResponse } from '../BaseResponse';
-import { KickClient } from '../KickClient';
-import { Message, MessageDto } from '../resources/Message';
-import { Scope } from '../Scope';
-import { constructEndpoint, handleError, parseJSON } from '../utils';
-import { Version } from '../Version';
+import { BaseResponse } from '../BaseResponse.js';
+import type { KickClient } from '../KickClient.js';
+import { Message, MessageDto } from '../resources/Message.js';
+import { Scope } from '../Scope.js';
+import { constructEndpoint, handleError, parseJSON } from '../utils.js';
+import { Version } from '../Version.js';
 
 export enum ChatMessageType {
   USER = 'user',

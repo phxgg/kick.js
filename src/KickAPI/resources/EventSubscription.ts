@@ -1,5 +1,5 @@
-import { KickClient } from '../KickClient';
-import { Serializable } from '../Serializable';
+import type { KickClient } from '../KickClient.js';
+import { Serializable } from '../Serializable.js';
 
 export type EventSubscriptionDto = {
   app_id: string;

@@ -1,6 +1,6 @@
-import { BaseResponse } from '../BaseResponse';
-import { constructEndpoint, handleError, parseJSON } from '../utils';
-import { Version } from '../Version';
+import { BaseResponse } from '../BaseResponse.js';
+import { constructEndpoint, handleError, parseJSON } from '../utils.js';
+import { Version } from '../Version.js';
 
 export type PublicKeyDto = { public_key: string };
 export type PublicKeyResponse = BaseResponse<PublicKeyDto>;

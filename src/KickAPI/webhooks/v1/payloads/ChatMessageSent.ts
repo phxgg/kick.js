@@ -1,4 +1,4 @@
-import type { EmoteEventProperty, UserEventProperty, WithIdentity, WithIdentityNull } from '../Properties';
+import type { EmoteEventProperty, UserEventProperty, WithIdentity, WithIdentityNull } from '../Properties.js';
 
 export type ChatMessageSentEventPayload = {
   message_id: string;

@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { envValidator } from './validators/env.validator';
+import { envValidator } from './validators/env.validator.js';
 
 // validate env file
 const validate = envValidator.safeParse(process.env);

@@ -7,10 +7,10 @@ import {
   NotFoundError,
   RateLimitError,
   UnauthorizedError,
-} from './errors';
-import { KICK_BASE_URL } from './KickClient';
-import { Version } from './Version';
-import { WebhookEventNames } from './webhooks/WebhookEvents';
+} from './errors.js';
+import { KICK_BASE_URL } from './KickClient.js';
+import { Version } from './Version.js';
+import { WebhookEventNames } from './webhooks/WebhookEvents.js';
 
 export function handleError(response: Response) {
   switch (response.status) {

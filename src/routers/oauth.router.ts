@@ -1,11 +1,11 @@
 import { Router } from 'express';
 import passport from 'passport';
 
-import { oauthController } from '@/controllers/oauth.controller';
-import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
-import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
-import { validateBody } from '@/middleware/validate-body.middleware';
-import { revokeTokenValidator, type RevokeTokenSchema } from '@/validators/body/revoke-token.validator';
+import { oauthController } from '@/controllers/oauth.controller.js';
+import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware.js';
+import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware.js';
+import { validateBody } from '@/middleware/validate-body.middleware.js';
+import { revokeTokenValidator, type RevokeTokenSchema } from '@/validators/body/revoke-token.validator.js';
 
 export function createOAuthRouter() {
   const router = Router();

@@ -1,7 +1,5 @@
 // initialize dotenv
-import './env';
-
-import path from 'path';
+import './env.js';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -10,18 +8,22 @@ import session from 'express-session';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import passport from 'passport';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-import { createLogger } from '@/winston.logger';
-import { connectMongo, disconnectMongo } from '@/db';
+import { createLogger } from '@/winston.logger.js';
 
-import { initCronJobs } from './cron-jobs';
-import { eventManager } from './KickAPI/EventManager';
-import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter';
-import { createOAuthRouter } from './routers/oauth.router';
-import { createTestRouter } from './routers/test.router';
-import { initKickPassportOAuthStrategy } from './strategies/kick.strategy';
+import { connectMongo, disconnectMongo } from '@/db.js';
+
+import { initCronJobs } from './cron-jobs.js';
+import { eventManager } from './KickAPI/EventManager.js';
+import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter.js';
+import { createOAuthRouter } from './routers/oauth.router.js';
+import { createTestRouter } from './routers/test.router.js';
+import { initKickPassportOAuthStrategy } from './strategies/kick.strategy.js';
 
 const logger = createLogger('App');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 morgan.token('remote-user', (req: any) => {
   return req.user ? req.user.email : 'guest';

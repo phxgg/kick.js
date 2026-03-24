@@ -1,6 +1,6 @@
-import { KickClient } from '../KickClient';
-import { Serializable } from '../Serializable';
-import { Category, type CategoryDto } from './Category';
+import type { KickClient } from '../KickClient.js';
+import { Serializable } from '../Serializable.js';
+import { Category, type CategoryDto } from './Category.js';
 
 export type LivestreamDto = {
   broadcaster_user_id: number;

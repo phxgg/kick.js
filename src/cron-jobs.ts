@@ -1,6 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import { pathToFileURL } from 'url';
+import { fileURLToPath, pathToFileURL } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function initCronJobs() {
   // import and initialize all cron jobs from the jobs directory

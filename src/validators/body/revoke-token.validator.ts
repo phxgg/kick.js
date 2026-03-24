@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import { TokenType } from '@/models/Token';
+import { TokenType } from '@/models/Token.js';
 
 export const revokeTokenValidator = z.object({
   token: z.string(),

@@ -1,9 +1,9 @@
 import z from 'zod';
 
-import { KickClient } from '../KickClient';
-import { Scope } from '../Scope';
-import { constructEndpoint, handleError } from '../utils';
-import { Version } from '../Version';
+import type { KickClient } from '../KickClient.js';
+import { Scope } from '../Scope.js';
+import { constructEndpoint, handleError } from '../utils.js';
+import { Version } from '../Version.js';
 
 export const banUserSchema = z.object({
   broadcasterUserId: z.number().int().positive(),

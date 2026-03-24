@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { createLogger } from '@/winston.logger';
+import { createLogger } from '@/winston.logger.js';
 
-import { UserModel } from '@/models/User';
-import { jwtService } from '@/services/jwt.service';
+import { UserModel } from '@/models/User.js';
+import { jwtService } from '@/services/jwt.service.js';
 
 const logger = createLogger('Middleware.BearerAuth');
 

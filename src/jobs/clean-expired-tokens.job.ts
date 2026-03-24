@@ -1,8 +1,8 @@
 import { CronJob } from 'cron';
 
-import { createLogger } from '@/winston.logger';
+import { createLogger } from '@/winston.logger.js';
 
-import { TokenModel } from '@/models/Token';
+import { TokenModel } from '@/models/Token.js';
 
 const logger = createLogger('cron');
 

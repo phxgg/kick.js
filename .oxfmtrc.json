@@ -1,0 +1,80 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "endOfLine": "lf",
+  "semi": true,
+  "singleQuote": true,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "printWidth": 120,
+  "sortImports": {
+    "internalPattern": ["@/"],
+    "newlinesBetween": true,
+    "customGroups": [
+      {
+        "groupName": "env",
+        "selector": "side_effect",
+        "elementNamePattern": ["./env", "./env.js", "env", "env/**"]
+      },
+      {
+        "groupName": "winston-logger",
+        "selector": "import",
+        "elementNamePattern": ["**/winston.logger", "**/winston.logger.js"]
+      },
+      {
+        "groupName": "db",
+        "selector": "import",
+        "elementNamePattern": ["**/db", "**/db.js"]
+      },
+      {
+        "groupName": "types-root",
+        "selector": "import",
+        "elementNamePattern": ["types"]
+      },
+      {
+        "groupName": "types",
+        "selector": "internal",
+        "elementNamePattern": ["@/types/**"]
+      },
+      {
+        "groupName": "config",
+        "selector": "internal",
+        "elementNamePattern": ["@/config/**"]
+      },
+      {
+        "groupName": "utils",
+        "selector": "internal",
+        "elementNamePattern": ["@/utils/**"]
+      },
+      {
+        "groupName": "lib",
+        "selector": "internal",
+        "elementNamePattern": ["@/lib/**"]
+      },
+      {
+        "groupName": "internal-rest",
+        "selector": "internal",
+        "elementNamePattern": ["@/**"]
+      }
+    ],
+    "groups": [
+      "env",
+      { "newlinesBetween": true },
+      ["builtin", "external"],
+      { "newlinesBetween": true },
+      "winston-logger",
+      "db",
+      { "newlinesBetween": true },
+      "types-root",
+      "types",
+      "config",
+      "utils",
+      "lib",
+      "internal-rest",
+      { "newlinesBetween": true },
+      ["parent", "sibling", "index"],
+      "unknown"
+    ]
+  },
+  "sortPackageJson": false,
+  "ignorePatterns": ["env.ts"]
+}
