@@ -1,8 +1,5 @@
 // initialize dotenv
 import './env.js';
-
-import path from 'path';
-import { fileURLToPath } from 'url';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
@@ -11,9 +8,12 @@ import session from 'express-session';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import passport from 'passport';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+import { createLogger } from '@/winston.logger.js';
 
 import { connectMongo, disconnectMongo } from '@/db.js';
-import { createLogger } from '@/winston.logger.js';
 
 import { initCronJobs } from './cron-jobs.js';
 import { eventManager } from './KickAPI/EventManager.js';

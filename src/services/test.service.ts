@@ -1,8 +1,9 @@
+import { createLogger } from '@/winston.logger.js';
+
 import { KickClient } from '@/KickAPI/KickClient.js';
 import { EventSubscriptionMethod } from '@/KickAPI/services/EventsService.js';
 import { WebhookEventNames } from '@/KickAPI/webhooks/WebhookEvents.js';
 import { CategoriesQuerySchema } from '@/validators/query/categories-query.validator.js';
-import { createLogger } from '@/winston.logger.js';
 
 const logger = createLogger('TestService');
 

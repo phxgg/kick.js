@@ -1,7 +1,6 @@
 import { inspect } from 'util';
-import DailyRotateFile from 'winston-daily-rotate-file';
-
 import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
 
 const _BLUE = '\x1b[34m';
 const _CYAN = '\x1b[36m';
