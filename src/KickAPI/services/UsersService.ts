@@ -1,9 +1,9 @@
-import { BaseResponse } from '../BaseResponse';
-import { KickClient } from '../KickClient';
-import { User, type UserDto } from '../resources/User';
-import { Scope } from '../Scope';
-import { constructEndpoint, handleError, parseJSON } from '../utils';
-import { Version } from '../Version';
+import { BaseResponse } from '../BaseResponse.js';
+import type { KickClient } from '../KickClient.js';
+import { User, type UserDto } from '../resources/User.js';
+import { Scope } from '../Scope.js';
+import { constructEndpoint, handleError, parseJSON } from '../utils.js';
+import { Version } from '../Version.js';
 
 export type FetchUserResponse = BaseResponse<UserDto[]>;
 

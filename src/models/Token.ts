@@ -1,4 +1,6 @@
-import { Document, Model, model, models, Schema, type Types } from 'mongoose';
+import mongoose, { type Document, type Model, type Types } from 'mongoose';
+
+const { model, models, Schema } = mongoose;
 
 export enum TokenType {
   ACCESS_TOKEN = 'access_token',

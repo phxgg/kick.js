@@ -1,4 +1,6 @@
-import { Document, Model, model, models, Schema } from 'mongoose';
+import mongoose, { type Document, type Model } from 'mongoose';
+
+const { model, models, Schema } = mongoose;
 
 export interface IUser extends Document {
   kickUserId: string;

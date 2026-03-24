@@ -1,9 +1,8 @@
 {
   "$schema": "https://swc.rs/schema.json",
   "module": {
-    "type": "commonjs",
-    // These are defaults.
-    "strict": false,
+    "type": "nodenext",
+    "strict": true,
     "strictMode": true,
     "lazy": false,
     "noInterop": false
@@ -14,10 +13,10 @@
       "decorators": true,
       "dynamicImport": true
     },
-    "target": "es2024",
+    "target": "esnext",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     }
   },
   "sourceMaps": true,

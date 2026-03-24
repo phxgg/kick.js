@@ -1,4 +1,4 @@
-import type { LivestreamMetadataEventProperty, UserEventProperty, WithIdentityNull } from '../Properties';
+import type { LivestreamMetadataEventProperty, UserEventProperty, WithIdentityNull } from '../Properties.js';
 
 export type LivestreamMetadataUpdatedEventPayload = {
   broadcaster: WithIdentityNull<UserEventProperty>;

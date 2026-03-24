@@ -2,11 +2,11 @@ import crypto from 'crypto';
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { createLogger } from '@/winston.logger';
+import { createLogger } from '@/winston.logger.js';
 
-import { eventManager } from '../EventManager';
-import { getKickPublicKey } from '../services/PublicKeyService';
-import { extractUniqueId } from '../utils';
+import { eventManager } from '../EventManager.js';
+import { getKickPublicKey } from '../services/PublicKeyService.js';
+import { extractUniqueId } from '../utils.js';
 import {
   handleChannelFollowed,
   handleChannelRewardRedemptionUpdated,
@@ -18,8 +18,8 @@ import {
   handleLivestreamMetadataUpdated,
   handleLivestreamStatusUpdated,
   handleModerationBanned,
-} from './WebhookEventHandlers';
-import { WebhookEvents, type WebhookEventNames } from './WebhookEvents';
+} from './WebhookEventHandlers.js';
+import { WebhookEvents, type WebhookEventNames } from './WebhookEvents.js';
 
 const logger = createLogger('KickAPI.WebhookRouter');
 

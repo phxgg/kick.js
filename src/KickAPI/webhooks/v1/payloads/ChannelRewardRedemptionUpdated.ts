@@ -1,6 +1,6 @@
-import type { ChannelRewardRedemptionStatus } from '@/KickAPI/resources/ChannelRewardRedemption';
+import type { ChannelRewardRedemptionStatus } from '@/KickAPI/resources/ChannelRewardRedemption.js';
 
-import type { UserEventProperty, WithIdentityNull } from '../Properties';
+import type { UserEventProperty, WithIdentityNull } from '../Properties.js';
 
 export type ChannelRewardRedemptionUpdatedEventPayload = {
   id: string;

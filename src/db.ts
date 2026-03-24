@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import { createLogger } from '@/winston.logger';
+import { createLogger } from '@/winston.logger.js';
 
 const logger = createLogger('MongoDB');
 

@@ -1,12 +1,12 @@
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
 
-import { Scope } from '@/KickAPI/Scope';
-import { FetchUserResponse } from '@/KickAPI/services/UsersService';
-import { constructEndpoint } from '@/KickAPI/utils';
-import { Version } from '@/KickAPI/Version';
-import { AccountModel } from '@/models/Account';
-import { UserModel } from '@/models/User';
+import { Scope } from '@/KickAPI/Scope.js';
+import { FetchUserResponse } from '@/KickAPI/services/UsersService.js';
+import { constructEndpoint } from '@/KickAPI/utils.js';
+import { Version } from '@/KickAPI/Version.js';
+import { AccountModel } from '@/models/Account.js';
+import { UserModel } from '@/models/User.js';
 
 const scopes = Object.values(Scope);
 

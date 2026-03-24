@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken';
 import { Types } from 'mongoose';
 import type { StringValue } from 'ms';
 
-import { TokenModel, TokenType } from '@/models/Token';
+import { TokenModel, TokenType } from '@/models/Token.js';
 
 export type JwtPayload = { sub: string; jti: string };
 

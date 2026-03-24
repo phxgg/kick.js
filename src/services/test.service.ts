@@ -1,9 +1,8 @@
-import { createLogger } from '@/winston.logger';
-
-import { KickClient } from '@/KickAPI/KickClient';
-import { EventSubscriptionMethod } from '@/KickAPI/services/EventsService';
-import { WebhookEventNames } from '@/KickAPI/webhooks/WebhookEvents';
-import { CategoriesQuerySchema } from '@/validators/query/categories-query.validator';
+import { KickClient } from '@/KickAPI/KickClient.js';
+import { EventSubscriptionMethod } from '@/KickAPI/services/EventsService.js';
+import { WebhookEventNames } from '@/KickAPI/webhooks/WebhookEvents.js';
+import { CategoriesQuerySchema } from '@/validators/query/categories-query.validator.js';
+import { createLogger } from '@/winston.logger.js';
 
 const logger = createLogger('TestService');
 

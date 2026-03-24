@@ -3,9 +3,9 @@ import { StatusCodes } from 'http-status-codes';
 import ms, { type StringValue } from 'ms';
 import { ulid } from 'ulid';
 
-import { TokenType } from '@/models/Token';
-import { jwtService, type JwtPayload } from '@/services/jwt.service';
-import { type RevokeTokenSchema } from '@/validators/body/revoke-token.validator';
+import { TokenType } from '@/models/Token.js';
+import { jwtService, type JwtPayload } from '@/services/jwt.service.js';
+import { type RevokeTokenSchema } from '@/validators/body/revoke-token.validator.js';
 
 class OAuthController {
   async kickCallback(req: Request, res: Response) {

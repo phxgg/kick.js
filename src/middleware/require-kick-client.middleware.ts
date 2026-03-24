@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { attachKickClientToReq } from './attach-kick-client-to-req.middleware';
+import { attachKickClientToReq } from './attach-kick-client-to-req.middleware.js';
 
 /**
  * Middleware to require that `req.kick` is set (KickClient is attached).

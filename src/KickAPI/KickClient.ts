@@ -1,21 +1,21 @@
 import EventEmitter from 'events';
 
-import { MissingScopeError, NoTokenSetError } from './errors';
-import { eventManager } from './EventManager';
-import { AppToken, OAuth, Token } from './OAuth';
-import { User } from './resources/User';
-import { Scope } from './Scope';
-import { CategoriesService } from './services/CategoriesService';
-import { CategoriesServiceV2 } from './services/CategoriesServiceV2';
-import { ChannelRewardsService } from './services/ChannelRewardsService';
-import { ChannelsService } from './services/ChannelsService';
-import { ChatService } from './services/ChatService';
-import { EventsService } from './services/EventsService';
-import { KICKsService } from './services/KICKsService';
-import { LivestreamsService } from './services/LivestreamsService';
-import { ModerationService } from './services/ModerationService';
-import { UsersService } from './services/UsersService';
-import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents';
+import { MissingScopeError, NoTokenSetError } from './errors.js';
+import { eventManager } from './EventManager.js';
+import { AppToken, OAuth, Token } from './OAuth.js';
+import { User } from './resources/User.js';
+import { Scope } from './Scope.js';
+import { CategoriesService } from './services/CategoriesService.js';
+import { CategoriesServiceV2 } from './services/CategoriesServiceV2.js';
+import { ChannelRewardsService } from './services/ChannelRewardsService.js';
+import { ChannelsService } from './services/ChannelsService.js';
+import { ChatService } from './services/ChatService.js';
+import { EventsService } from './services/EventsService.js';
+import { KICKsService } from './services/KICKsService.js';
+import { LivestreamsService } from './services/LivestreamsService.js';
+import { ModerationService } from './services/ModerationService.js';
+import { UsersService } from './services/UsersService.js';
+import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents.js';
 
 export const KICK_BASE_URL = 'https://api.kick.com/public';
 
@@ -61,7 +61,7 @@ export class KickClient {
         .me()
         .then((me) => {
           this.me = me;
-          eventManager.register(this.me.userId.toString(), this.eventEmitter);
+          eventManager.register(this.me!.userId.toString(), this.eventEmitter);
         })
         .catch((err) => {
           console.error('Failed to fetch authenticated user for KickClient:', err);

@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-empty-object-type */
-import type { KickClient } from '@/KickAPI/KickClient';
-import type { IUser } from '@/models/User';
-import type { EnvSchema } from '@/validators/env.validator';
+import type { KickClient } from '@/KickAPI/KickClient.ts';
+import type { IUser } from '@/models/User.ts';
+import type { EnvSchema } from '@/validators/env.validator.ts';
 
 declare global {
   namespace NodeJS {

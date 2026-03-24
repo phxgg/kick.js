@@ -1,11 +1,11 @@
 import z from 'zod';
 
-import { BaseResponse } from '../BaseResponse';
-import { KickClient } from '../KickClient';
-import { Channel, ChannelDto } from '../resources/Channel';
-import { Scope } from '../Scope';
-import { constructEndpoint, handleError, parseJSON } from '../utils';
-import { Version } from '../Version';
+import { BaseResponse } from '../BaseResponse.js';
+import type { KickClient } from '../KickClient.js';
+import { Channel, ChannelDto } from '../resources/Channel.js';
+import { Scope } from '../Scope.js';
+import { constructEndpoint, handleError, parseJSON } from '../utils.js';
+import { Version } from '../Version.js';
 
 export type FetchChannelsResponse = BaseResponse<ChannelDto[]>;
 

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 
-import { KickClient } from '@/KickAPI/KickClient';
-import { AccountModel } from '@/models/Account';
+import { KickClient } from '@/KickAPI/KickClient.js';
+import { AccountModel } from '@/models/Account.js';
 
 const REFRESH_THRESHOLD_MS = 60 * 1000; // refresh if <60s left
 

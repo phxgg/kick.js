@@ -1,15 +1,15 @@
 import { Router } from 'express';
 
-import { testController } from '@/controllers/test.controller';
-import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware';
-import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware';
-import { requireKickClient } from '@/middleware/require-kick-client.middleware';
-import { validateBody } from '@/middleware/validate-body.middleware';
-import { validateParams } from '@/middleware/validate-params.middleware';
-import { validateQuery } from '@/middleware/validate-query.middleware';
-import { testBodyValidator } from '@/validators/body/test-body.validator';
-import { getCategoryParamsValidator } from '@/validators/params/get-category-params.validator';
-import { categoriesQueryValidator } from '@/validators/query/categories-query.validator';
+import { testController } from '@/controllers/test.controller.js';
+import { attachKickClientToReq } from '@/middleware/attach-kick-client-to-req.middleware.js';
+import { bearerAuthMiddleware } from '@/middleware/bearer-auth.middleware.js';
+import { requireKickClient } from '@/middleware/require-kick-client.middleware.js';
+import { validateBody } from '@/middleware/validate-body.middleware.js';
+import { validateParams } from '@/middleware/validate-params.middleware.js';
+import { validateQuery } from '@/middleware/validate-query.middleware.js';
+import { testBodyValidator } from '@/validators/body/test-body.validator.js';
+import { getCategoryParamsValidator } from '@/validators/params/get-category-params.validator.js';
+import { categoriesQueryValidator } from '@/validators/query/categories-query.validator.js';
 
 export function createTestRouter() {
   const router = Router();

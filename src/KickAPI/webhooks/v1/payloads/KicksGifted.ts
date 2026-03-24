@@ -1,4 +1,4 @@
-import type { GiftEventProperty, UserEventProperty } from '../Properties';
+import type { GiftEventProperty, UserEventProperty } from '../Properties.js';
 
 export type KicksGiftedEventPayload = {
   broadcaster: Omit<UserEventProperty, 'identity' | 'is_anonymous'>;

@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
 
-import { WebhookEvents } from '@/KickAPI/webhooks/WebhookEvents';
-import { testService } from '@/services/test.service';
-import { GetCategoryParams } from '@/validators/params/get-category-params.validator';
-import { CategoriesQuerySchema } from '@/validators/query/categories-query.validator';
+import { WebhookEvents } from '@/KickAPI/webhooks/WebhookEvents.js';
+import { testService } from '@/services/test.service.js';
+import { GetCategoryParams } from '@/validators/params/get-category-params.validator.js';
+import { CategoriesQuerySchema } from '@/validators/query/categories-query.validator.js';
 
 class TestController {
   async getTest(req: Request, res: Response) {

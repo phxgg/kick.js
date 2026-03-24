@@ -1,4 +1,4 @@
-import type { UserEventProperty, WithIdentityNull } from '../Properties';
+import type { UserEventProperty, WithIdentityNull } from '../Properties.js';
 
 export type ModerationBannedEventPayload = {
   broadcaster: WithIdentityNull<UserEventProperty>;

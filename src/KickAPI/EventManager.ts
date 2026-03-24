@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 
-import { WebhookEventNames } from './webhooks/WebhookEvents';
+import { WebhookEventNames } from './webhooks/WebhookEvents.js';
 
 class EventManager {
   private static instance: EventManager;
