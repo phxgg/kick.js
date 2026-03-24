@@ -1,3 +1,4 @@
+// oxlint-disable typescript/no-empty-object-type
 import type { KickClient } from '@/KickAPI/KickClient.ts';
 import type { IUser } from '@/models/User.ts';
 import type { EnvSchema } from '@/validators/env.validator.ts';
