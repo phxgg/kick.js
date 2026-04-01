@@ -48,7 +48,7 @@
     "zod": "^4.3.6"
   },
   "devDependencies": {
-    "@swc/cli": "^0.8.0",
+    "@swc/cli": "^0.8.1",
     "@swc/core": "^1.15.21",
     "@types/compression": "^1.8.1",
     "@types/cookie-parser": "^1.4.10",
