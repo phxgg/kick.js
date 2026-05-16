@@ -1,10 +1,7 @@
+import { constructEndpoint, FetchUserResponse, Scope, Version } from '@phxgg/kick.js';
 import passport from 'passport';
 import OAuth2Strategy from 'passport-oauth2';
 
-import { Scope } from '@/KickAPI/Scope.js';
-import { FetchUserResponse } from '@/KickAPI/services/UsersService.js';
-import { constructEndpoint } from '@/KickAPI/utils.js';
-import { Version } from '@/KickAPI/Version.js';
 import { AccountModel } from '@/models/Account.js';
 import { UserModel } from '@/models/User.js';
 
@@ -46,7 +43,7 @@ export function initKickPassportOAuthStrategy() {
               email: kickUser.email,
               image: kickUser.profile_picture,
             },
-            { new: true, upsert: true }
+            { upsert: true, returnDocument: 'after' }
           );
 
           // Upsert Account
@@ -62,7 +59,7 @@ export function initKickPassportOAuthStrategy() {
               scope: params.scope ? params.scope.split(' ') : null,
               expiresAt: new Date(Date.now() + params.expires_in * 1000),
             },
-            { upsert: true, new: true }
+            { upsert: true, returnDocument: 'after' }
           );
 
           done(null, userDoc);

@@ -1,5 +1,6 @@
 > [!NOTE]
-> The KickAPI library can be found in the `src/KickAPI` directory. This project also implements a sample web API server using Express.
+> The SDK lives in [`packages/kick-sdk`](./packages/kick-sdk) and is published as `kick-sdk`.
+> Example applications consuming the SDK live under [`examples/`](./examples/) (e.g. [`examples/express-app`](./examples/express-app)). The repo is an npm workspace.
 
 # kick.js
 

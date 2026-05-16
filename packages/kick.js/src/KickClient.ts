@@ -1,6 +1,6 @@
 import EventEmitter from 'events';
 
-import { MissingScopeError, NoTokenSetError } from './errors.js';
+import { MissingScopeError, NoTokenSetError } from './Errors.js';
 import { eventManager } from './EventManager.js';
 import { AppToken, OAuth, Token } from './OAuth.js';
 import { User } from './resources/User.js';
@@ -18,6 +18,13 @@ import { UsersService } from './services/UsersService.js';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents.js';
 
 export const KICK_BASE_URL = 'https://api.kick.com/public';
+
+export interface KickClientOptions {
+  clientId: string;
+  clientSecret: string;
+  /** OAuth redirect URI. Required only for `oauth.generateAuthorizeURL()` and `oauth.exchangeToken()`. */
+  redirectUri?: string;
+}
 
 export class KickClient {
   private me: User | null = null;
@@ -39,8 +46,8 @@ export class KickClient {
   public events: EventsService;
   public kicks: KICKsService;
 
-  constructor(clientId: string, clientSecret: string) {
-    this.oauth = new OAuth(this, clientId, clientSecret);
+  constructor(options: KickClientOptions) {
+    this.oauth = new OAuth(this, options.clientId, options.clientSecret, options.redirectUri);
     this.categories = new CategoriesService(this);
     this.categoriesV2 = new CategoriesServiceV2(this);
     this.channels = new ChannelsService(this);

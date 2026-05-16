@@ -3,7 +3,6 @@
     "module": "nodenext",
     "target": "esnext",
     "moduleResolution": "nodenext",
-    "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -11,7 +10,7 @@
     "sourceMap": true,
     "resolveJsonModule": true,
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": "../..",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -21,7 +20,8 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@phxgg/kick.js": ["../../packages/kick.js/src/index.ts"]
     },
     "types": ["node"]
   },

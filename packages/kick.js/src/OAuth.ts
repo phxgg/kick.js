@@ -38,11 +38,20 @@ export class OAuth {
 
   private clientId: string;
   private clientSecret: string;
+  private redirectUri?: string;
 
-  constructor(client: KickClient, clientId: string, clientSecret: string) {
+  constructor(client: KickClient, clientId: string, clientSecret: string, redirectUri?: string) {
     this.client = client;
     this.clientId = clientId;
     this.clientSecret = clientSecret;
+    this.redirectUri = redirectUri;
+  }
+
+  private requireRedirectUri(): string {
+    if (!this.redirectUri) {
+      throw new Error('redirectUri is required for this OAuth operation. Pass it to the KickClient constructor.');
+    }
+    return this.redirectUri;
   }
 
   /**
@@ -62,7 +71,7 @@ export class OAuth {
 
     authorizeUrl.searchParams.append('client_id', this.clientId);
     authorizeUrl.searchParams.append('response_type', 'code');
-    authorizeUrl.searchParams.append('redirect_uri', process.env.KICK_CALLBACK_URL);
+    authorizeUrl.searchParams.append('redirect_uri', this.requireRedirectUri());
     authorizeUrl.searchParams.append('state', 'your_state');
     authorizeUrl.searchParams.append('scope', scopes.join(' '));
     authorizeUrl.searchParams.append('code_challenge', codeChallenge);
@@ -88,7 +97,7 @@ export class OAuth {
         client_secret: this.clientSecret,
         grant_type: 'authorization_code',
         code,
-        redirect_uri: process.env.KICK_CALLBACK_URL,
+        redirect_uri: this.requireRedirectUri(),
         code_verifier: codeVerifier,
       }),
     });

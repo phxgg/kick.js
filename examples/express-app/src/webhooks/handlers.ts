@@ -9,7 +9,7 @@ import type {
   LivestreamMetadataUpdatedEventPayload,
   LivestreamStatusUpdatedEventPayload,
   ModerationBannedEventPayload,
-} from './v1/payloads/index.js';
+} from '@phxgg/kick.js';
 
 export async function handleChatMessageSent(data: ChatMessageSentEventPayload) {
   //

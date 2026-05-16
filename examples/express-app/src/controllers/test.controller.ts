@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { WebhookEvents } from '@phxgg/kick.js';
 
-import { WebhookEvents } from '@/KickAPI/webhooks/WebhookEvents.js';
 import { testService } from '@/services/test.service.js';
 import { GetCategoryParams } from '@/validators/params/get-category-params.validator.js';
 import { CategoriesQuerySchema } from '@/validators/query/categories-query.validator.js';
