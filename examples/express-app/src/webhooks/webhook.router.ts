@@ -1,5 +1,3 @@
-import express from 'express';
-import { StatusCodes } from 'http-status-codes';
 import {
   dispatchWebhookEvent,
   getKickPublicKey,
@@ -7,6 +5,8 @@ import {
   WebhookEvents,
   type WebhookEventNames,
 } from '@phxgg/kick.js';
+import express from 'express';
+import { StatusCodes } from 'http-status-codes';
 
 import { createLogger } from '@/winston.logger.js';
 

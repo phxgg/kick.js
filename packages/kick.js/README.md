@@ -333,20 +333,16 @@ kick.js provides framework-agnostic primitives so you can handle Kick webhook de
 ### Verify & dispatch
 
 ```ts
-import {
-  verifyKickSignature,
-  dispatchWebhookEvent,
-  getKickPublicKey,
-} from '@phxgg/kick.js';
+import { verifyKickSignature, dispatchWebhookEvent, getKickPublicKey } from '@phxgg/kick.js';
 
 // Inside your POST /webhooks/kick handler:
 const publicKey = await getKickPublicKey(); // cached, refreshes every hour
 
 const valid = verifyKickSignature({
-  messageId:        req.headers['kick-event-message-id'],
+  messageId: req.headers['kick-event-message-id'],
   messageTimestamp: req.headers['kick-event-message-timestamp'],
-  rawBody:          rawBody, // Buffer or string — must be read before JSON.parse
-  signature:        req.headers['kick-event-signature'],
+  rawBody: rawBody, // Buffer or string — must be read before JSON.parse
+  signature: req.headers['kick-event-signature'],
   publicKey,
 });
 
@@ -392,18 +388,18 @@ client.destroy();
 
 **Supported webhook events**
 
-| Event | Constant |
-|---|---|
-| `chat.message.sent` | `WebhookEvents.CHAT_MESSAGE_SENT` |
-| `channel.followed` | `WebhookEvents.CHANNEL_FOLLOWED` |
-| `channel.subscription.new` | `WebhookEvents.CHANNEL_SUBSCRIPTION_NEW` |
-| `channel.subscription.renewal` | `WebhookEvents.CHANNEL_SUBSCRIPTION_RENEWAL` |
-| `channel.subscription.gifts` | `WebhookEvents.CHANNEL_SUBSCRIPTION_GIFTS` |
+| Event                               | Constant                                          |
+| ----------------------------------- | ------------------------------------------------- |
+| `chat.message.sent`                 | `WebhookEvents.CHAT_MESSAGE_SENT`                 |
+| `channel.followed`                  | `WebhookEvents.CHANNEL_FOLLOWED`                  |
+| `channel.subscription.new`          | `WebhookEvents.CHANNEL_SUBSCRIPTION_NEW`          |
+| `channel.subscription.renewal`      | `WebhookEvents.CHANNEL_SUBSCRIPTION_RENEWAL`      |
+| `channel.subscription.gifts`        | `WebhookEvents.CHANNEL_SUBSCRIPTION_GIFTS`        |
 | `channel.reward.redemption.updated` | `WebhookEvents.CHANNEL_REWARD_REDEMPTION_UPDATED` |
-| `livestream.status.updated` | `WebhookEvents.LIVESTREAM_STATUS_UPDATED` |
-| `livestream.metadata.updated` | `WebhookEvents.LIVESTREAM_METADATA_UPDATED` |
-| `moderation.banned` | `WebhookEvents.MODERATION_BANNED` |
-| `kicks.gifted` | `WebhookEvents.KICKS_GIFTED` |
+| `livestream.status.updated`         | `WebhookEvents.LIVESTREAM_STATUS_UPDATED`         |
+| `livestream.metadata.updated`       | `WebhookEvents.LIVESTREAM_METADATA_UPDATED`       |
+| `moderation.banned`                 | `WebhookEvents.MODERATION_BANNED`                 |
+| `kicks.gifted`                      | `WebhookEvents.KICKS_GIFTED`                      |
 
 ---
 
