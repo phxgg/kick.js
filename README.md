@@ -1,5 +1,5 @@
 > [!NOTE]
-> The SDK lives in [`packages/kick-sdk`](./packages/kick-sdk) and is published as `kick-sdk`.
+> The SDK lives in [`packages/kick.js`](./packages/kick.js) and is published as `@phxgg/kick.js`.
 > Example applications consuming the SDK live under [`examples/`](./examples/) (e.g. [`examples/express-app`](./examples/express-app)). The repo is an npm workspace.
 
 # kick.js
