@@ -1,12 +1,12 @@
 // initialize dotenv
 import './env.js';
+import { eventManager } from '@phxgg/kick.js';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
-import { eventManager } from '@phxgg/kick.js';
 import morgan from 'morgan';
 import passport from 'passport';
 import path from 'path';

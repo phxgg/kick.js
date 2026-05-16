@@ -1,6 +1,6 @@
+import { WebhookEvents } from '@phxgg/kick.js';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { WebhookEvents } from '@phxgg/kick.js';
 
 import { testService } from '@/services/test.service.js';
 import { GetCategoryParams } from '@/validators/params/get-category-params.validator.js';

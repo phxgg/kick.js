@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
 import { KickClient } from '@phxgg/kick.js';
+import { NextFunction, Request, Response } from 'express';
 
 import { AccountModel } from '@/models/Account.js';
 
