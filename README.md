@@ -19,3 +19,9 @@ This library is currently under active development. This is what I am aiming for
 - Event Management: Efficient event handling system for real-time updates.
 - Modular Design: Easily extend and customize the library to fit your needs.
 - Active Maintenance: Regular updates to keep up with Kick.com's API changes.
+
+## Usage
+
+View the [documentation](./packages/kick.js/README.md) for detailed information on how to install and use the kick.js library in your projects.
+
+View the [examples](./examples/) directory for sample applications demonstrating how to use the kick.js library in various scenarios.
