@@ -6,6 +6,7 @@ import cors from 'cors';
 import express from 'express';
 import session from 'express-session';
 import helmet from 'helmet';
+import { eventManager } from '@phxgg/kick.js';
 import morgan from 'morgan';
 import passport from 'passport';
 import path from 'path';
@@ -16,11 +17,10 @@ import { createLogger } from '@/winston.logger.js';
 import { connectMongo, disconnectMongo } from '@/db.js';
 
 import { initCronJobs } from './cron-jobs.js';
-import { eventManager } from './KickAPI/EventManager.js';
-import { createWebhookRouter } from './KickAPI/webhooks/WebhookRouter.js';
 import { createOAuthRouter } from './routers/oauth.router.js';
 import { createTestRouter } from './routers/test.router.js';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy.js';
+import { createWebhookRouter } from './webhooks/webhook.router.js';
 
 const logger = createLogger('App');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

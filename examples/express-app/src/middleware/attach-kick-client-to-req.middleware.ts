@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import { KickClient } from '@phxgg/kick.js';
 
-import { KickClient } from '@/KickAPI/KickClient.js';
 import { AccountModel } from '@/models/Account.js';
 
 const REFRESH_THRESHOLD_MS = 60 * 1000; // refresh if <60s left
@@ -20,7 +20,11 @@ export async function attachKickClientToReq(req: Request, res: Response, next: N
     if (!account || !account.accessToken) return next();
 
     // Build a fresh client per request
-    const client = new KickClient(process.env.KICK_CLIENT_ID, process.env.KICK_CLIENT_SECRET);
+    const client = new KickClient({
+      clientId: process.env.KICK_CLIENT_ID,
+      clientSecret: process.env.KICK_CLIENT_SECRET,
+      redirectUri: process.env.KICK_CALLBACK_URL,
+    });
 
     // Refresh if expiring
     if (account.expiresAt && account.refreshToken && account.expiresAt.getTime() - Date.now() < REFRESH_THRESHOLD_MS) {

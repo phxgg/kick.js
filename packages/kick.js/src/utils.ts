@@ -7,7 +7,7 @@ import {
   NotFoundError,
   RateLimitError,
   UnauthorizedError,
-} from './errors.js';
+} from './Errors.js';
 import { KICK_BASE_URL } from './KickClient.js';
 import { Version } from './Version.js';
 import { WebhookEventNames } from './webhooks/WebhookEvents.js';

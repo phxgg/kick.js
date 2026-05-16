@@ -1,12 +1,15 @@
-import crypto from 'crypto';
 import express from 'express';
 import { StatusCodes } from 'http-status-codes';
+import {
+  dispatchWebhookEvent,
+  getKickPublicKey,
+  verifyKickSignature,
+  WebhookEvents,
+  type WebhookEventNames,
+} from '@phxgg/kick.js';
 
 import { createLogger } from '@/winston.logger.js';
 
-import { eventManager } from '../EventManager.js';
-import { getKickPublicKey } from '../services/PublicKeyService.js';
-import { extractUniqueId } from '../utils.js';
 import {
   handleChannelFollowed,
   handleChannelRewardRedemptionUpdated,
@@ -18,10 +21,9 @@ import {
   handleLivestreamMetadataUpdated,
   handleLivestreamStatusUpdated,
   handleModerationBanned,
-} from './WebhookEventHandlers.js';
-import { WebhookEvents, type WebhookEventNames } from './WebhookEvents.js';
+} from './handlers.js';
 
-const logger = createLogger('KickAPI.WebhookRouter');
+const logger = createLogger('WebhookRouter');
 
 export function createWebhookRouter() {
   const router = express.Router();
@@ -36,37 +38,31 @@ export function createWebhookRouter() {
 
     try {
       const publicKey = await getKickPublicKey();
-
-      const rawBody = req.rawBody!.toString('utf8');
+      const rawBody = req.rawBody?.toString('utf8');
       if (!messageId || !messageTimestamp || !rawBody || !eventSignature) {
         logger.error('Missing required parameters for signature verification');
         return res.sendStatus(StatusCodes.BAD_REQUEST);
       }
 
-      const constructSignature = `${messageId}.${messageTimestamp}.${rawBody}`;
-      // create an RSA-SHA256 verifier
-      const verifier = crypto.createVerify('RSA-SHA256').update(constructSignature);
-      const signature = Buffer.from(eventSignature, 'base64');
-      const isValid = verifier.verify(publicKey, signature);
+      const isValid = verifyKickSignature({
+        messageId,
+        messageTimestamp,
+        rawBody,
+        signature: eventSignature,
+        publicKey,
+      });
       if (!isValid) {
         logger.warn('Webhook signature verification failed');
         return res.sendStatus(StatusCodes.FORBIDDEN);
       }
+
       const payload = JSON.parse(rawBody);
       logger.info('Received Kick webhook event', { event: payload });
 
-      // Handle client event emitter listeners.
-      // Extract unique identifier from payload to route to correct client.
-      // Then, emit to specific client for this channel/user.
-      const uniqueId = extractUniqueId(eventType, payload);
-      if (uniqueId) {
-        eventManager.emit(uniqueId, eventType, payload);
-      }
+      // Route to any KickClient subscribed via `client.on(...)` for this broadcaster.
+      dispatchWebhookEvent(eventType, payload);
 
-      // Globally handle webhook events.
-      // IMPORTANT:
-      // This is to be used for global handling, not per-client.
-      // Per-client handling should be done via the eventManager above.
+      // Global handlers (cross-cutting, not per-client).
       switch (eventType) {
         case WebhookEvents.CHAT_MESSAGE_SENT:
           handleChatMessageSent(payload);
