@@ -27,5 +27,9 @@
     "jiti": "^2.7.0",
     "oxfmt": "^0.53.0",
     "oxlint": "^1.68.0"
+  },
+  "allowScripts": {
+    "@swc/core@1.15.40": true,
+    "esbuild@0.28.0": true
   }
 }
