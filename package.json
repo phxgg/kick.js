@@ -29,7 +29,7 @@
     "oxlint": "^1.69.0"
   },
   "allowScripts": {
-    "@swc/core@1.15.40": true,
-    "esbuild@0.28.0": true
+    "esbuild@0.28.0": true,
+    "@swc/core@1.15.41": true
   }
 }
