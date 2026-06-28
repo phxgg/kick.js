@@ -23,6 +23,9 @@ export type FetchLivestreamsParams = z.infer<typeof fetchLivestreamsSchema>;
 export type FetchLivestreamsResponse = BaseResponse<LivestreamDto[]>;
 export type FetchLivestreamStatsResponse = BaseResponse<LivestreamStatsDto>;
 
+/**
+ * @deprecated Use `LivestreamsServiceV2` instead.
+ */
 export class LivestreamsService {
   private readonly LIVESTREAMS_URL = constructEndpoint(Version.V1, 'livestreams');
   protected readonly client: KickClient;
