@@ -13,6 +13,7 @@ import { ChatService } from './services/ChatService.js';
 import { EventsService } from './services/EventsService.js';
 import { KICKsService } from './services/KICKsService.js';
 import { LivestreamsService } from './services/LivestreamsService.js';
+import { LivestreamsServiceV2 } from './services/LivestreamsServiceV2.js';
 import { ModerationService } from './services/ModerationService.js';
 import { UsersService } from './services/UsersService.js';
 import { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents.js';
@@ -43,6 +44,7 @@ export class KickClient {
   public chat: ChatService;
   public moderation: ModerationService;
   public livestreams: LivestreamsService;
+  public livestreamsV2: LivestreamsServiceV2;
   public events: EventsService;
   public kicks: KICKsService;
 
@@ -56,6 +58,7 @@ export class KickClient {
     this.chat = new ChatService(this);
     this.moderation = new ModerationService(this);
     this.livestreams = new LivestreamsService(this);
+    this.livestreamsV2 = new LivestreamsServiceV2(this);
     this.events = new EventsService(this);
     this.kicks = new KICKsService(this);
   }
