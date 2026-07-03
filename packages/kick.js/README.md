@@ -151,34 +151,41 @@ await client.channels.update({
 ## Livestreams
 
 ```ts
-// Fetch live streams (no scope required)
-const streams = await client.livestreams.fetch({
-  broadcasterUserId: [123, 456],
-  categoryId: 15,
-  language: 'en',
+// Fetch live streams (no scope required), paginated via cursor
+const streams = await client.livestreamsV2.fetch({
+  categoryId: [15],
+  language_code: ['en'],
   limit: 20,
-  sort: 'viewer_count', // or 'started_at'
+  cursor: undefined, // pass the cursor from a previous response to page through results
 });
 
+// Fetch live streams for specific users
+const userStreams = await client.livestreamsV2.fetchByUsers({ userIds: [123, 456] });
+
 // Total live stream count
-const stats = await client.livestreams.fetchStats();
+const stats = await client.livestreamsV2.fetchStats();
 console.log(stats.total_count);
 ```
+
+> [!NOTE]
+> `client.livestreams` (v1) is deprecated in favor of `client.livestreamsV2`, which supports cursor-based pagination and `fetchByUsers`.
 
 ---
 
 ## Categories
 
 ```ts
-// v1: fetch all categories
-const categories = await client.categories.fetch();
+// Search by name/tag/id, paginated via cursor
+const results = await client.categoriesV2.search({ name: ['gaming'], limit: 10 });
+// or: client.categoriesV2.search({ tag: ['irl'] })
+// or: client.categoriesV2.search({ id: [15, 16] })
 
-// v2: search with pagination
-const results = await client.categoriesV2.search({ query: 'gaming', limit: 10 });
-
-// v2: fetch a single category by ID
+// Fetch a single category by ID
 const category = await client.categoriesV2.fetch(15);
 ```
+
+> [!NOTE]
+> `client.categories` (v1) is deprecated in favor of `client.categoriesV2`.
 
 ---
 
