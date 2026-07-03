@@ -14,6 +14,11 @@ export const fetchLivestreamsV2Schema = z.object({
 });
 export type FetchLivestreamsV2Params = z.infer<typeof fetchLivestreamsV2Schema>;
 
+export const fetchByUsersSchema = z.object({
+  userIds: z.array(z.number().int().positive()).min(1).max(100),
+});
+export type FetchByUsersParams = z.infer<typeof fetchByUsersSchema>;
+
 export type FetchLivestreamsV2Response = BaseResponse<LivestreamV2Dto[]>;
 export type FetchLivestreamStatsResponse = BaseResponse<LivestreamV2StatsDto>;
 
@@ -97,5 +102,37 @@ export class LivestreamsServiceV2 {
 
     const json = await parseJSON<FetchLivestreamStatsResponse>(response);
     return json.data;
+  }
+
+  async fetchByUsers(params: FetchByUsersParams): Promise<LivestreamV2[]> {
+    const schema = fetchByUsersSchema.safeParse(params);
+
+    if (!schema.success) {
+      const errorMessages = schema.error.issues.map((issue) => ({
+        key: issue.path.join('.'),
+        message: issue.message,
+      }));
+      throw new Error(`Invalid parameters: ${JSON.stringify(errorMessages)}`);
+    }
+
+    const { userIds: ids } = schema.data;
+
+    const endpoint = new URL(constructEndpoint(Version.V1, 'users/livestreams'));
+
+    ids.forEach((id) => endpoint.searchParams.append('user_id', String(id)));
+
+    const response = await fetch(endpoint, {
+      headers: {
+        Authorization: `Bearer ${this.client.token?.access_token}`,
+      },
+    });
+
+    if (!response.ok) {
+      handleError(response);
+    }
+
+    const json = await parseJSON<FetchLivestreamsV2Response>(response);
+    const livestreams = json.data.map((livestream) => new LivestreamV2(this.client, livestream));
+    return livestreams;
   }
 }
