@@ -1,6 +1,6 @@
 import z from 'zod';
 
-import { BaseResponse } from '../BaseResponse.js';
+import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse.js';
 import type { KickClient } from '../KickClient.js';
 import { LivestreamV2, type LivestreamV2Dto, type LivestreamV2StatsDto } from '../index.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
@@ -19,7 +19,7 @@ export const fetchByUsersSchema = z.object({
 });
 export type FetchByUsersParams = z.infer<typeof fetchByUsersSchema>;
 
-export type FetchLivestreamsV2Response = BaseResponse<LivestreamV2Dto[]>;
+export type FetchLivestreamsV2Response = BaseResponseWithPagination<LivestreamV2Dto[]>;
 export type FetchLivestreamStatsResponse = BaseResponse<LivestreamV2StatsDto>;
 
 export class LivestreamsServiceV2 {
