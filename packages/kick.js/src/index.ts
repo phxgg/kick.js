@@ -48,6 +48,7 @@ export { CategoriesServiceV2 } from './services/CategoriesServiceV2.js';
 export { ChannelRewardsService } from './services/ChannelRewardsService.js';
 export { ChannelsService } from './services/ChannelsService.js';
 export { ChatService, ChatMessageType } from './services/ChatService.js';
+export { DropsService } from './services/DropsService.js';
 export { EventsService, EventSubscriptionMethod } from './services/EventsService.js';
 export { KICKsService } from './services/KICKsService.js';
 export { LivestreamsService } from './services/LivestreamsService.js';
@@ -89,6 +90,7 @@ export type { KickWebhookSignatureInput } from './webhooks/verify.js';
 export { dispatchWebhookEvent } from './webhooks/dispatch.js';
 export { WebhookEvents } from './webhooks/WebhookEvents.js';
 export type { WebhookEventNames, WebhookEventPayloadMap } from './webhooks/WebhookEvents.js';
+export type { DropClaimFulfillmentPayload } from './webhooks/DropClaimFulfillment.js';
 
 // Webhook payload types (v1)
 export type {

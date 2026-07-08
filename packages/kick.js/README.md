@@ -61,7 +61,7 @@ After `setToken` is called, the client automatically fetches the authenticated u
 
 ### Generate authorization URL
 
-Redirect your user to this URL to begin the authorization flow. Store the `codeVerifier` in the session — you'll need it in the next step.
+Redirect your user to this URL to begin the authorization flow. Store the `codeVerifier` in the session - you'll need it in the next step.
 
 ```ts
 const { url, codeVerifier } = await client.oauth.generateAuthorizeURL();
@@ -348,7 +348,7 @@ const publicKey = await getKickPublicKey(); // cached, refreshes every hour
 const valid = verifyKickSignature({
   messageId: req.headers['kick-event-message-id'],
   messageTimestamp: req.headers['kick-event-message-timestamp'],
-  rawBody: rawBody, // Buffer or string — must be read before JSON.parse
+  rawBody: rawBody, // Buffer or string - must be read before JSON.parse
   signature: req.headers['kick-event-signature'],
   publicKey,
 });
@@ -408,6 +408,42 @@ client.destroy();
 | `moderation.banned`                 | `WebhookEvents.MODERATION_BANNED`                 |
 | `kicks.gifted`                      | `WebhookEvents.KICKS_GIFTED`                      |
 
+### Drops fulfillment webhook
+
+Separate from the events above: when a viewer claims a drop reward, Kick sends a synchronous
+POST to the fulfillment URL configured for your organization. It has no `Kick-Event-Type`
+header and no `broadcaster` field (it isn't scoped to a channel), so it isn't routed through
+`dispatchWebhookEvent`/`client.on()` - handle it directly in its own route. Reuse
+`verifyKickSignature` for authenticity, and respond `200 OK` - including on retries, so treat
+`claim_id` as an idempotency key.
+
+```ts
+import { getKickPublicKey, verifyKickSignature, type DropClaimFulfillmentPayload } from '@phxgg/kick.js';
+
+// Inside your POST /webhooks/kick/drops handler:
+const publicKey = await getKickPublicKey();
+
+const valid = verifyKickSignature({
+  messageId: req.headers['kick-event-message-id'],
+  messageTimestamp: req.headers['kick-event-message-timestamp'],
+  rawBody, // Buffer or string - must be read before JSON.parse
+  signature: req.headers['kick-event-signature'],
+  publicKey,
+});
+
+if (!valid) return res.sendStatus(403);
+
+const claim: DropClaimFulfillmentPayload = JSON.parse(rawBody);
+
+// Look up claim.claim_id first - if you've already processed it, just return 200.
+await grantReward(claim); // your fulfillment logic
+
+// Report fulfillment status back so it shows up in the Kick dashboard.
+await client.dropsService.updateOne(claim.claim_id, 'fulfilled');
+
+res.sendStatus(200);
+```
+
 ---
 
 ## Error handling
@@ -429,7 +465,7 @@ try {
   const me = await client.users.me();
 } catch (err) {
   if (err instanceof UnauthorizedError) {
-    // token expired — refresh and retry
+    // token expired - refresh and retry
   } else if (err instanceof MissingScopeError) {
     // the token is missing a required scope
   } else if (err instanceof RateLimitError) {
