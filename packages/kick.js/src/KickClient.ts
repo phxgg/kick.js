@@ -82,6 +82,10 @@ export class KickClient {
     }
   }
 
+  setAppToken(appToken: AppToken) {
+    this.appToken = appToken;
+  }
+
   destroy() {
     if (this.me) {
       eventManager.destroy(this.me.userId.toString());

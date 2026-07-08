@@ -81,7 +81,7 @@ Use this for API calls that don't require a user context.
 
 ```ts
 const appToken = await client.oauth.generateAppToken();
-client.appToken = appToken;
+client.setAppToken(appToken);
 ```
 
 ### Refresh a token
