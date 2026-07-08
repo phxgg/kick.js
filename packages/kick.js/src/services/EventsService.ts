@@ -56,7 +56,7 @@ export class EventsService {
   async fetch(): Promise<EventSubscription[]> {
     const response = await fetch(this.EVENTS_URL, {
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
       },
     });
 
@@ -96,7 +96,7 @@ export class EventsService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -157,7 +157,7 @@ export class EventsService {
     const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
       },
     });
 

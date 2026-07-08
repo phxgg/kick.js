@@ -77,7 +77,7 @@ client.setToken(token);
 
 ### Generate an app token (client credentials)
 
-Use this for API calls that don't require a user context.
+Use this for API calls that don't require a user context. It's also required for `dropsService` endpoints (see [Drops fulfillment webhook](#drops-fulfillment-webhook)), which only accept an app token from an OAuth app associated with your organization - a user token won't work there.
 
 ```ts
 const appToken = await client.oauth.generateAppToken();
@@ -416,6 +416,8 @@ header and no `broadcaster` field (it isn't scoped to a channel), so it isn't ro
 `dispatchWebhookEvent`/`client.on()` - handle it directly in its own route. Reuse
 `verifyKickSignature` for authenticity, and respond `200 OK` - including on retries, so treat
 `claim_id` as an idempotency key.
+
+`dropsService` calls require an app token - call `client.setAppToken(...)` (see [above](#generate-an-app-token-client-credentials)) before using it; a user token is not accepted.
 
 ```ts
 import { getKickPublicKey, verifyKickSignature, type DropClaimFulfillmentPayload } from '@phxgg/kick.js';

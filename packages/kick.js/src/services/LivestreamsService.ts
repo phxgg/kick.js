@@ -85,7 +85,7 @@ export class LivestreamsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
       },
     });
 
@@ -103,7 +103,7 @@ export class LivestreamsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
       },
     });
 

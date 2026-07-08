@@ -86,6 +86,23 @@ export class KickClient {
     this.appToken = appToken;
   }
 
+  /** Access token to use for requests: prefers the user token, falls back to the app token. */
+  authToken(): string {
+    const token = this.token?.access_token ?? this.appToken?.access_token;
+    if (!token) {
+      throw new NoTokenSetError('No user or app token set on KickClient.');
+    }
+    return token;
+  }
+
+  /** App token to use for endpoints that only accept app tokens (e.g. Drops), never a user token. */
+  requireAppToken(): string {
+    if (!this.appToken) {
+      throw new NoTokenSetError('No app token set on KickClient. This endpoint requires an app token.');
+    }
+    return this.appToken.access_token;
+  }
+
   destroy() {
     if (this.me) {
       eventManager.destroy(this.me.userId.toString());
