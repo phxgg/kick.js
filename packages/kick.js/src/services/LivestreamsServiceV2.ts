@@ -1,8 +1,8 @@
 import z from 'zod';
 
 import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse.js';
-import type { KickClient } from '../KickClient.js';
 import { LivestreamV2, type LivestreamV2Dto, type LivestreamV2StatsDto } from '../index.js';
+import type { KickClient } from '../KickClient.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
 import { Version } from '../Version.js';
 

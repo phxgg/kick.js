@@ -10,6 +10,7 @@ import { CategoriesServiceV2 } from './services/CategoriesServiceV2.js';
 import { ChannelRewardsService } from './services/ChannelRewardsService.js';
 import { ChannelsService } from './services/ChannelsService.js';
 import { ChatService } from './services/ChatService.js';
+import { DropsService } from './services/DropsService.js';
 import { EventsService } from './services/EventsService.js';
 import { KICKsService } from './services/KICKsService.js';
 import { LivestreamsService } from './services/LivestreamsService.js';
@@ -40,13 +41,14 @@ export class KickClient {
   public categoriesV2: CategoriesServiceV2;
   public channels: ChannelsService;
   public channelRewards: ChannelRewardsService;
-  public users: UsersService;
   public chat: ChatService;
-  public moderation: ModerationService;
-  public livestreams: LivestreamsService;
-  public livestreamsV2: LivestreamsServiceV2;
+  public dropsService: DropsService;
   public events: EventsService;
   public kicks: KICKsService;
+  public livestreams: LivestreamsService;
+  public livestreamsV2: LivestreamsServiceV2;
+  public moderation: ModerationService;
+  public users: UsersService;
 
   constructor(options: KickClientOptions) {
     this.oauth = new OAuth(this, options.clientId, options.clientSecret, options.redirectUri);
@@ -54,13 +56,14 @@ export class KickClient {
     this.categoriesV2 = new CategoriesServiceV2(this);
     this.channels = new ChannelsService(this);
     this.channelRewards = new ChannelRewardsService(this);
-    this.users = new UsersService(this);
     this.chat = new ChatService(this);
-    this.moderation = new ModerationService(this);
-    this.livestreams = new LivestreamsService(this);
-    this.livestreamsV2 = new LivestreamsServiceV2(this);
+    this.dropsService = new DropsService(this);
     this.events = new EventsService(this);
     this.kicks = new KICKsService(this);
+    this.livestreams = new LivestreamsService(this);
+    this.livestreamsV2 = new LivestreamsServiceV2(this);
+    this.moderation = new ModerationService(this);
+    this.users = new UsersService(this);
   }
 
   setToken(token: Token) {

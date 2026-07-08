@@ -36,6 +36,7 @@ export class CategoriesServiceV2 {
    * @param params.tag (Optional) Array of tags to filter by
    * @param params.id (Optional) Single ID or array of IDs to filter by
    * @returns An array of `Category` instances.
+   * @throws An error if the request fails or if the parameters are invalid.
    */
   async search(params: SearchCategoryParamsV2): Promise<Omit<Category, 'viewerCount'>[]> {
     const schema = searchCategoryParamsV2Schema.safeParse(params);
@@ -93,6 +94,7 @@ export class CategoriesServiceV2 {
    *
    * @param id The ID of the category to fetch
    * @returns A `Category` instance.
+   * @throws An error if the category cannot be found.
    */
   async fetch(id: number) {
     const result = await this.search({ id, limit: 1 });

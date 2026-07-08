@@ -5,17 +5,17 @@ type LivestreamUserDto = {
   id: number;
   profile_picture: string;
   username: string;
-}
+};
 
 type LivestreamCategoryDto = {
   id: number;
   name: string;
   thumbnail: string;
-}
+};
 
 type LivestreamChannelDto = {
   slug: string;
-}
+};
 
 export type LivestreamV2Dto = {
   broadcaster_user: LivestreamUserDto;
