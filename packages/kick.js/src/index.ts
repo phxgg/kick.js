@@ -60,23 +60,27 @@ export type { FetchUserResponse } from './services/UsersService.js';
 
 // Resources
 export { Category } from './resources/Category.js';
-export type { CategoryDto } from './resources/Category.js';
 export { Channel } from './resources/Channel.js';
-export type { ChannelDto } from './resources/Channel.js';
 export { ChannelReward } from './resources/ChannelReward.js';
+export { DropClaim } from './resources/DropClaim.js';
+export { EventSubscription } from './resources/EventSubscription.js';
+export { Leaderboard } from './resources/Leaderboard.js';
+export { Livestream } from './resources/Livestream.js';
+export { LivestreamV2 } from './resources/LivestreamV2.js';
+export { Message } from './resources/Message.js';
+export { User } from './resources/User.js';
+
+// Resource Types
+export type { CategoryDto } from './resources/Category.js';
+export type { ChannelDto } from './resources/Channel.js';
 export type { ChannelRewardDto } from './resources/ChannelReward.js';
 export type { ChannelRewardRedemptionStatus } from './resources/ChannelRewardRedemption.js';
-export { EventSubscription } from './resources/EventSubscription.js';
+export type { DropClaimDto } from './resources/DropClaim.js';
 export type { EventSubscriptionDto } from './resources/EventSubscription.js';
-export { Leaderboard } from './resources/Leaderboard.js';
 export type { LeaderboardDto } from './resources/Leaderboard.js';
-export { Livestream } from './resources/Livestream.js';
 export type { LivestreamDto, LivestreamStatsDto } from './resources/Livestream.js';
-export { LivestreamV2} from './resources/LivestreamV2.js';
 export type { LivestreamV2Dto, LivestreamV2StatsDto } from './resources/LivestreamV2.js';
-export { Message } from './resources/Message.js';
 export type { MessageDto } from './resources/Message.js';
-export { User } from './resources/User.js';
 export type { UserDto } from './resources/User.js';
 
 // Webhooks: framework-agnostic primitives
