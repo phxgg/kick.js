@@ -61,7 +61,7 @@ export class ChatService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -98,7 +98,7 @@ export class ChatService {
     const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
       },
     });
 

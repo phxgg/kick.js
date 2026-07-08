@@ -86,7 +86,7 @@ export class DropsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.requireAppToken()}`,
       },
     });
 
@@ -134,7 +134,7 @@ export class DropsService {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.requireAppToken()}`,
       },
       body: JSON.stringify(schema.data),
     });

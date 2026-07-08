@@ -78,7 +78,7 @@ export class ChannelsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
       },
     });
 
@@ -138,7 +138,7 @@ export class ChannelsService {
     const response = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${this.client.token?.access_token}`,
+        Authorization: `Bearer ${this.client.authToken()}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
