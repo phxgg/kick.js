@@ -1,7 +1,9 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse.js';
+import { UserTokenRequiredError } from '../Errors.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { Leaderboard, type LeaderboardDto } from '../resources/Leaderboard.js';
 import { Scope } from '../Scope.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
@@ -25,15 +27,20 @@ export class KICKsService {
   /**
    * Gets the KICKs leaderboard for the authenticated broadcaster.
    *
-   * Required scopes:
+   * Required user scopes:
    * `kicks:read`
    *
    * @param params Parameters for fetching leaderboard.
    * @param params.top (Optional) The number of entries from the top of the leaderboard to return. For example, 10 will fetch the top 10 entries.
+   * @param options (Optional) Request options.
    * @returns A `Leaderboard` instance.
    */
-  async fetchLeaderboard(params: FetchLeaderboardParams): Promise<Leaderboard> {
-    this.client.requiresScope(Scope.KICKS_READ);
+  async fetchLeaderboard(params: FetchLeaderboardParams, options?: RequestOptions): Promise<Leaderboard> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Fetching KICKs leaderboard requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.KICKS_READ);
 
     const schema = fetchLeaderboardSchema.safeParse(params);
 
@@ -50,7 +57,7 @@ export class KICKsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
       },
     });
 

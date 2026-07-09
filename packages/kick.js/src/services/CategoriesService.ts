@@ -2,6 +2,7 @@ import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { Category, CategoryDto } from '../resources/Category.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
 import { Version } from '../Version.js';
@@ -33,10 +34,11 @@ export class CategoriesService {
    * @param params The search parameters
    * @param params.q Search query
    * @param params.page (Optional) Page (defaults to 1 if not provided)
+   * @param options (Optional) Request options
    * @returns An array of `Category` instances.
    * @deprecated Use `CategoriesServiceV2` instead.
    */
-  async search(params: SearchCategoryParams): Promise<Omit<Category, 'viewerCount'>[]> {
+  async search(params: SearchCategoryParams, options?: RequestOptions): Promise<Omit<Category, 'viewerCount'>[]> {
     const schema = searchCategoryParamsSchema.safeParse(params);
 
     if (!schema.success) {
@@ -53,7 +55,7 @@ export class CategoriesService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
@@ -70,15 +72,16 @@ export class CategoriesService {
    * Get information about a specific category.
    *
    * @param id The ID of the category to fetch
+   * @param options (Optional) Request options
    * @returns A `Category` instance.
    * @deprecated Use `CategoriesServiceV2` instead.
    */
-  async fetch(id: number): Promise<Category> {
+  async fetch(id: number, options?: RequestOptions): Promise<Category> {
     const endpoint = new URL(`${this.CATEGORIES_URL}/${id}`);
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 

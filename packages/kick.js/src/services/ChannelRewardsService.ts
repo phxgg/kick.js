@@ -1,7 +1,9 @@
 import z from 'zod';
 
 import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse.js';
+import { UserTokenRequiredError } from '../Errors.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { ChannelReward, ChannelRewardDto } from '../resources/ChannelReward.js';
 import {
   ChannelRewardAcceptRedemptionDto,
@@ -75,19 +77,24 @@ export class ChannelRewardsService {
    * Get channel rewards for a broadcaster's channel.
    * Channels may have up to 15 rewards, including both enabled and disabled rewards.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:rewards:read`
    *
+   * @param options (Optional) Request options.
    * @returns An array of `ChannelReward` instances.
    */
-  async fetch(): Promise<ChannelReward[]> {
-    this.client.requiresScope(Scope.CHANNEL_REWARDS_READ);
+  async fetch(options?: RequestOptions): Promise<ChannelReward[]> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Fetching channel rewards requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHANNEL_REWARDS_READ);
 
     const endpoint = new URL(this.CHANNEL_REWARDS_URL);
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
       },
     });
 
@@ -104,21 +111,37 @@ export class ChannelRewardsService {
    * Creates a channel reward in the broadcaster's channel.
    * A maximum of 15 rewards can be created, including both enabled and disabled rewards.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:rewards:write`
    *
+   * @param params The parameters for creating a channel reward
+   * @param params.backgroundColor (Optional) The background color of the reward card in hexadecimal format (e.g., #00FF00).
+   * @param params.cost The cost of the reward in channel points. Must be a positive integer.
+   * @param params.description (Optional) The description of the reward. Maximum length is 200 characters.
+   * @param params.isEnabled (Optional) Whether the reward is enabled. Defaults to true.
+   * @param params.isUserInputRequired (Optional) Whether user input is required when redeeming the reward. Defaults to false.
+   * @param params.shouldRedemptionsSkipRequestQueue (Optional) Whether redemptions should skip the request queue. Defaults to false.
+   * @param params.title The title of the reward. Maximum length is 50 characters.
+   * @param options (Optional) Request options.
    * @returns The created `ChannelReward` instance.
    */
-  async create({
-    backgroundColor,
-    cost,
-    description,
-    isEnabled,
-    isUserInputRequired,
-    shouldRedemptionsSkipRequestQueue,
-    title,
-  }: CreateChannelRewardParams): Promise<ChannelReward> {
-    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+  async create(
+    {
+      backgroundColor,
+      cost,
+      description,
+      isEnabled,
+      isUserInputRequired,
+      shouldRedemptionsSkipRequestQueue,
+      title,
+    }: CreateChannelRewardParams,
+    options?: RequestOptions
+  ): Promise<ChannelReward> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Creating channel rewards requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = createChannelRewardSchema.safeParse({
       backgroundColor,
@@ -139,7 +162,7 @@ export class ChannelRewardsService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -165,20 +188,25 @@ export class ChannelRewardsService {
   /**
    * Deletes a channel reward in the broadcaster's channel. Note that only the app that created the reward can delete it.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:rewards:write`
    *
    * @param rewardId The ID of the reward to delete
+   * @param options (Optional) Request options.
    */
-  async delete(rewardId: string): Promise<void> {
-    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+  async delete(rewardId: string, options?: RequestOptions): Promise<void> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Deleting channel rewards requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/${rewardId}`);
 
     const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
       },
     });
 
@@ -190,15 +218,20 @@ export class ChannelRewardsService {
   /**
    * Updates a channel reward in the broadcaster's channel. Note that only the app that created the reward can update it.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:rewards:write`
    *
    * @param rewardId The ID of the reward to update
    * @param data The data to update the reward with
+   * @param options (Optional) Request options.
    * @returns The updated `ChannelReward` instance.
    */
-  async update(rewardId: string, data: UpdateChannelRewardParams): Promise<ChannelReward> {
-    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+  async update(rewardId: string, data: UpdateChannelRewardParams, options?: RequestOptions): Promise<ChannelReward> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Updating channel rewards requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = updateChannelRewardSchema.safeParse(data);
 
@@ -211,7 +244,7 @@ export class ChannelRewardsService {
     const response = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -238,7 +271,7 @@ export class ChannelRewardsService {
   /**
    * Get channel reward redemptions for a broadcaster's channel.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:rewards:write`
    *
    * @param params The parameters for fetching redemptions
@@ -246,16 +279,24 @@ export class ChannelRewardsService {
    * @param params.status (Optional) Optionally provide a specific status to filter by. Defaults to `pending`.
    * @param params.id (Optional) Optionally provide a list of redemption IDs to filter by. You cannot provide any other filters if you filter by redemption IDs.
    * @param params.cursor (Optional) Optionally provide a cursor to paginate through the results.
+   * @param options (Optional) Request options.
    * @returns An array of `ChannelRewardRedemption` instances.
    */
-  async getRedemptions(params: GetChannelRewardRedemptionsParams): Promise<ChannelRewardRedemption[]> {
+  async getRedemptions(
+    params: GetChannelRewardRedemptionsParams,
+    options?: RequestOptions
+  ): Promise<ChannelRewardRedemption[]> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Fetching channel reward redemptions requires a user access token.');
+    }
+
     const schema = getChannelRewardRedemptionsSchema.safeParse(params);
 
     if (!schema.success) {
       throw new Error(`Invalid data: ${schema.error.message}`);
     }
 
-    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+    this.client.requiresUserScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const { rewardId, status, id, cursor } = schema.data;
     const endpoint = new URL(`${this.CHANNEL_REWARDS_URL}/redemptions`);
@@ -282,7 +323,7 @@ export class ChannelRewardsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
       },
     });
 
@@ -298,15 +339,23 @@ export class ChannelRewardsService {
   /**
    * Accept channel reward redemptions for a broadcaster's channel. The response will only include data for redemptions that failed to be accepted.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:rewards:write`
    *
    * @param params The parameters for accepting redemptions
    * @param params.ids List of redemption IDs to accept. A maximum of 25 redemptions can be accepted per request. IDs must be unique.
+   * @param options (Optional) Request options.
    * @returns An array of `ChannelRewardAcceptRedemptionDto` instances for redemptions that failed to be accepted.
    */
-  async acceptRedemptions({ ids }: AcceptRedemptionsParams): Promise<ChannelRewardAcceptRedemptionDto[]> {
-    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+  async acceptRedemptions(
+    { ids }: AcceptRedemptionsParams,
+    options?: RequestOptions
+  ): Promise<ChannelRewardAcceptRedemptionDto[]> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Accepting channel reward redemptions requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = acceptRedemptionsSchema.safeParse({ ids });
 
@@ -319,7 +368,7 @@ export class ChannelRewardsService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -338,15 +387,23 @@ export class ChannelRewardsService {
   /**
    * Reject channel reward redemptions for a broadcaster's channel. The response will only include data for redemptions that failed to be rejected.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:rewards:write`
    *
    * @param params The parameters for rejecting redemptions
    * @param params.ids List of redemption IDs to reject. A maximum of 25 redemptions can be rejected per request. IDs must be unique.
+   * @param options (Optional) Request options.
    * @returns An array of `ChannelRewardRejectRedemptionDto` instances for redemptions that failed to be rejected.
    */
-  async rejectRedemptions({ ids }: RejectRedemptionsParams): Promise<ChannelRewardRejectRedemptionDto[]> {
-    this.client.requiresScope(Scope.CHANNEL_REWARDS_WRITE);
+  async rejectRedemptions(
+    { ids }: RejectRedemptionsParams,
+    options?: RequestOptions
+  ): Promise<ChannelRewardRejectRedemptionDto[]> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Rejecting channel reward redemptions requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHANNEL_REWARDS_WRITE);
 
     const schema = rejectRedemptionsSchema.safeParse({ ids });
 
@@ -359,7 +416,7 @@ export class ChannelRewardsService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

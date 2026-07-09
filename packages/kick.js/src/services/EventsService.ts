@@ -2,6 +2,7 @@ import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { EventSubscription, EventSubscriptionDto } from '../resources/EventSubscription.js';
 import { Scope } from '../Scope.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
@@ -72,17 +73,24 @@ export class EventsService {
   /**
    * Subscribe to multiple events.
    *
-   * Required scopes:
+   * Required user scopes:
    * `events:subscribe`
    *
    * @param params The parameters for subscribing to multiple events
-   * @param params.broadcasterUserId (Optional) The ID of the broadcaster to whom the events are related
+   * @param params.broadcasterUserId (Optional) When using a user access token, this field will be ignored and the broadcaster user ID will be inferred from the user access token. When using an app access token, this field is required.
    * @param params.events An array of event details (name and version)
    * @param params.method (Optional) The method of subscription (default is 'webhook')
+   * @param options (Optional) Request options
    * @returns An array of `PostEventSubscriptionData` instances.
    */
-  async subscribeMultiple(params: SubscribeToMultipleEventsParams): Promise<PostEventSubscriptionData[]> {
-    this.client.requiresScope(Scope.EVENTS_SUBSCRIBE);
+  async subscribeMultiple(
+    params: SubscribeToMultipleEventsParams,
+    options?: RequestOptions
+  ): Promise<PostEventSubscriptionData[]> {
+    // App tokens aren't scoped; only user tokens need the events:subscribe scope check.
+    if (this.client.usingUserToken(options?.tokenType)) {
+      this.client.requiresUserScope(Scope.EVENTS_SUBSCRIBE);
+    }
 
     const schema = subscribeToMultipleEventsSchema.safeParse(params);
 
@@ -96,7 +104,7 @@ export class EventsService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -111,42 +119,54 @@ export class EventsService {
     }
 
     const json = await parseJSON<EventSubscriptionResponse>(response);
+
+    // Register for dispatch regardless of token type: app tokens must pass broadcasterUserId
+    // explicitly, while user tokens subscribe to themselves when it's omitted.
+    const targetUserId = broadcasterUserId ?? (await this.client.users.me()).userId;
+    this.client.registerEventTarget(targetUserId.toString());
+
     return json.data;
   }
 
   /**
    * Subscribe to a single event.
    *
-   * Required scopes:
+   * Required user scopes:
    * `events:subscribe`
    *
    * @param params The parameters for subscribing to a single event
-   * @param params.broadcasterUserId (Optional) The ID of the broadcaster to whom the event is related
+   * @param params.broadcasterUserId (Optional) When using a user access token, this field will be ignored and the broadcaster user ID will be inferred from the user access token. When using an app access token, this field is required.
    * @param params.event The event details (name and version)
    * @param params.method (Optional) The method of subscription (default is 'webhook')
+   * @param options (Optional) Request options
    * @returns The created `PostEventSubscriptionData` instance.
    */
-  async subscribe(params: SubscribeToSingleEventParams): Promise<PostEventSubscriptionData> {
+  async subscribe(params: SubscribeToSingleEventParams, options?: RequestOptions): Promise<PostEventSubscriptionData> {
     const { broadcasterUserId, event, method } = params;
-    const results = await this.subscribeMultiple({
-      broadcasterUserId,
-      events: [event],
-      method,
-    });
+    const results = await this.subscribeMultiple(
+      {
+        broadcasterUserId,
+        events: [event],
+        method,
+      },
+      options
+    );
     return results[0];
   }
 
   /**
    * Unsubscribe from multiple events.
    *
-   * Required scopes:
+   * Required user scopes:
    * `events:subscribe`
    *
    * @param ids Array of subscription IDs to unsubscribe from
    * @returns void
    */
-  async unsubscribeMultiple(ids: string[]): Promise<void> {
-    this.client.requiresScope(Scope.EVENTS_SUBSCRIBE);
+  async unsubscribeMultiple(ids: string[], options?: RequestOptions): Promise<void> {
+    if (this.client.usingUserToken(options?.tokenType)) {
+      this.client.requiresUserScope(Scope.EVENTS_SUBSCRIBE);
+    }
 
     if (ids.length === 0) return;
 
@@ -157,7 +177,7 @@ export class EventsService {
     const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
@@ -169,13 +189,14 @@ export class EventsService {
   /**
    * Unsubscribe from a single event.
    *
-   * Required scopes:
+   * Required user scopes:
    * `events:subscribe`
    *
    * @param id The subscription ID to unsubscribe from
+   * @param options (Optional) Request options
    * @returns void
    */
-  async unsubscribe(id: string): Promise<void> {
-    return this.unsubscribeMultiple([id]);
+  async unsubscribe(id: string, options?: RequestOptions): Promise<void> {
+    return this.unsubscribeMultiple([id], options);
   }
 }

@@ -1,7 +1,9 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse.js';
+import { UserTokenRequiredError } from '../Errors.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { Channel, ChannelDto } from '../resources/Channel.js';
 import { Scope } from '../Scope.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
@@ -49,16 +51,19 @@ export class ChannelsService {
    * 2. Provide only `broadcasterUserId` parameters (up to 50)
    * 3. Provide only `slug` parameters (up to 50, each max 25 characters) Note: You cannot mix `broadcasterUserId` and `slug` parameters in the same request.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:read`
    *
    * @param params The parameters for fetching the channel
    * @param params.broadcasterUserId (Optional) Array of broadcaster user IDs (up to 50)
    * @param params.slug (Optional) Array of channel slugs (up to 50, each max 25 characters)
+   * @param options (Optional) Request options
    * @returns An array of `Channel` instances.
    */
-  async fetch(params: FetchChannelParamsDto): Promise<Channel[]> {
-    this.client.requiresScope(Scope.CHANNEL_READ);
+  async fetch(params: FetchChannelParamsDto, options?: RequestOptions): Promise<Channel[]> {
+    if (this.client.usingUserToken(options?.tokenType)) {
+      this.client.requiresUserScope(Scope.CHANNEL_READ);
+    }
 
     const schema = fetchChannelParamsSchema.safeParse(params);
 
@@ -78,7 +83,7 @@ export class ChannelsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
@@ -95,36 +100,42 @@ export class ChannelsService {
    * Fetch a channel by its ID.
    *
    * @param id The ID of the channel to fetch
+   * @param options (Optional) Set `tokenType` to force the user or app token for this call
    * @returns The `Channel` instance.
    */
-  async fetchById(id: number): Promise<Channel> {
-    return (await this.fetch({ broadcasterUserId: [id] }))[0];
+  async fetchById(id: number, options?: RequestOptions): Promise<Channel> {
+    return (await this.fetch({ broadcasterUserId: [id] }, options))[0];
   }
 
   /**
    * Fetch a channel by its slug.
    *
    * @param slug The slug of the channel to fetch
+   * @param options (Optional) Set `tokenType` to force the user or app token for this call
    * @returns The `Channel` instance.
    */
-  async fetchBySlug(slug: string): Promise<Channel> {
-    return (await this.fetch({ slug: [slug] }))[0];
+  async fetchBySlug(slug: string, options?: RequestOptions): Promise<Channel> {
+    return (await this.fetch({ slug: [slug] }, options))[0];
   }
 
   /**
    * Update the authenticated user's channel information.
    *
-   * Required scopes:
+   * Required user scopes:
    * `channel:write`
    *
    * @param params The parameters for updating the channel
    * @param params.categoryId (Optional) The ID of the category to set for the channel
    * @param params.customTags (Optional) An array of custom tags to set for the channel
    * @param params.streamTitle (Optional) The title of the stream
-   * @returns void
+   * @param options (Optional) Request options
    */
-  async update(params: UpdateChannelParams): Promise<void> {
-    this.client.requiresScope(Scope.CHANNEL_WRITE);
+  async update(params: UpdateChannelParams, options?: RequestOptions): Promise<void> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Updating channel information requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHANNEL_WRITE);
 
     const schema = updateChannelSchema.safeParse(params);
 
@@ -138,7 +149,7 @@ export class ChannelsService {
     const response = await fetch(endpoint, {
       method: 'PATCH',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

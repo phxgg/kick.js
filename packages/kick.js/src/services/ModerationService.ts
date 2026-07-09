@@ -1,6 +1,8 @@
 import z from 'zod';
 
+import { UserTokenRequiredError } from '../Errors.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { Scope } from '../Scope.js';
 import { constructEndpoint, handleError } from '../utils.js';
 import { Version } from '../Version.js';
@@ -34,17 +36,22 @@ export class ModerationService {
   /**
    * Ban a user from a channel.
    *
-   * Required scopes:
+   * Required user scopes:
    * `moderation:ban`
    *
    * @param params The parameters for banning a user
    * @param params.broadcasterUserId The ID of the broadcaster from whose channel the user is being banned
    * @param params.userId The ID of the user to be banned
    * @param params.reason (Optional) The reason for the ban
+   * @param options (Optional) Request options
    * @returns void
    */
-  async banUser(params: BanUserParams): Promise<void> {
-    this.client.requiresScope(Scope.MODERATION_BAN);
+  async banUser(params: BanUserParams, options?: RequestOptions): Promise<void> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Banning users requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.MODERATION_BAN);
 
     const schema = banUserSchema.safeParse(params);
 
@@ -58,7 +65,7 @@ export class ModerationService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -76,7 +83,7 @@ export class ModerationService {
   /**
    * Timeout a user in a channel.
    *
-   * Required scopes:
+   * Required user scopes:
    * `moderation:ban`
    *
    * @param params The parameters for timing out a user
@@ -84,10 +91,15 @@ export class ModerationService {
    * @param params.userId The ID of the user to be timed out
    * @param params.reason (Optional) The reason for the timeout
    * @param params.duration The duration of the timeout in seconds (max 7 days)
+   * @param options (Optional) Request options
    * @returns void
    */
-  async timeoutUser(params: TimeoutUserParams): Promise<void> {
-    this.client.requiresScope(Scope.MODERATION_BAN);
+  async timeoutUser(params: TimeoutUserParams, options?: RequestOptions): Promise<void> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Timing out users requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.MODERATION_BAN);
 
     const schema = timeoutUserSchema.safeParse(params);
 
@@ -101,7 +113,7 @@ export class ModerationService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -120,7 +132,7 @@ export class ModerationService {
   /**
    * Remove a ban or timeout from a user in a channel.
    *
-   * Required scopes:
+   * Required user scopes:
    * `moderation:ban`
    *
    * @param options The options for removing a ban or timeout
@@ -128,8 +140,12 @@ export class ModerationService {
    * @param options.userId The ID of the user whose ban/timeout is being removed
    * @returns void
    */
-  async removeBan(params: RemoveBanParams): Promise<void> {
-    this.client.requiresScope(Scope.MODERATION_BAN);
+  async removeBan(params: RemoveBanParams, options?: RequestOptions): Promise<void> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Removing bans or timeouts requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.MODERATION_BAN);
 
     const schema = removeBanSchema.safeParse(params);
 
@@ -143,7 +159,7 @@ export class ModerationService {
     const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({

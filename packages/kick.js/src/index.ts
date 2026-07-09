@@ -12,17 +12,20 @@ export { Version } from './Version.js';
 
 // Common types
 export type { BaseResponse, BaseResponseWithPagination } from './BaseResponse.js';
+export type { RequestOptions } from './RequestOptions.js';
 
 // Errors
 export {
-  BadRequestError,
-  ForbiddenError,
-  InternalServerError,
-  MissingScopeError,
-  NoTokenSetError,
-  NotFoundError,
-  RateLimitError,
   UnauthorizedError,
+  InternalServerError,
+  ForbiddenError,
+  NotFoundError,
+  BadRequestError,
+  RateLimitError,
+  NoTokenSetError,
+  UserTokenRequiredError,
+  AppTokenRequiredError,
+  MissingScopeError,
 } from './Errors.js';
 
 // Serialization

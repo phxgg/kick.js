@@ -20,14 +20,14 @@ export class UsersService {
    * If no user IDs are specified, the information
    * for the currently authorised user will be returned by default.
    *
-   * Required scopes:
+   * Required user scopes:
    * `user:read`
    *
    * @param ids (Optional) Array of user IDs
    * @returns An array of `User` instances.
    */
   async fetch(ids?: number[]): Promise<User[]> {
-    this.client.requiresScope(Scope.USER_READ);
+    this.client.requiresUserScope(Scope.USER_READ);
 
     const endpoint = new URL(this.USERS_URL);
 

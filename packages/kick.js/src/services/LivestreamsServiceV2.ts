@@ -3,6 +3,7 @@ import z from 'zod';
 import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse.js';
 import { LivestreamV2, type LivestreamV2Dto, type LivestreamV2StatsDto } from '../index.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
 import { Version } from '../Version.js';
 
@@ -38,9 +39,10 @@ export class LivestreamsServiceV2 {
    * @param params.language_code (Optional) Array of language codes to filter by.
    * @param params.limit (Optional) Maximum number of results to return. Min: 1, Max: 1000.
    * @param params.cursor (Optional) Cursor for pagination.
+   * @param options (Optional) Request options.
    * @returns An array of `LivestreamV2` instances.
    */
-  async fetch(params: FetchLivestreamsV2Params): Promise<LivestreamV2[]> {
+  async fetch(params: FetchLivestreamsV2Params, options?: RequestOptions): Promise<LivestreamV2[]> {
     const schema = fetchLivestreamsV2Schema.safeParse(params);
 
     if (!schema.success) {
@@ -74,7 +76,7 @@ export class LivestreamsServiceV2 {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
@@ -87,12 +89,12 @@ export class LivestreamsServiceV2 {
     return livestreams;
   }
 
-  async fetchStats(): Promise<{ total_count: number }> {
+  async fetchStats(options?: RequestOptions): Promise<{ total_count: number }> {
     const endpoint = new URL(this.LIVESTREAMS_URL.replace(`/${Version.V2}/`, `/${Version.V1}/`) + '/stats');
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
@@ -104,7 +106,7 @@ export class LivestreamsServiceV2 {
     return json.data;
   }
 
-  async fetchByUsers(params: FetchByUsersParams): Promise<LivestreamV2[]> {
+  async fetchByUsers(params: FetchByUsersParams, options?: RequestOptions): Promise<LivestreamV2[]> {
     const schema = fetchByUsersSchema.safeParse(params);
 
     if (!schema.success) {
@@ -123,7 +125,7 @@ export class LivestreamsServiceV2 {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
