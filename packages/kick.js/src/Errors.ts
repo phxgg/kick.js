@@ -47,6 +47,20 @@ export class NoTokenSetError extends Error {
   }
 }
 
+export class UserTokenRequiredError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'UserTokenRequiredError';
+  }
+}
+
+export class AppTokenRequiredError extends Error {
+  constructor(message?: string) {
+    super(message);
+    this.name = 'AppTokenRequiredError';
+  }
+}
+
 export class MissingScopeError extends Error {
   constructor(message?: string) {
     super(message);

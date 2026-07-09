@@ -3,7 +3,6 @@ import EventEmitter from 'events';
 import { MissingScopeError, NoTokenSetError } from './Errors.js';
 import { eventManager } from './EventManager.js';
 import { AppToken, OAuth, Token } from './OAuth.js';
-import { User } from './resources/User.js';
 import { Scope } from './Scope.js';
 import { CategoriesService } from './services/CategoriesService.js';
 import { CategoriesServiceV2 } from './services/CategoriesServiceV2.js';
@@ -29,8 +28,8 @@ export interface KickClientOptions {
 }
 
 export class KickClient {
-  private me: User | null = null;
   private eventEmitter = new EventEmitter();
+  private registeredBroadcasterIds = new Set<string>();
 
   public token: Token | null = null;
   public appToken: AppToken | null = null;
@@ -68,26 +67,27 @@ export class KickClient {
 
   setToken(token: Token) {
     this.token = token;
-    // register event emitter in the global event manager
-    if (!this.me) {
-      this.users
-        .me()
-        .then((me) => {
-          this.me = me;
-          eventManager.register(this.me!.userId.toString(), this.eventEmitter);
-        })
-        .catch((err) => {
-          console.error('Failed to fetch authenticated user for KickClient:', err);
-        });
-    }
   }
 
   setAppToken(appToken: AppToken) {
     this.appToken = appToken;
   }
 
-  /** Access token to use for requests: prefers the user token, falls back to the app token. */
-  authToken(): string {
+  /**
+   * Access token to use for requests.
+   * @param tokenType Force 'user' or 'app'. Omit to prefer the user token, falling back to the app token.
+   */
+  authToken(tokenType?: 'user' | 'app'): string {
+    if (tokenType === 'user') {
+      if (!this.token) {
+        throw new NoTokenSetError('No user token set on KickClient.');
+      }
+      return this.token.access_token;
+    }
+    if (tokenType === 'app') {
+      return this.requireAppToken();
+    }
+
     const token = this.token?.access_token ?? this.appToken?.access_token;
     if (!token) {
       throw new NoTokenSetError('No user or app token set on KickClient.');
@@ -95,8 +95,13 @@ export class KickClient {
     return token;
   }
 
+  /** Whether `authToken(tokenType)` would resolve to the user token: forced via `tokenType`, or the default fallback when a user token is set. */
+  usingUserToken(tokenType?: 'user' | 'app'): boolean {
+    return tokenType === 'user' || (!tokenType && !!this.token);
+  }
+
   /** App token to use for endpoints that only accept app tokens (e.g. Drops), never a user token. */
-  requireAppToken(): string {
+  private requireAppToken(): string {
     if (!this.appToken) {
       throw new NoTokenSetError('No app token set on KickClient. This endpoint requires an app token.');
     }
@@ -104,9 +109,22 @@ export class KickClient {
   }
 
   destroy() {
-    if (this.me) {
-      eventManager.destroy(this.me.userId.toString());
+    for (const broadcasterUserId of this.registeredBroadcasterIds) {
+      eventManager.destroy(broadcasterUserId);
     }
+    this.registeredBroadcasterIds.clear();
+  }
+
+  /**
+   * Registers this client's emitter with the {@link EventManager} so that webhooks targeting
+   * `broadcasterUserId` are dispatched to `client.on(...)` listeners. Called by
+   * `EventsService.subscribe`/`subscribeMultiple` - works for both user and app access tokens,
+   * since subscriptions are always tied to an explicit (or resolved) broadcaster user id.
+   */
+  registerEventTarget(broadcasterUserId: string) {
+    if (this.registeredBroadcasterIds.has(broadcasterUserId)) return;
+    eventManager.register(broadcasterUserId, this.eventEmitter);
+    this.registeredBroadcasterIds.add(broadcasterUserId);
   }
 
   on<E extends WebhookEventNames>(event: E, listener: (payload: WebhookEventPayloadMap[E]) => void) {
@@ -125,7 +143,7 @@ export class KickClient {
     this.eventEmitter.removeAllListeners();
   }
 
-  requiresScope(scope: Scope) {
+  requiresUserScope(scope: Scope) {
     if (!this.token) {
       throw new NoTokenSetError('No user token set on KickClient.');
     }

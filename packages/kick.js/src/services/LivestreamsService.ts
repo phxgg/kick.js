@@ -2,6 +2,7 @@ import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { Livestream, type LivestreamDto, type LivestreamStatsDto } from '../resources/Livestream.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
 import { Version } from '../Version.js';
@@ -43,9 +44,10 @@ export class LivestreamsService {
    * @param params.language (Optional) Language code to filter by.
    * @param params.limit (Optional) Maximum number of results to return. Min: 1, Max: 100.
    * @param params.sort (Optional) Sort order.
+   * @param options (Optional) Request options.
    * @returns An array of `Livestream` instances.
    */
-  async fetch(params: FetchLivestreamsParams): Promise<Livestream[]> {
+  async fetch(params: FetchLivestreamsParams, options?: RequestOptions): Promise<Livestream[]> {
     const schema = fetchLivestreamsSchema.safeParse(params);
 
     if (!schema.success) {
@@ -85,7 +87,7 @@ export class LivestreamsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
@@ -98,12 +100,12 @@ export class LivestreamsService {
     return livestreams;
   }
 
-  async fetchStats(): Promise<{ total_count: number }> {
+  async fetchStats(options?: RequestOptions): Promise<{ total_count: number }> {
     const endpoint = new URL(this.LIVESTREAMS_URL + '/stats');
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 

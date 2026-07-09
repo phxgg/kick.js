@@ -2,6 +2,7 @@ import z from 'zod';
 
 import { BaseResponse, BaseResponseWithPagination } from '../BaseResponse.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { Category, CategoryDto } from '../resources/Category.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
 import { Version } from '../Version.js';
@@ -35,10 +36,11 @@ export class CategoriesServiceV2 {
    * @param params.name (Optional) Array of category names to filter by
    * @param params.tag (Optional) Array of tags to filter by
    * @param params.id (Optional) Single ID or array of IDs to filter by
+   * @param options (Optional) Request options
    * @returns An array of `Category` instances.
    * @throws An error if the request fails or if the parameters are invalid.
    */
-  async search(params: SearchCategoryParamsV2): Promise<Omit<Category, 'viewerCount'>[]> {
+  async search(params: SearchCategoryParamsV2, options?: RequestOptions): Promise<Omit<Category, 'viewerCount'>[]> {
     const schema = searchCategoryParamsV2Schema.safeParse(params);
 
     if (!schema.success) {
@@ -76,7 +78,7 @@ export class CategoriesServiceV2 {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken(options?.tokenType)}`,
       },
     });
 
@@ -93,11 +95,12 @@ export class CategoriesServiceV2 {
    * Get information about a specific category.
    *
    * @param id The ID of the category to fetch
+   * @param options (Optional) Request options
    * @returns A `Category` instance.
    * @throws An error if the category cannot be found.
    */
-  async fetch(id: number) {
-    const result = await this.search({ id, limit: 1 });
+  async fetch(id: number, options?: RequestOptions) {
+    const result = await this.search({ id, limit: 1 }, options);
     if (result.length === 0) {
       throw new Error(`Category with ID ${id} not found.`);
     }

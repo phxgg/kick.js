@@ -1,7 +1,9 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse.js';
+import { AppTokenRequiredError } from '../Errors.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { DropClaim, DropClaimDto } from '../resources/DropClaim.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
 import { Version } from '../Version.js';
@@ -53,9 +55,14 @@ export class DropsService {
    * Retrieve claims based on the provided parameters.
    * This method allows filtering by campaign ID, user ID, claim ID, external status, and supports pagination through limit and cursor.
    * @param params The parameters for retrieving claims.
+   * @param options (Optional) Request options.
    * @returns An array of `DropClaim` instances.
    */
-  async retrieve(params: RetrieveClaimsParams): Promise<DropClaim[]> {
+  async retrieve(params: RetrieveClaimsParams, options?: RequestOptions): Promise<DropClaim[]> {
+    if (options?.tokenType === 'user') {
+      throw new AppTokenRequiredError('Retrieving claims requires an app access token.');
+    }
+
     const schema = retrieveClaimsParamsSchema.safeParse(params);
 
     if (!schema.success) {
@@ -86,7 +93,7 @@ export class DropsService {
 
     const response = await fetch(endpoint, {
       headers: {
-        Authorization: `Bearer ${this.client.requireAppToken()}`,
+        Authorization: `Bearer ${this.client.authToken('app')}`,
       },
     });
 
@@ -103,11 +110,12 @@ export class DropsService {
    * Retrieve a single claim by its claim_id.
    *
    * @param claimId The ID of the claim to retrieve.
+   * @param options (Optional) Request options.
    * @returns A `DropClaim` instance.
    * @remarks This method is a convenience wrapper around the `retrieve` method.
    */
-  async fetch(claimId: string): Promise<DropClaim> {
-    const claims = await this.retrieve({ claim_id: claimId, limit: 1 });
+  async fetch(claimId: string, options?: RequestOptions): Promise<DropClaim> {
+    const claims = await this.retrieve({ claim_id: claimId, limit: 1 }, options);
     if (claims.length === 0) {
       throw new Error(`No claim found with claim_id: ${claimId}`);
     }
@@ -118,10 +126,18 @@ export class DropsService {
    * Update the external status of one or more claims.
    *
    * @param params The parameters for updating claims, including an array of claim updates.
+   * @param options (Optional) Request options.
    * @returns An array of objects containing the claim_id and the updated external_status for each claim.
    * @throws An error if the request fails or if the parameters are invalid.
    */
-  async update(params: UpdateClaimParams): Promise<Pick<DropClaimDto, 'claim_id' | 'external_status'>[]> {
+  async update(
+    params: UpdateClaimParams,
+    options?: RequestOptions
+  ): Promise<Pick<DropClaimDto, 'claim_id' | 'external_status'>[]> {
+    if (options?.tokenType === 'user') {
+      throw new AppTokenRequiredError('Updating claims requires an app access token.');
+    }
+
     const schema = updateClaimParamsSchema.safeParse(params);
 
     if (!schema.success) {
@@ -134,7 +150,7 @@ export class DropsService {
       method: 'PATCH',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${this.client.requireAppToken()}`,
+        Authorization: `Bearer ${this.client.authToken('app')}`,
       },
       body: JSON.stringify(schema.data),
     });
@@ -152,15 +168,20 @@ export class DropsService {
    *
    * @param claimId The ID of the claim to update.
    * @param externalStatus The new external status to set for the claim.
+   * @param options (Optional) Request options.
    * @returns An object containing the claim_id and the updated external_status.
    * @throws An error if the claim cannot be found or updated.
    * @remarks This method is a convenience wrapper around the `update` method for updating a single claim.
    */
   async updateOne(
     claimId: string,
-    externalStatus: string
+    externalStatus: string,
+    options?: RequestOptions
   ): Promise<Pick<DropClaimDto, 'claim_id' | 'external_status'>> {
-    const updatedClaims = await this.update({ claims: [{ claim_id: claimId, external_status: externalStatus }] });
+    const updatedClaims = await this.update(
+      { claims: [{ claim_id: claimId, external_status: externalStatus }] },
+      options
+    );
     return updatedClaims[0];
   }
 
@@ -169,13 +190,14 @@ export class DropsService {
    *
    * @param claimId The ID of the claim to update and fetch.
    * @param externalStatus The new external status to set for the claim.
+   * @param options (Optional) Request options
    * @returns A `DropClaim` instance representing the updated claim.
    * @throws An error if the claim cannot be found or updated.
    * @remarks This method first updates the claim's external status and then retrieves the updated claim from the API.
    * It is a convenience method that combines the functionality of `updateOne` and `fetch`.
    */
-  async updateOneAndFetch(claimId: string, externalStatus: string): Promise<DropClaim> {
-    const updatedClaim = await this.updateOne(claimId, externalStatus);
-    return this.fetch(updatedClaim.claim_id);
+  async updateOneAndFetch(claimId: string, externalStatus: string, options?: RequestOptions): Promise<DropClaim> {
+    const updatedClaim = await this.updateOne(claimId, externalStatus, options);
+    return this.fetch(updatedClaim.claim_id, options);
   }
 }

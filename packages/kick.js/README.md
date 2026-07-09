@@ -15,6 +15,7 @@ npm install @phxgg/kick.js
 
 - [Setup](#setup)
 - [OAuth](#oauth)
+- [Choosing a token per call](#choosing-a-token-per-call)
 - [Users](#users)
 - [Channels](#channels)
 - [Livestreams](#livestreams)
@@ -53,7 +54,7 @@ client.setToken({
 });
 ```
 
-After `setToken` is called, the client automatically fetches the authenticated user in the background and registers itself in the global event manager so that [webhook events](#webhooks) can be routed to it.
+The client registers itself in the global event manager when you subscribe to events (see [Event subscriptions](#event-subscriptions)), so that [webhook events](#webhooks) can be routed to it.
 
 ---
 
@@ -105,6 +106,21 @@ await client.oauth.revokeToken(token.access_token, TokenHintType.ACCESS_TOKEN);
 const info = await client.oauth.introspect();
 console.log(info.active, info.scope);
 ```
+
+---
+
+## Choosing a token per call
+
+Most read endpoints (channels, categories, livestreams, event subscriptions) accept either a user or an app token - by default kick.js prefers the user token and falls back to the app token if only one is set. Some endpoints are locked to one token type: writes like chat, moderation, channel rewards, and KICKs require a user token, while `dropsService` requires an app token.
+
+Pass `{ tokenType: 'user' | 'app' }` as the last argument to force a specific token for a single call, overriding the default:
+
+```ts
+// Force the app token for this call, even if a user token is also set
+const channel = await client.channels.fetchBySlug('monstercat', { tokenType: 'app' });
+```
+
+If the endpoint can't honor the requested (or default) token, it throws `UserTokenRequiredError` or `AppTokenRequiredError` - see [Error handling](#error-handling).
 
 ---
 
@@ -301,9 +317,9 @@ const leaderboard = await client.kicks.fetchLeaderboard({ top: 10 });
 
 ## Event subscriptions
 
-Required scope: `events:subscribe`
+Required scope: `events:subscribe` (user tokens only - app tokens aren't scoped)
 
-Subscribe your app to receive webhook events for a broadcaster.
+Subscribe your app to receive webhook events for a broadcaster. Both user and app tokens can subscribe: with a user token, `broadcasterUserId` is optional and defaults to the authenticated user; with an app token, `broadcasterUserId` is required, since an app token has no "self" to fall back to.
 
 ```ts
 import { WebhookEvents } from '@phxgg/kick.js';
@@ -366,7 +382,7 @@ res.sendStatus(200);
 
 ### Per-client listeners
 
-After calling `client.setToken()`, the client registers itself so that `dispatchWebhookEvent` can route events to the correct instance. Use `client.on()` to react to events:
+After calling `client.events.subscribe()`/`subscribeMultiple()`, the client registers itself for the target broadcaster so that `dispatchWebhookEvent` can route events to the correct instance. Use `client.on()` to react to events:
 
 ```ts
 import { WebhookEvents } from '@phxgg/kick.js';
@@ -450,7 +466,7 @@ res.sendStatus(200);
 
 ## Error handling
 
-All methods throw typed errors on non-2xx responses:
+All methods throw typed errors on non-2xx responses. Methods locked to one token type also throw before making a request if the required token isn't set or is explicitly overridden with the wrong `tokenType` (see [Choosing a token per call](#choosing-a-token-per-call)):
 
 ```ts
 import {
@@ -461,6 +477,8 @@ import {
   BadRequestError,
   MissingScopeError,
   NoTokenSetError,
+  UserTokenRequiredError,
+  AppTokenRequiredError,
 } from '@phxgg/kick.js';
 
 try {

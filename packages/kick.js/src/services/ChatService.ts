@@ -1,7 +1,9 @@
 import z from 'zod';
 
 import { BaseResponse } from '../BaseResponse.js';
+import { UserTokenRequiredError } from '../Errors.js';
 import type { KickClient } from '../KickClient.js';
+import { RequestOptions } from '../RequestOptions.js';
 import { Message, MessageDto } from '../resources/Message.js';
 import { Scope } from '../Scope.js';
 import { constructEndpoint, handleError, parseJSON } from '../utils.js';
@@ -36,7 +38,7 @@ export class ChatService {
    * Whereas when sending as a bot, the broadcaster_user_id is not required and is ignored.
    * As a bot, the message will always be sent to the channel attached to your token.
    *
-   * Required scopes:
+   * Required user scopes:
    * `chat:write`
    *
    * @param params The parameters for sending a message
@@ -46,8 +48,12 @@ export class ChatService {
    * @param params.type The type of message (user or bot)
    * @returns The sent `Message` instance.
    */
-  async send(params: SendMessageParams): Promise<Message> {
-    this.client.requiresScope(Scope.CHAT_WRITE);
+  async send(params: SendMessageParams, options?: RequestOptions): Promise<Message> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Sending chat messages requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.CHAT_WRITE);
 
     const schema = sendMessageSchema.safeParse(params);
 
@@ -61,7 +67,7 @@ export class ChatService {
     const response = await fetch(endpoint, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -84,21 +90,25 @@ export class ChatService {
   /**
    * Delete a chat message from a channel.
    *
-   * Required scopes:
+   * Required user scopes:
    * `moderation:chat_message:manage`
    *
    * @param messageId The ID of the message to delete
    * @returns void
    */
-  async delete(messageId: string): Promise<void> {
-    this.client.requiresScope(Scope.MODERATION_CHAT_MESSAGE_MANAGE);
+  async delete(messageId: string, options?: RequestOptions): Promise<void> {
+    if (!this.client.usingUserToken(options?.tokenType)) {
+      throw new UserTokenRequiredError('Deleting chat messages requires a user access token.');
+    }
+
+    this.client.requiresUserScope(Scope.MODERATION_CHAT_MESSAGE_MANAGE);
 
     const endpoint = new URL(`${this.CHAT_URL}/${messageId}`);
 
     const response = await fetch(endpoint, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${this.client.authToken()}`,
+        Authorization: `Bearer ${this.client.authToken('user')}`,
       },
     });
 
