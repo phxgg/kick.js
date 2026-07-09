@@ -4,7 +4,7 @@ import { WebhookEventNames } from './webhooks/WebhookEvents.js';
 
 class EventManager {
   private static instance: EventManager;
-  private clientsByUniqueId: Map<string, EventEmitter> = new Map();
+  private clientsByUniqueId: Map<string, Set<EventEmitter>> = new Map();
 
   private constructor() {}
 
@@ -16,27 +16,40 @@ class EventManager {
   }
 
   register(uniqueId: string, client: EventEmitter) {
-    this.clientsByUniqueId.set(uniqueId, client);
+    let clients = this.clientsByUniqueId.get(uniqueId);
+    if (!clients) {
+      clients = new Set();
+      this.clientsByUniqueId.set(uniqueId, clients);
+    }
+    clients.add(client);
   }
 
-  destroy(uniqueId: string) {
-    const client = this.clientsByUniqueId.get(uniqueId);
-    if (client) {
-      client.removeAllListeners();
+  /** Deregisters a single client's emitter from `uniqueId`, leaving any other clients registered for it untouched. */
+  destroy(uniqueId: string, client: EventEmitter) {
+    const clients = this.clientsByUniqueId.get(uniqueId);
+    if (!clients) return;
+
+    client.removeAllListeners();
+    clients.delete(client);
+    if (clients.size === 0) {
+      this.clientsByUniqueId.delete(uniqueId);
     }
-    this.clientsByUniqueId.delete(uniqueId);
   }
 
   destroyAll() {
-    for (const [uniqueId, client] of this.clientsByUniqueId) {
-      client.removeAllListeners();
+    for (const [uniqueId, clients] of this.clientsByUniqueId) {
+      for (const client of clients) {
+        client.removeAllListeners();
+      }
       this.clientsByUniqueId.delete(uniqueId);
     }
   }
 
   emit(uniqueId: string, event: WebhookEventNames, payload: any) {
-    const client = this.clientsByUniqueId.get(uniqueId);
-    if (client) {
+    const clients = this.clientsByUniqueId.get(uniqueId);
+    if (!clients) return;
+
+    for (const client of clients) {
       client.emit(event, payload);
     }
   }

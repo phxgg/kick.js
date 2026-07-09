@@ -110,7 +110,7 @@ export class KickClient {
 
   destroy() {
     for (const broadcasterUserId of this.registeredBroadcasterIds) {
-      eventManager.destroy(broadcasterUserId);
+      eventManager.destroy(broadcasterUserId, this.eventEmitter);
     }
     this.registeredBroadcasterIds.clear();
   }
