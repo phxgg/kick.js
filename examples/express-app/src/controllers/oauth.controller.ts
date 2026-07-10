@@ -9,6 +9,12 @@ import { type RevokeTokenSchema } from '@/validators/body/revoke-token.validator
 
 class OAuthController {
   async kickCallback(req: Request, res: Response) {
+    // Browser logins land here via a redirect and now have a session (see oauth.router.ts) -
+    // send them straight to the dashboard. API clients that explicitly ask for JSON get tokens back.
+    if (req.accepts(['html', 'json']) !== 'json') {
+      return res.redirect('/dashboard');
+    }
+
     const userId = req.user!._id.toString();
     const jtiAccess = ulid();
     const jtiRefresh = ulid();
