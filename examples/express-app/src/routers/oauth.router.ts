@@ -10,11 +10,14 @@ import { revokeTokenValidator, type RevokeTokenSchema } from '@/validators/body/
 export function createOAuthRouter() {
   const router = Router();
 
-  router.get('/kick', passport.authenticate('kick', { session: false }));
+  // in a real world express app that acts as an API server, you would likely
+  // not want to have a session-based login flow, and you would instead use
+  // router.get('/kick', passport.authenticate('kick', { session: false }));
+  router.get('/kick', passport.authenticate('kick'));
 
   router.get(
     '/kick/callback',
-    passport.authenticate('kick', { session: false }),
+    passport.authenticate('kick', { failureRedirect: '/' }), // same comment as above regarding session: false
     attachKickClientToReq,
     oauthController.kickCallback
   );
