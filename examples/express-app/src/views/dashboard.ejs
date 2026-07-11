@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard - Kick Bot Example</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <div class="topbar">
+      <form method="post" action="/logout">
+        <button class="btn secondary" type="submit">Log out</button>
+      </form>
+    </div>
+
+    <div class="container">
+      <div class="card profile">
+        <% if (user.image) { %>
+        <img src="<%= user.image %>" alt="" />
+        <% } %>
+        <div>
+          <h2><%= user.name || user.email %></h2>
+          <p>Kick user ID: <%= user.kickUserId %></p>
+          <p>Scopes: <%= scopes.length ? scopes.join(', ') : 'none' %></p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Chat auto-reply demo</h3>
+        <p>
+          Subscribes to <code>chat.message.sent</code> for your channel. Once subscribed, the bot replies
+          <code>pong!</code> whenever someone sends <code>!ping</code> in your chat.
+        </p>
+        <% if (chatSubscribed) { %>
+        <p class="empty">Already subscribed - see it in the table below.</p>
+        <% } else { %>
+        <form method="post" action="/dashboard/events/subscribe">
+          <button class="btn" type="submit">Subscribe to chat messages</button>
+        </form>
+        <% } %>
+      </div>
+
+      <div class="card">
+        <h3>Subscribed events</h3>
+        <% if (events.length === 0) { %>
+        <p class="empty">No active event subscriptions.</p>
+        <% } else { %>
+        <table>
+          <thead>
+            <tr>
+              <th>Event</th>
+              <th>Version</th>
+              <th>Method</th>
+              <th>Created</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% events.forEach(function(sub) { %>
+            <tr>
+              <td><%= sub.event %></td>
+              <td><%= sub.version %></td>
+              <td><%= sub.method %></td>
+              <td><%= sub.createdAt.toLocaleString() %></td>
+              <td>
+                <form method="post" action="/dashboard/events/<%= sub.id %>/unsubscribe">
+                  <button class="btn secondary" type="submit">Unsubscribe</button>
+                </form>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+        <% } %>
+      </div>
+    </div>
+  </body>
+</html>
