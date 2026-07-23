@@ -29,8 +29,8 @@
     "oxlint": "^1.74.0"
   },
   "allowScripts": {
-    "@swc/core@1.15.43": true,
     "esbuild@0.28.1": true,
-    "fsevents@2.3.3": true
+    "fsevents@2.3.3": true,
+    "@swc/core@1.15.46": true
   }
 }
