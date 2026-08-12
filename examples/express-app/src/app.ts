@@ -19,6 +19,7 @@ import { connectMongo, disconnectMongo } from '@/db.js';
 import { initCronJobs } from './cron-jobs.js';
 import { createOAuthRouter } from './routers/oauth.router.js';
 import { createTestRouter } from './routers/test.router.js';
+import { createWebRouter } from './routers/web.router.js';
 import { initKickPassportOAuthStrategy } from './strategies/kick.strategy.js';
 import { createWebhookRouter } from './webhooks/webhook.router.js';
 
@@ -97,10 +98,8 @@ app.use('/webhooks', createWebhookRouter()); // kick webhooks
 app.use('/oauth', createOAuthRouter());
 // Test route to verify auth and validation
 app.use('/test', createTestRouter());
-// Simple hello world route to test view engine
-app.get('/hello', (req, res) => {
-  res.render('hello', { message: 'Hello World!' });
-});
+// Example website: login page + dashboard
+app.use('/', createWebRouter());
 
 // Initialize in order
 (async () => {

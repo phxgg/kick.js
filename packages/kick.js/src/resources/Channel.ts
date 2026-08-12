@@ -5,6 +5,8 @@ import { Category, type CategoryDto } from './Category.js';
 import { Message } from './Message.js';
 
 export type ChannelDto = {
+  active_gifted_subscribers_count: number;
+  active_subscribers_count: number;
   banner_picture: string;
   broadcaster_user_id: number;
   category: CategoryDto;
@@ -33,6 +35,14 @@ export class Channel extends Serializable {
   ) {
     super();
     this.client = client;
+  }
+
+  get activeGiftedSubscribersCount(): number {
+    return this.dto.active_gifted_subscribers_count;
+  }
+
+  get activeSubscribersCount(): number {
+    return this.dto.active_subscribers_count;
   }
 
   get bannerPicture(): URL {
