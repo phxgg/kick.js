@@ -23,10 +23,10 @@
     "format": "oxfmt"
   },
   "devDependencies": {
-    "globals": "^17.9.0",
+    "globals": "^17.11.0",
     "jiti": "^2.7.0",
-    "oxfmt": "^0.63.0",
-    "oxlint": "^1.78.0",
+    "oxfmt": "^0.64.0",
+    "oxlint": "^1.79.0",
     "oxlint-tsgolint": "^7.0.2001"
   },
   "allowScripts": {
