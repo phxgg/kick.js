@@ -23,11 +23,11 @@
     "format": "oxfmt"
   },
   "devDependencies": {
-    "globals": "^17.13.0",
+    "globals": "^17.14.0",
     "jiti": "^2.7.0",
-    "oxfmt": "^0.74.0",
-    "oxlint": "^1.89.0",
-    "oxlint-tsgolint": "^7.0.2004"
+    "oxfmt": "^0.77.0",
+    "oxlint": "^1.92.0",
+    "oxlint-tsgolint": "^7.0.2006"
   },
   "allowScripts": {
     "esbuild@0.28.1": true,
